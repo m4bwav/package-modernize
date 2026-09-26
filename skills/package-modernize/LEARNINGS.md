@@ -279,3 +279,19 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: T-20260926-1 baseline runs; evals.json `baseline` fields of both cases
 - Scope: skill
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-035 · 2026-09-26 · A kickoff's claim about an error path is a hypothesis until the capture records it
+- Trigger: the stack-exchange-markdown-retriever kickoff (written from a reading of index.js) said an API `error_message` throws an uncaught exception that crashes the caller, and planned a named exception for its fix. The capture showed the throw sits inside the `try` around `JSON.parse`, so the callback gets `(null, Error)`; the same `try` also calls a callback that throws a second time, which nobody had noticed (2026-09-26).
+- Hypothesis: reading a small file for control flow misses which `try` encloses a throw; only running the published version against each error route shows where an exception lands.
+- Rule: for every error-path claim in a kickoff or survey, add a capture case that exercises it (an API error, a malformed body, a callback that throws) and write the plan's exceptions from the recording. A claimed exception that the capture refutes is dropped, not implemented; say so in the plan and the kickoff's corrections.
+- Evidence: stack-exchange-markdown-retriever test/golden/1.1.7.json cases "API error 400 (bad_parameter)", "callback that throws"; its survey note
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-036 · 2026-09-26 · Search old package.json scripts and published versions for tokens, not only config files
+- Trigger: the kickoff expected no secrets; `git log -p` showed `snyk auth <uuid>` in package.json's test script, removed in 2017, and `npm view PACKAGE@1.1.5 scripts` still shows it (masked as `***`) in two published versions (2026-09-26).
+- Hypothesis: the survey looked at dotfiles and workflows; 2016 to 2017 packages often put CLI logins straight into npm scripts, and the registry keeps every version's package.json.
+- Rule: grep history for `auth [0-9a-f]{8}-`, `_authToken` and `token`, and read `scripts` of every published version; a masked `***` in npm's output means a token was there. Name the provider for the maintainer to revoke; never copy the token into docs.
+- Evidence: stack-exchange-markdown-retriever commit ee6e4b0; references/npm.md Phase 0 "Leaked credentials" (C-20260926-10)
+- Scope: skill
+- Status: promoted (C-20260926-10) · helpful 1 · harmful 0 · last_confirmed 2026-09-26

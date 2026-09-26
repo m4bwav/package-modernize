@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-10 · 2026-09-26 · Fixed-host capture recipe, fixture server under the untouched check, token search in scripts and old versions, four traps
+- because: L-035, L-036; the stack-exchange-markdown-retriever run (first use of check-golden-untouched.sh, watch-run.sh and check-workflow-shell.py)
+- files: scripts/check-golden-untouched.sh (checks `fixture-server*` too), scripts/README.md, references/npm.md (Phase 0: fixed-host HTTPS capture through a CONNECT proxy, error-path claims read from the capture, leaked credentials in npm scripts and old versions; Traps: `npx --no -- <bin>`, `node --import` with a file URL, DecompressionStream differences per Node line, a hanging golden case on its own fixture server), LEARNINGS.md (L-035, L-036)
+- check-golden-untouched.sh let the fixture server change although its routes define what each recorded case means; it now checks it (passes on is-an-image-url and stack-exchange-markdown-retriever). watch-run.sh and check-workflow-shell.py worked as documented on first use.
+
 ### C-20260926-9 · 2026-09-26 · The survey lists every action pin with its runtime
 - because: R-20260926-1 (GitHub stopped running node20 actions on 2026-09-23)
 - files: scripts/survey-github.sh (section "Action pins in the default branch's workflows"), scripts/README.md, SKILL.md ("What every run does the same way": Survey), references/nuget.md (Phase 2: NuGet/login v1.2.0 runtime)
