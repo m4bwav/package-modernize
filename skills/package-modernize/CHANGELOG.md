@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-5 · 2026-09-26 · Shell inside workflows checked by shellcheck, not only actionlint
+- because: L-030
+- files: scripts/check-workflow-shell.py (new), scripts/README.md, SKILL.md (Phases row 2), references/npm.md (Traps: actionlint), LEARNINGS.md (L-030)
+- A truncated test line in is-an-image-url's verify workflow passed actionlint (no shellcheck installed) and failed the Bun job of the beta's verification; the new script runs shellcheck on each run block and catches it.
+
 ### C-20260926-4 · 2026-09-26 · Changelog heading and a lint pass before the first tag; the maintainer wants commands run, not handed over
 - because: L-029, L-028 (updated)
 - files: references/npm.md (Phase 5 and 6: "Before the first tag", Rehearsal), LEARNINGS.md (L-028, L-029)

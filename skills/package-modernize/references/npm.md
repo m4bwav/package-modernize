@@ -113,7 +113,7 @@ HANDOFF.md rewritten around standing work (Dependabot merges when `ci` is green,
 - `xo --fix` removes `| null` from public types, rewrites `http://` to `https://` inside comments, capitalises package names that start a comment, and rewrites strings as `String.raw` (which cannot end in a backslash); stage first and read `git diff src/` (L-025, 2026-09-26).
 - `import-x/order` reads a local `const require = createRequire(...)` followed by `require(...)` calls after a blank line as a second import group; name the variable `load` (2026-09-26).
 - Portable Node lines without nvm: `npx -y -p node@20 node --test <files>` runs the built suites on Node 20 (and 22, 26); pass `--test-reporter=spec` so every line prints the `ℹ pass` summary (2026-09-26).
-- actionlint is not on npm: `gh release download -R rhysd/actionlint -p '*windows_amd64.zip'` into the scratchpad, unzip, and run it from the repository root (1.7.12, 2026-09-26).
+- actionlint is not on npm: `gh release download -R rhysd/actionlint -p '*windows_amd64.zip'` into the scratchpad, unzip, and run it from the repository root (1.7.12, 2026-09-26). Without shellcheck on PATH it checks no shell at all: run `python scripts/check-workflow-shell.py REPO` too (L-030; a truncated `[ "$answer" = "true"` in verify-published.yml passed actionlint and failed the Bun job after the beta was live).
 
 ## Reference runs
 

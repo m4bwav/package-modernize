@@ -239,3 +239,11 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: is-an-image-url release runs 36247863837 (no section), 36247959799 (xo), 36248115597 (staged); C-20260926-4
 - Scope: skill
 - Status: promoted (C-20260926-4) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-030 · 2026-09-26 · actionlint without shellcheck checks no shell; a truncated test line reached a live verify run
+- Trigger: is-an-image-url's verify-published.yml had `[ "$answer" = "true"` with no closing bracket in the Bun job (a Phase 2 edit cut the line); actionlint 1.7.12 passed it because shellcheck was not installed, `bash -n` passes it too (`[` is a command), and it failed only in verify run 36249319506 after 2.0.0-beta.3 was approved. Re-run 36249497972 green after the fix (2026-09-26).
+- Hypothesis: "actionlint clean" was taken to cover the shell inside `run:` blocks; it silently skips that without shellcheck.
+- Rule: run `scripts/check-workflow-shell.py` (shellcheck at error level per block, through `uvx --from shellcheck-py` when not on PATH; dedents the YAML block first) with actionlint on every workflow change, and verify a checker catches a planted bug before trusting its pass.
+- Evidence: is-an-image-url commit "verify-published: close the Bun CLI test bracket"; the script flags the pre-fix file and passes both templates and five repositories; C-20260926-5
+- Scope: skill
+- Status: promoted (C-20260926-5) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
