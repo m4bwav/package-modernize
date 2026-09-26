@@ -1,0 +1,19 @@
+# Agent rules for package-modernize
+
+Read [README.md](README.md) first. The skill is [skills/package-modernize/SKILL.md](skills/package-modernize/SKILL.md); its evidence, changes, lessons and tests are the evergreen companions beside it (RESEARCH, CHANGELOG, LEARNINGS, TESTS, evals).
+
+- **This repository is public.** Nothing in it names a person's private packages, accounts, machines, hosts, tokens or decisions. Templates carry `{{PLACEHOLDER}}` tokens and `TEMPLATE:` blocks; the maintainer's own values live in a private overlay the skill reads at run time (`PACKAGE_MODERNIZE_OVERLAY` or `~/.package-modernize/OVERLAY.md`), never here. Before committing, grep for owner names, registry user names, local paths and email addresses.
+- Evergreen unit in pointer mode: before editing the skill read `skills/package-modernize/evergreen.json`; if `next_due` has passed or `contradiction` is set, say so and refresh after the task (`evergreen-refresh`); if `tests.failing` is non-empty, run `evergreen-tune` after the task. Every edit to SKILL.md or a reference gets a `C-` entry in its CHANGELOG.md citing an `R-`, `L-` or `T-` id or "user request", and a description edit re-runs the trigger cases.
+- Registry facts (trusted publishing, staging, provenance, deprecation, audit tools, supported versions) carry the date they were checked, in the reference file and in RESEARCH.md. Re-verify any older than three months before a run relies on it. Coverage words are exact: "complete" means finished runs, "from N runs plus docs" means partly, "docs only" means unverified until a run uses it.
+- Templates come from finished runs, not from memory. When a run changes a template, the change lands here with the run's date and the reason, and `templates/README.md` names the run.
+- Scripts stay dependency-free: bash for Git Bash and POSIX shells, Node 20 or later for the `.mjs` files, no npm installs, no writes to a registry.
+- No AI attribution in commits, pull requests or files.
+
+## everlast (session knowledge, load on demand)
+
+- `ai-docs/INDEX.md` lists what past sessions learned here (solutions with verified commands, decisions with reasons, plans). At the start of a task, scan it and open only the entries whose title or tags match; no line matches: `everlast.py search "<key terms>"` before concluding nothing was recorded. Read `ai-docs/HANDOFF.md` when continuing unfinished work (everlast-resume skill).
+- Before acting on an entry marked `(recheck due)`, run `everlast.py recheck <entry>`, re-run its Verified-by command only when that is read-only or safe (a build, a test, a version query), then record `everlast.py verify <entry>` or `verify <entry> --failed "what broke"`; a fix that changed is superseded, never reused blindly.
+- Before finishing a task that hit a dead end, verified a non-obvious command, made a design choice, or taught you something about the user, record it (everlast-capture skill, or `everlast.py note` / `handoff`); rewrite `HANDOFF.md` when work is left unfinished. Say "nothing to record" when that is true.
+- Anything naming a person, an internal host or name, a credential, or an opinion about people goes to the private sidecar (`--private`), never here. Lessons about the user or this machine go to the user tier (`--user`).
+- Rules go in this file, system layout in CODEMAP.md; the doc set holds only what could not be re-derived from the code in a minute.
+- Link documents together with relative markdown links: every markdown folder is reachable from an index whose lines say when to read each file (`ai-docs/INDEX.md` is generated from frontmatter; give entries a one-line `summary`), and an entry links the entries it relates to on a typed `Related:` line (`supersedes`, `contradicts`, `builds on`, `see also`). The set then reads as a graph for people in Obsidian and for agents alike. No wikilinks in the repo.

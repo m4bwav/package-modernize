@@ -1,0 +1,15 @@
+# Changelog: package-modernize
+
+Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with the reason. Reasons cite findings in [RESEARCH.md](RESEARCH.md) (`R-`), lessons in [LEARNINGS.md](LEARNINGS.md) (`L-`), and test runs in [TESTS.md](TESTS.md) (`T-`). State in `evergreen.json`. Protocol: [MAINTENANCE.md](MAINTENANCE.md).
+
+Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
+
+### C-20260925-2 · 2026-09-25 · First test pass: description tuned for plan and decisions-table asks, overlay read by path, action evidence trace-only
+- because: T-20260925-1, L-013
+- files: SKILL.md (frontmatter description: shortened from 1700 to about 1250 characters so the roster shows the trigger phrases, plus "asks for a modernization plan, survey or decisions table for a package"; Step 0: read the overlay with the Read tool at its full path), evals/evals.json (action-1 evidence is the survey script call only, baselines recorded; outcome-1 prompt phrased as a maintainer would), evals/run-headless.mjs (new harness), TESTS.md
+- The outcome case never invoked the skill on "write only the decisions table" (undertrigger, 0 of 3), and the action case passed without the skill on a file-exists check; after the edits the suite is 8/8.
+
+### C-20260925-1 · 2026-09-25 · Created as an evergreen unit from the npm playbook, two NuGet runs and today's registry research
+- because: user request (the kickoff prompt of 2026-09-25), R-20260925-1 to R-20260925-5, L-001 to L-012
+- files: SKILL.md (all sections), references/ (npm, nuget, pypi, crates, maven, go, plan-skeleton), scripts/ (survey-npm, survey-nuget, survey-github, golden-capture templates, check-line-endings), templates/npm and templates/nuget, prompts/ (kickoff-skeleton, review-subagent), RESEARCH.md, LEARNINGS.md, TESTS.md, evals/evals.json, evergreen.json
+- Initial version. Eight phases the same for every system, with exit criteria and stops; shared checklists written once; a per-system table; npm complete from two runs, NuGet from two runs plus docs, four systems documented and marked unverified. Tier `fast`, interval 14 days. The private overlay mechanism (`PACKAGE_MODERNIZE_OVERLAY` or `~/.package-modernize/OVERLAY.md`) keeps the maintainer's identities and decisions out of the public skill. The npm templates come from seeded-random-utilities and get-title-at-url with placeholders; the NuGet release, verify and CI workflows are new (pinned actions, tag check before packing, attestation, environment gate) and marked unverified until a run uses them.

@@ -1,0 +1,77 @@
+{
+  "skill": "package-modernize",
+  "_format": "skill-creator evals.json plus evergreen fields (kind, decoy, evidence, baseline); extra fields are ignored by skill-creator's runner. Rules: protocol/TESTING.md. Harness on this machine: evals/run-headless.mjs (claude -p with stream-json).",
+  "evals": [
+    {
+      "id": "trigger-1",
+      "kind": "trigger",
+      "prompt": "Update my old npm package replace-string-at-position. It's from 2016, nobody has touched it since, and I want a proper modern release of it.",
+      "expectations": ["the package-modernize skill is invoked"],
+      "runs": 3
+    },
+    {
+      "id": "trigger-2",
+      "kind": "trigger",
+      "prompt": "modernize my NuGet library JsonPrettyPrinter the way we did the npm ones",
+      "expectations": ["the package-modernize skill is invoked"],
+      "runs": 3
+    },
+    {
+      "id": "trigger-3",
+      "kind": "trigger",
+      "prompt": "Time for the next package: is-an-image-url. Run the playbook on it.",
+      "expectations": ["the package-modernize skill is invoked"],
+      "runs": 3
+    },
+    {
+      "id": "decoy-1",
+      "kind": "trigger",
+      "decoy": true,
+      "prompt": "Add a feature to this app: a dark mode toggle in the settings page that remembers the choice.",
+      "expectations": ["the package-modernize skill is not invoked"],
+      "runs": 3
+    },
+    {
+      "id": "decoy-2",
+      "kind": "trigger",
+      "decoy": true,
+      "prompt": "Publish this package once to npm; it's already current, I just bumped the patch version and want it out.",
+      "expectations": ["the package-modernize skill is not invoked"],
+      "runs": 3
+    },
+    {
+      "id": "decoy-3",
+      "kind": "trigger",
+      "decoy": true,
+      "prompt": "Bump the dependencies in this repo to their latest versions and fix whatever breaks.",
+      "expectations": ["the package-modernize skill is not invoked"],
+      "runs": 3
+    },
+    {
+      "id": "action-1",
+      "kind": "action",
+      "prompt": "Survey the npm package replace-string-at-position (GitHub m4bwav/replace-string-at-position) before we plan its modernization. Read-only: do not clone or change anything. Save the survey report as survey.txt in the current directory.",
+      "expectations": ["the action happened, proven by the evidence below, not by the reply saying so"],
+      "evidence": {
+        "type": "trace",
+        "tool": "Bash",
+        "input_match": "survey-npm\\.sh|survey-github\\.sh"
+      },
+      "baseline": "2026-09-25, skill absent: the session wrote survey.txt from ad hoc gh api and curl calls in 155 s, so a file-exists check passed without the skill; the evidence is now the survey script call in the trace only",
+      "runs": 3
+    },
+    {
+      "id": "outcome-1",
+      "kind": "outcome",
+      "prompt": "Write the modernization plan's decisions table for my old npm package replace-string-at-position (just the table, into decisions.md in the current directory; the rest of the plan comes later). Facts: version 1.0.4 published 2016-05-22, about 19 downloads a month, one function `replaceStringAtPosition(originalString, sourceString, newString, position)` exported with `module.exports = function`, no runtime dependencies, an unregistered cli.js in the tarball, 0 issues, 0 open pull requests, 0 Dependabot alerts, two Snyk webhooks and a Travis webhook, one dependent (markdown-plain-link-replacer ^1.0.4). Do not survey, clone or run anything; just the table.",
+      "files": [],
+      "expectations": [
+        "decisions.md exists and contains a markdown table whose header has the columns #, Question, Recommendation, Why, Alternative (regex: \\| *# *\\| *Question *\\| *Recommendation *\\| *Why *\\| *Alternative *\\|)",
+        "the table has a row on the export shape (plain require() staying callable) and a row on whether a major is warranted (regex: require|major)",
+        "every row gives a recommendation first, then the reason, then an alternative (judge)"
+      ],
+      "baseline": "2026-09-25, skill absent: a table was written in 36 s but without the #, Question, Recommendation, Why, Alternative header, so the case fails without the skill",
+      "runs": 3
+    }
+  ]
+}

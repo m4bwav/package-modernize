@@ -1,0 +1,144 @@
+# TEMPLATE (package-modernize), unverified by a run as of 2026-09-25 (the two NuGet runs published from a job inside ci.yml).
+# A tag v<version>, pushed only after master is green, builds, tests and packs the package, then a second job waits at the
+# `nuget` GitHub environment (required reviewer: the maintainer) before it attests the nupkg, trades the job's OIDC token
+# for a one-hour nuget.org key through Trusted Publishing and pushes. nuget.org has no staging, so the environment approval
+# is the gate: nothing is on the registry before the maintainer clicks Review deployments on the run, and nothing can be
+# deleted afterwards (only unlisted). The nuget.org policy names this file, release.yml, and the environment `nuget`;
+# renaming either breaks publishing. NUGET_USER is the nuget.org profile name (not the email), stored on the environment.
+# Replace {{PROJECT}} and {{PACKAGE_ID}}.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: build, test and pack the release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      # Before anything is built: the tag must equal <Version> in the csproj, the one place the version lives.
+      - name: The tag must equal the csproj version
+        id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' {{PROJECT}}/{{PROJECT}}.csproj)
+          if [ "v$version" != "$TAG" ]; then
+            echo "::error::tag $TAG does not match <Version>$version</Version> in {{PROJECT}}/{{PROJECT}}.csproj"
+            exit 1
+          fi
+          if [[ "$version" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Release notes from the changelog
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          section() {
+            awk -v heading="## [$1]" '
+              /^## / { if (found) exit; found = (index($0, heading) == 1); next }
+              found { print }
+            ' CHANGELOG.md
+          }
+          notes=$(section "$VERSION")
+          # A prerelease takes the section of the release it leads to: 2.0.0-beta.1 uses 2.0.0.
+          if [ -z "$notes" ] && [[ "$VERSION" == *-* ]]; then
+            notes=$(section "${VERSION%%-*}")
+          fi
+          if [ -z "$notes" ]; then
+            echo "::error::CHANGELOG.md has no section for $VERSION"
+            exit 1
+          fi
+          if [[ "$VERSION" != *-* ]] && ! grep -Eq "^## \[${VERSION//./\\.}\] - [0-9]{4}-[0-9]{2}-[0-9]{2}" CHANGELOG.md; then
+            echo "::error::the CHANGELOG.md heading for $VERSION has no date"
+            exit 1
+          fi
+          printf '%s\n' "$notes" > release-notes.md
+      - run: dotnet restore --locked-mode
+      - run: dotnet format --no-restore --verify-no-changes
+      - run: dotnet build --no-restore -c Release
+      - run: dotnet test --no-build -c Release -f net10.0
+      - name: Pack with package validation
+        run: dotnet pack {{PROJECT}} --no-build -c Release -o artifacts -p:ContinuousIntegrationBuild=true
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+            release-notes.md
+          if-no-files-found: error
+
+  publish:
+    name: push to nuget.org and create the GitHub Release
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    # The gate: this environment has a required reviewer and a `v*` tag rule. The job waits here for the approval.
+    environment: nuget
+    # The only job with write permissions, and it runs no project code: it pushes the package the build job tested.
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release
+      # No checkout in this job, so global.json is not available; pin the SDK line instead.
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      # The attestation covers the nupkg as built; nuget.org adds its repository signature after upload, so the file
+      # downloaded from the registry has a different hash. Verify with `gh attestation verify` on this run's artifact.
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4
+        with:
+          subject-path: artifacts/*.nupkg
+      - name: NuGet login (OIDC to a one-hour API key)
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+      - name: Push the package and its symbols
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: GitHub Release with the changelog section
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          PRERELEASE: ${{ needs.build.outputs.prerelease }}
+        run: |
+          flags=()
+          if [ "$PRERELEASE" = true ]; then
+            flags+=(--prerelease)
+          fi
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "$TAG" --notes-file release-notes.md "${flags[@]}" artifacts/*.nupkg artifacts/*.snupkg

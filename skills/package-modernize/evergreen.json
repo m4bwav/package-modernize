@@ -1,0 +1,55 @@
+{
+  "evergreen": "1.0",
+  "name": "package-modernize",
+  "kind": "skill",
+  "main": "SKILL.md",
+  "files": {
+    "research": "RESEARCH.md",
+    "changelog": "CHANGELOG.md",
+    "learnings": "LEARNINGS.md",
+    "tests": "TESTS.md"
+  },
+  "protocol": "plugin",
+  "source": null,
+  "topic": "modernizing and re-releasing old published libraries: npm, NuGet, PyPI, crates.io, Maven Central and Go registry mechanics (trusted publishing, staged or gated publishing, provenance, deprecation, audit tooling), TypeScript and .NET library packaging defaults, and how AI agents modernize legacy libraries safely",
+  "tier": "fast",
+  "interval_days": 14,
+  "last_checked": "2026-09-25",
+  "next_due": "2026-10-09",
+  "verify_at_use": false,
+  "volatile_claims": [],
+  "contradiction": null,
+  "events": [],
+  "streak": {
+    "quiet": 0,
+    "pinned_min": 0,
+    "pinned_max": 0,
+    "vau_quiet": 0
+  },
+  "history": [
+    {
+      "date": "2026-09-25",
+      "m": null,
+      "interval_after": 14,
+      "note": "created"
+    }
+  ],
+  "counts": {
+    "learnings": 13,
+    "changes": 2,
+    "research": 5,
+    "tests": 1
+  },
+  "consolidate_every": 25,
+  "tests": {
+    "last_run": "2026-09-25T22:00",
+    "harness": "claude -p stream-json (evals/run-headless.mjs)",
+    "env": "DESKTOP-7KS2S6E, Windows 11, Claude Code 2.1.281",
+    "cases": 8,
+    "passed": 8,
+    "failed": 0,
+    "failing": [],
+    "last_failure": null,
+    "research_after_days": null
+  }
+}

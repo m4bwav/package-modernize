@@ -1,0 +1,95 @@
+# NuGet: how each phase is done
+
+Coverage: **from two runs plus current docs**. The runs: DotNetJsonPrettyPrinter (package JsonPrettyPrinter, .NET 3.5 to netstandard2.0 and net10.0, versions 2.0.0, 2.1.1 and 3.0.1) and DotNetRandomNameGenerator (RandomNameGeneratorLibrary, project.json to the same targets, 2.0.0, 2.0.1 and 2.1.0), both on 2026-09-24 and 25, published through nuget.org Trusted Publishing from a GitHub environment. They walked the phases loosely (no golden capture, no separate release workflow, no verify workflow, no independent review, tags pushed before CI was green twice), so this file says what the runs did and what the skill does instead. Registry facts were checked against learn.microsoft.com, github.com/NuGet and GitHub Docs on 2026-09-25 (RESEARCH.md has the sources); items marked *unverified* have no run behind them yet. The phase list and shared rules are in [../SKILL.md](../SKILL.md).
+
+## Phase 0: survey and baseline
+
+- `scripts/survey-nuget.sh PACKAGE_ID [OWNER/REPO]`: versions from the flat container (listed and unlisted), the search entry (total downloads, verified prefix, owners, deprecation, vulnerabilities), the registration index (per-version `listed`, published date, deprecation, dependency groups by target framework), the nupkg's file list and nuspec, then the GitHub side.
+- In the clone: every `.csproj`, `.sln` or `.slnx`, `Directory.Build.props`, `.nuspec`, `packages.config`, `project.json`, `global.json`, the tests, the README, every dotfile. Old projects often carry a checked-in `packages/` folder or a `.nuspec` beside the csproj.
+- Baseline: `dotnet --list-sdks`, then `dotnet restore`, `build`, `test` as they are. A .NET Framework 3.5 or 4.0 project, or a project.json one, will not build on a machine with only the .NET 10 SDK; record that as a fact and use the old test files as the behaviour record. `dotnet list package --outdated --include-transitive` and `dotnet list package --vulnerable --include-transitive` (`dotnet package list` from .NET 10) on the old project if it restores.
+- Golden capture (*unverified*: neither run did it, and both changed observable output without a fixture guarding it: JPP 2.0.0 rewrote its expectation file to System.Text.Json's output, RNG 2.1.0 changed seeded name output). Copy `scripts/golden-capture-nuget.template.cs` into a scratch console project that references the published old version (`dotnet add package ID --version OLD`), fill in every public method with normal, edge and odd inputs (null, empty, whitespace, invalid input, culture-sensitive values under two cultures), run, commit the JSON and the program under `tests/Golden/`. A `PackageValidationBaselineVersion` pointing at the published version covers the API shape, not the behaviour.
+- Dead services on .NET repos: AppVeyor (`appveyor.yml`, badge), Travis, MyGet feeds, Coveralls, codecov, NuGet badges from dead hosts; the VS `.gitignore` template's `[Ll]og/` line, which swallows `ai-docs/log/`.
+
+## Phase 1: plan defaults
+
+| Question | Default | Note |
+|---|---|---|
+| Target frameworks | `netstandard2.0;net8.0;net10.0` for a library; the runs used `netstandard2.0;net10.0` | Library guidance (2026-04-13): start with net8.0 or later, add netstandard2.0 for .NET Framework reach, avoid netstandard1.x. .NET 8 and 9 leave support on 2026-11-10; .NET 10 LTS to 2028-11-14. Tests target `net10.0;net48` (net48 exercises the netstandard2.0 build, Windows only). |
+| SDK | `global.json` `10.0.100` with `rollForward: latestFeature`; SDK 10.0.401 current on 2026-09-25 | The docs pair lock files with `rollForward: disable`; the runs used `latestFeature` and hit lock-file mismatches for other reasons (below). Choose and say why. |
+| Language | `LangVersion latest`, `Nullable enable`, `ImplicitUsings disable`, `GenerateDocumentationFile true` | netstandard2.0 needs polyfills (`IsExternalInit.cs`; no `ArgumentNullException.ThrowIfNull`, `HashCode`); guard net5+ APIs with `#if`. |
+| Warnings and analyzers | `TreatWarningsAsErrors true`, `EnableNETAnalyzers true`, `AnalysisLevel latest-recommended`, `EnforceCodeStyleInBuild true`, `dotnet format --verify-no-changes` in CI | `.editorconfig` with `end_of_line = lf` and `.gitattributes` `* text=auto eol=lf`, or format disagrees across OSes. |
+| Dependency audit | NuGetAudit on (default since SDK 8); `NuGetAuditMode all` (default for net10.0); with `TreatWarningsAsErrors`, `WarningsNotAsErrors` for NU1901 to NU1904 so a future advisory in a dev tool does not block every build, and a dedicated `dotnet restore -p:AuditPipeline=true` step that does fail on them | The documented pattern: `NuGetAuditCodes` plus conditional `WarningsAsErrors` / `WarningsNotAsErrors`. `PrunePackageReference` is on for net10.0 and removes framework packages from the graph. |
+| Lock files | `RestorePackagesWithLockFile true` in `Directory.Build.props`, `dotnet restore --locked-mode` in CI, `setup-dotnet` cache keyed on `**/packages.lock.json` | A locked-mode lock file for a multi-OS matrix must not depend on anything the SDK infers per OS: reference `Microsoft.NETFramework.ReferenceAssemblies` explicitly with `PrivateAssets="all"`, and pin `RuntimeIdentifier win-x86` plus `SelfContained false` on a net48 test exe. The benchmark project needs a lock file too. |
+| Package metadata | `PackageId`, `Version` (hand-edited, the one place the version lives), `Authors`, `Copyright`, `Description`, `PackageTags`, `PackageProjectUrl`, `RepositoryUrl`, `RepositoryType git`, `PackageLicenseExpression MIT`, `PackageReadmeFile README.md`, `PackageIcon icon.png` (128 by 128 PNG under 1 MB), `PackageReleaseNotes` pointing at the changelog | `PackageLicenseUrl` and `PackageIconUrl` are deprecated. A README fix needs a new version. |
+| Source Link, symbols, determinism | `PublishRepositoryUrl true`, `EmbedUntrackedSources true`, `IncludeSymbols true` with `SymbolPackageFormat snupkg`, `Deterministic true`, `ContinuousIntegrationBuild true` when `GITHUB_ACTIONS` is `true`; `fetch-depth: 0` on checkout | Source Link is built into SDK 8+ for GitHub; no `Microsoft.SourceLink.*` package. Pushing the nupkg with the snupkg beside it pushes both. |
+| API compatibility | `EnablePackageValidation true` with `PackageValidationBaselineVersion` = the last published stable; a breaking major removes the baseline for that release and sets it to the new version once published | Intentional breaks: `dotnet pack -p:GenerateCompatibilitySuppressionFile=true`, commit `CompatibilitySuppressions.xml`, delete after the release. Additive changes only in a minor: adding members to a public interface breaks implementers and mocks. |
+| Trim and AOT | `IsAotCompatible true` for targets compatible with net8.0 (sets `IsTrimmable` and the analyzers) | Reflection-based System.Text.Json paths carry `RequiresUnreferencedCode` and `RequiresDynamicCode` under `#if NET5_0_OR_GREATER`, with a `JsonTypeInfo<T>` overload beside them. |
+| Tests | NUnit 4 with `Microsoft.NET.Test.Sdk` and coverlet (JPP), or xunit.v3 on Microsoft.Testing.Platform (RNG; needs `OutputType Exe`, `global.json` `test.runner`, `dotnet test --coverage`); golden tests against the captured JSON; resource-integrity tests for embedded data | Both frameworks ran fine; pick one and say why. |
+| Benchmarks | A BenchmarkDotNet project (not packed, analyzers off) when the change touches a hot path; before and after numbers in the changelog | Optional. |
+| Versioning and release | Version in the csproj, tag `v<version>` must equal it (checked before packing), tag only after `master` is green, `release.yml` builds, tests, packs, attests and pushes from a job gated by the `nuget` environment | MinVer and GitVersion rejected in the runs to keep one source of truth. |
+| Dependabot | `nuget`, `github-actions` and `dotnet-sdk` (updates `global.json`) weekly; test packages grouped | |
+| Solution format | `.slnx` (the default of `dotnet new sln` from .NET 10; `dotnet sln x.sln migrate`) | |
+| Default branch | Keep `master` | |
+
+## Phase 2: rewrite
+
+- Branch `v<major>`. Remove the old csproj or project.json, `.nuspec`, `packages/`, `packages.config`, AppVeyor and Travis files; add the templates from `templates/nuget/` (`Library.csproj.template`, `Directory.Build.props`, `global.json`, `.editorconfig`, `.gitattributes`, `.gitignore`, workflows, Dependabot, `CLAUDE.md`, Copilot pointer) and write AGENTS.md, SECURITY.md, README (badges: NuGet version, downloads, CI), CHANGELOG (Keep a Changelog; the first paragraph of the new major states the compatibility promise and every exception).
+- Golden test first against the capture; then the source, the rest of the tests, the docs.
+- Verify locally: `dotnet restore --locked-mode`, `dotnet format --verify-no-changes`, `dotnet build -c Release`, `dotnet test -c Release` (net10.0 and net48), `dotnet pack -c Release -o artifacts` (package validation runs here), and a scratch console project that references the packed nupkg from `artifacts/` as a local source. Push, open the pull request with a "For review" list.
+
+## Phase 3: review
+
+`prompts/review-subagent.md` with the NuGet substitutions: compare against the published old package in a scratch project, fuzz odd inputs, check the public API surface (package validation output, or `PublicAPI.Shipped.txt` from `Microsoft.CodeAnalysis.PublicApiAnalyzers` if the package adopts it), culture and encoding behaviour, thread safety of lazily loaded data.
+
+## Phase 4: CI, settings, merge, cleanup
+
+- `ci.yml` (build, format check, test on Ubuntu and Windows, pack on Linux, artifacts kept) and `release.yml`, `verify-published.yml`, `dependabot.yml` from the templates. Pin actions to commit SHAs (the runs used major tags: `actions/checkout@v7`, `actions/setup-dotnet@v6`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`, `NuGet/login@v1`, `softprops/action-gh-release@v3`); `permissions: contents: read` at the top; `persist-credentials: false`; actionlint clean.
+- Ruleset on `master` (deletion and non-fast-forward blocked, required check `ci`, admin bypass); squash-merge after the maintainer's review.
+- GitHub environment `nuget`: required reviewer (the maintainer), deployment branch and tag rule `v*`, secret `NUGET_USER` = the nuget.org profile name (not the email). This is the human gate, because nuget.org has no staging.
+- Cleanup as for npm: webhooks, old bot pull requests closed with one comment naming the merge commit, issues answered with the accurate history, `gh repo edit`, secret scanning and push protection, private vulnerability reporting, workflow permissions read.
+
+## Phase 5 and 6: release rehearsal, release, verification
+
+- Trusted Publishing policy, once, by the maintainer on nuget.org (user menu, Trusted Publishing, add policy): Repository Owner `OWNER`, Repository `REPO`, Workflow File `release.yml` (file name only), Environment `nuget`, scope "push only new package versions" with the glob set to the package id. The policy is temporarily active for seven days until the first publish binds GitHub's repository ids to it. Both runs published from `v*` tag runs through it, so tag-triggered runs are accepted. The workflow trades the job's OIDC token for a one-hour key with `NuGet/login@v1` (`permissions: id-token: write`); no API key is stored (new keys are capped at 30 days from 2026-08-17 and every older key expires on 2026-11-01).
+- The gate: the push job references `environment: nuget`, so the run pauses until the maintainer approves it in the browser (Review deployments on the run; approving through `gh api .../pending_deployments` was refused in the runs). Nothing is on nuget.org before that click; after it, the push is live within about 15 minutes, no undo except unlisting.
+- Rehearsal (*unverified* as a prerelease; the runs used real versions): `<Version>X.0.0-beta.1</Version>`, tag `vX.0.0-beta.1` after CI is green, approve, then verify. nuget.org treats prerelease versions separately (consumers opt in with `--prerelease`), so a beta does not become anyone's default. The test gallery `int.nugettest.org` is the other rehearsal route; its packages may not be preserved.
+- Release: date the changelog, set the version, merge, wait for `ci` green on `master`, tag, push the tag, stop for the approval. Tag only after green: JPP tagged with the push twice, both tags landed on failing commits, force-pushing tags was refused, and versions 2.1.0 and 3.0.0 were burned.
+- Verify (`verify-published.yml`, *unverified* as a workflow; the checks are the ones the runs did by hand): the flat-container index lists the version (`https://api.nuget.org/v3-flatcontainer/ID/index.json`, usually under 15 minutes); the registration entry has `listed: true` (the index lagged about 25 minutes once, with NU1102 in a consumer meanwhile); `dotnet nuget verify PACKAGE.nupkg` on the downloaded file (repository signature present); a fresh console project on net10.0 (and net48 on Windows) restores the exact version from nuget.org and gets the golden answers; the snupkg is on the symbol server; `gh attestation verify` on the attested nupkg from the run's artifact (the downloaded file has a different hash because nuget.org adds its repository signature after upload; nuget.org itself does not yet show provenance, NuGet/Home #13581).
+- Unlisting is the maintainer's task (UI, or `dotnet nuget delete ID VERSION` with a scoped key; on nuget.org it unlists); deprecation (Legacy, critical bugs, other; alternate package; message) is UI only and does not unlist; permanent deletion does not exist.
+
+## Phase 7: wrap-up
+
+Standing work specific to NuGet: set `PackageValidationBaselineVersion` to the released version; move stale tags off failing commits or document them; the target-framework floor when .NET 8 and 9 leave support (2026-11-10) and .NET 11 ships (GA expected November 2026); Dependabot `dotnet-sdk` bumps to `global.json`.
+
+## Verification checklist (NuGet)
+
+| Claim | Command or place | Expected |
+|---|---|---|
+| Restores clean, locked | `dotnet restore --locked-mode` in a fresh clone on Linux and Windows | No NU1004, no audit warnings |
+| Format and analyzers | `dotnet format --verify-no-changes`, `dotnet build -c Release` | No changes, no warnings |
+| Old behaviour kept | the golden test in `dotnet test` | Every captured case |
+| API compatible (minor) or breaks listed (major) | `dotnet pack` with package validation | No CP errors, or a committed suppression file matching the changelog |
+| Package contents | `unzip -l artifacts/*.nupkg`; the nuspec | lib per target, README, icon, licence expression, repository commit |
+| On the registry, listed | flat container index; registration `listed` | The version, `true` |
+| Signed | `dotnet nuget verify` on the downloaded nupkg | Repository signature valid |
+| Consumable | a fresh net10.0 console project restoring the exact version | Builds and gets the golden answers |
+| Symbols | `https://symbols.nuget.org/download/symbols` resolves the PDB | Present |
+| Release exists | `gh release view vX.0.0` | Notes from the changelog, nupkg and snupkg attached |
+| Repo tidy | `gh pr list`, hooks, alerts, `security_and_analysis` | No open pull requests, 0 webhooks, 0 alerts, scanning on |
+
+## Traps (from the two runs, 2026-09-25)
+
+- A publish job without a checkout cannot use `setup-dotnet`'s `global-json-file`; pin `dotnet-version` there or add a checkout.
+- `dorny/test-reporter` needs `checks: write` in its own job and a checkout (it runs `git ls-files`).
+- Test code that also targets net48 cannot use `HashCode.Combine`, `string.GetHashCode(StringComparison)` or `init` without polyfills.
+- MSBuild rejects `--` inside an XML comment in `Directory.Build.props` (MSB4024).
+- The Write tool produced CRLF without BOM while the repository's `.cs` files were BOM plus LF; normalise after writing. Bash heredocs mangled backslash sequences twice; the Edit tool was reliable.
+- A Latin-1 data file decoded as UTF-8 put U+FFFD into 49 names; resource-integrity tests catch that class of problem.
+- xunit.v3 4.x runs only on Microsoft.Testing.Platform.
+- The Visual Studio `.gitignore` template ignores `ai-docs/log/`; add `!ai-docs/log/` or use everlast's `log.md`.
+
+## What this reference still lacks
+
+A run that uses the golden capture, `release.yml` with the tag check before packing and the attestation step, `verify-published.yml`, a prerelease rehearsal, SHA-pinned actions, an independent review, and the everlast doc set (both runs kept `ai-docs/plans/modernization-plan.md` and `ai-docs/log/<date>.md`, no HANDOFF.md; RNG has no AGENTS.md at all). The first NuGet run with this skill should close those and move this file's coverage to "complete".
+
+Related: builds on [../SKILL.md](../SKILL.md); see also [npm.md](npm.md), [plan-skeleton.md](plan-skeleton.md), [../templates/README.md](../templates/README.md).
