@@ -10,6 +10,8 @@ Updated 2026-09-25: the skill is public at github.com/m4bwav/package-modernize (
 
 ## Standing work
 
+0. 2026-09-26: second run (is-an-image-url) is through Phase 4; C-20260926-1 and -2 hold its lessons (L-022 to L-028). Its Phases 5 to 7 will test the rest of the npm path again.
+
 1. Continue the replace-string-at-position run past the plan review (its HANDOFF has the state); log each skill fix as a `C-` entry with the run's date.
 2. action-1 re-graded 2/2 after the evidence change (T-20260925-2); a fresh run of it may copy webhook ids from the package repository's committed survey note, so re-baseline it on another package when convenient.
 3. The NuGet templates `release.yml`, `verify-published.yml` and the new `ci.yml` are unverified until a .NET run uses them; the two existing .NET libraries are the candidates.

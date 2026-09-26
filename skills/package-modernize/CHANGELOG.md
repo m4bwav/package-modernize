@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-2 · 2026-09-26 · Lessons from is-an-image-url Phase 4: read the merge actually made, take the go for GitHub writes in the session
+- because: L-027, L-028
+- files: SKILL.md ("The shape of a run" stops: GitHub writes under automatic permission modes; Phases table row 4: ruleset before the merge, read the merge method and SHA), LEARNINGS.md (L-027, L-028), references/npm.md (Phase 4: ruleset command)
+- The maintainer merged with a merge commit where the plan said squash, and auto mode refused the ruleset after the bot pull request closures although the plan recorded the OKs; the ruleset JSON is now in the reference so the HANDOFF can carry it.
+
 ### C-20260926-1 · 2026-09-26 · Lessons from is-an-image-url Phases 2 and 3: first-hand rulings, fixture socket reuse, exact inlining, xo --fix traps, network timeouts and SSRF wording
 - because: L-022, L-023, L-024, L-025, L-026 (user request: record the net-positive learnings)
 - files: SKILL.md (stops: rulings taken first-hand in a later session), references/npm.md (Phase 2: golden pattern for callback and network packages, fixture socket wait, inlined dependencies, network package checks; Traps: xo --fix, import-x/order, portable Node lines through npx, actionlint download), LEARNINGS.md (L-022 to L-026)

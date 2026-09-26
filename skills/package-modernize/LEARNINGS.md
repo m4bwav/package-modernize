@@ -215,3 +215,19 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: is-an-image-url review findings 2, 3, 4, 8; C-20260926-1
 - Scope: skill
 - Status: promoted (C-20260926-1) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-027 · 2026-09-26 · Read the merge method and SHA after the maintainer merges; the plan's "squash" is a wish
+- Trigger: the is-an-image-url plan said squash-merge; the maintainer merged PR #25 with a merge commit (d9e246b), and the ruleset that would have pinned the method was still waiting for the merge (2026-09-26).
+- Hypothesis: the maintainer merges from the web UI with whatever button is the default; nothing in the run enforced the method.
+- Rule: after the merge, read `gh pr view N --json mergeCommit,mergedAt` and cite that SHA in the bot pull request comments and the log; accept the method used unless the maintainer asks otherwise. Apply the ruleset before the merge (it gates the merge on `ci`); if squash matters, also set the repository to allow only squash merges in the Phase 4 settings.
+- Evidence: is-an-image-url log 2026-09-26, plan Phase 4; C-20260926-2
+- Scope: skill
+- Status: promoted (C-20260926-2) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-028 · 2026-09-26 · Under automatic permission modes, take the go for GitHub writes in the session and hand over the commands
+- Trigger: after the merge of is-an-image-url, 17 `gh pr close --delete-branch` calls and a branch deletion went through; the next step (the ruleset) was refused by Claude Code's auto-mode classifier as an external system write, and the refusal covered the same outcome by any route. The deletion OKs were recorded in the plan by an earlier session (2026-09-26).
+- Hypothesis: the classifier judges a burst of outward writes on its own evidence; OKs written in repository files by an earlier session do not count as the user's authorization in this one.
+- Rule: before the post-merge cleanup, list every GitHub write in one message (closures with their comment, branch deletions, ruleset, settings, tag push) and take the maintainer's go in that session. Write the exact commands (ruleset JSON included) into the HANDOFF so the maintainer can run whatever gets refused. Stop at a refusal; never re-route it.
+- Evidence: is-an-image-url HANDOFF.md and log 2026-09-26; C-20260926-2
+- Scope: skill
+- Status: promoted (C-20260926-2) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
