@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-4 · 2026-09-26 · Changelog heading and a lint pass before the first tag; the maintainer wants commands run, not handed over
+- because: L-029, L-028 (updated)
+- files: references/npm.md (Phase 5 and 6: "Before the first tag", Rehearsal), LEARNINGS.md (L-028, L-029)
+- is-an-image-url spent beta.1 and beta.2 on a bare `## [Unreleased]` heading and then an unused link definition; the tag push went through once the maintainer explicitly said to run it.
+
 ### C-20260926-3 · 2026-09-26 · The release tag push is the maintainer's under automatic permission modes
 - because: L-028 (updated)
 - files: LEARNINGS.md (L-028 rule and evidence), references/npm.md (Phase 5 and 6: Rehearsal)
