@@ -92,13 +92,14 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 ### Phase 3: review
 - [ ] Independent read-only review (prompts/review-subagent.md); findings fixed or answered; summary on the pull request
 ### Phase 4: CI, settings, merge, cleanup
-- [ ] CI green (run id); ruleset on master; squash-merge after the maintainer's review (SHA)
-- [ ] Alerts 0; old bot pull requests closed with one comment each; issues answered; webhooks removed (with the OK); repo settings; secret scanning and push protection; private vulnerability reporting; workflow permissions read
+- [ ] CI green (run id); ruleset on master before the merge; merge after the maintainer's review (read the SHA and method back)
+- [ ] One go from the maintainer for the whole cleanup list (the dry run of `post-merge-cleanup.sh` with ai-docs/notes/dispositions.tsv), then `--apply`: alerts 0; old bot pull requests closed with one comment each; issues answered; webhooks removed; repo settings; secret scanning and push protection; private vulnerability reporting; workflow permissions read
 ### Phase 5: release rehearsal
 - [ ] The maintainer adds the trusted publisher (fields in the reference). **Stop.**
-- [ ] N.0.0-beta.1 tagged and staged; **stop** for the approval; verified from the registry (run id)
+- [ ] `preflight-tag-npm.sh N.0.0-beta.1` READY; tagged; `watch-run.sh` shows the stage id; **stop** for the approval; `verify-registry-npm.sh` VERIFIED (run id)
 ### Phase 6: release
-- [ ] Changelog dated; N.0.0 tagged and staged; **stop** for the approval; verified from the registry; GitHub Release; provenance
+- [ ] Changelog dated; `preflight-tag-npm.sh N.0.0` READY; tagged and staged; **stop** for the approval; `verify-registry-npm.sh` VERIFIED (GitHub Release, provenance, signatures, verify-published)
+- [ ] Old major deprecated by the CLI with the full message (never a placeholder); `npm view PACKAGE@OLD deprecated` shows it
 ### Phase 7: wrap-up
 - [ ] HANDOFF.md around standing work; inventory row; lessons into the skill; what the prompt got wrong
 
@@ -134,6 +135,14 @@ One row per image in the old README (the script's Phase 0 output). New badges or
 ## Risks and open points
 
 ## Appendix: cleanup commands (all paths absolute)
+
+The disposition table above, as `ai-docs/notes/dispositions.tsv` for `scripts/post-merge-cleanup.sh` (tab-separated; `{SHA}` becomes the merge commit):
+
+~~~
+pr	<N>	Closed by the N.0.0 rewrite ({SHA}): <why>
+branch	<name>
+hook	<id>
+~~~
 
 ## Next single action
 ```

@@ -247,3 +247,19 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: is-an-image-url commit "verify-published: close the Bun CLI test bracket"; the script flags the pre-fix file and passes both templates and five repositories; C-20260926-5
 - Scope: skill
 - Status: promoted (C-20260926-5) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-031 · 2026-09-26 · A placeholder in a command shown to the maintainer can become the live registry state
+- Trigger: the agent wrote the 1.x deprecation as `npm deprecate is-an-image-url@"<2" "..."` in a chat reply, meaning "the message from D4"; the maintainer ran it verbatim and every 1.x version went live with the deprecation message `...` (2026-09-26). The agent's attempt to correct it was refused by auto mode as a change to a shared resource.
+- Hypothesis: a maintainer copies commands; shorthand that is obvious in the transcript is invisible at the terminal.
+- Rule: every command shown to the maintainer is complete and runnable, messages included; after any registry change the maintainer makes, read it back (`npm view PACKAGE@OLD deprecated`, `verify-registry-npm.sh`) before logging it done.
+- Evidence: is-an-image-url log 2026-09-26; `npm view is-an-image-url@1.0.4 deprecated` printed "..."; C-20260926-6
+- Scope: skill
+- Status: promoted (C-20260926-6) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-032 · 2026-09-26 · Script any command chain a run repeats, and prove the script on a replay of the real mistake
+- Trigger: the release and verification steps of is-an-image-url took about 25 ad-hoc calls (finding runs, digging logs for the stage id, the failing step, dist-tags, attestations, audit, smoke, release view) and two failed tags that a pre-tag check would have caught (2026-09-26).
+- Hypothesis: each step is short, so nobody scripts it; across seven packages the chain costs more than the scripts, and every retyping risks a slip.
+- Rule: when a phase needs the same three or more commands in every run, write a script under scripts/ that prints only the evidence, and test it against the run that motivated it (a known failed run, a replayed commit, a dry run on the merged pull request) before relying on it. Scripts added: preflight-tag-npm.sh, watch-run.sh, verify-registry-npm.sh, post-merge-cleanup.sh, check-workflow-shell.py.
+- Evidence: scripts tested 2026-09-26 on is-an-image-url runs 36247959799 (failure shown in 7 lines) and 36248115597 (stage id shown), a replay of f2bf891~1 (FAIL on the changelog), 2.0.0 (VERIFIED) and 1.0.4 (FAIL: deprecated, no provenance), and a dry run on PR #25; C-20260926-6
+- Scope: skill
+- Status: promoted (C-20260926-6) · helpful 1 · harmful 0 · last_confirmed 2026-09-26

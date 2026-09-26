@@ -13,13 +13,19 @@
   "source": null,
   "topic": "modernizing and re-releasing old published libraries: npm, NuGet, PyPI, crates.io, Maven Central and Go registry mechanics (trusted publishing, staged or gated publishing, provenance, deprecation, audit tooling), TypeScript and .NET library packaging defaults, and how AI agents modernize legacy libraries safely",
   "tier": "fast",
-  "interval_days": 14,
-  "last_checked": "2026-09-25",
-  "next_due": "2026-10-09",
+  "interval_days": 9.33,
+  "last_checked": "2026-09-26",
+  "next_due": "2026-10-05",
   "verify_at_use": false,
   "volatile_claims": [],
   "contradiction": null,
-  "events": [],
+  "events": [
+    {
+      "date": "2026-10-28",
+      "label": "node-26-active-lts",
+      "settle_days": 2.0
+    }
+  ],
   "streak": {
     "quiet": 0,
     "pinned_min": 0,
@@ -32,12 +38,18 @@
       "m": null,
       "interval_after": 14,
       "note": "created"
+    },
+    {
+      "date": "2026-09-26",
+      "m": 0.4,
+      "interval_after": 9.33,
+      "note": "R-20260926-1, R-20260926-2: Node 20 action runtime gone, npm stage-only tokens, code-modernization 1.0.0 canary, RepoRescue, secure-npm-package, Drydock"
     }
   ],
   "counts": {
     "learnings": 21,
     "changes": 6,
-    "research": 5,
+    "research": 6,
     "tests": 2
   },
   "consolidate_every": 25,

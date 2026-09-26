@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-6 · 2026-09-26 · Release and cleanup shortcuts as scripts, deprecation by CLI with full messages, research on prior art
+- because: L-031, L-032, R-20260926-1, R-20260926-2
+- files: scripts/preflight-tag-npm.sh, scripts/watch-run.sh, scripts/verify-registry-npm.sh, scripts/post-merge-cleanup.sh (new), scripts/README.md, SKILL.md (Phases row 4: cleanup script; "Tools and prior art": code-modernization 1.0.0 canary, Evil Martians secure-npm-package, Drydock, RepoRescue), references/npm.md (Phase 4 cleanup shortcut; Phases 5 and 6: shortcuts, `next` after the release, deprecation by CLI with the full message), references/plan-skeleton.md (Phases 4 to 6 name the scripts; dispositions.tsv in the appendix), RESEARCH.md (R-20260926-1, R-20260926-2), LEARNINGS.md (L-031, L-032)
+- is-an-image-url's release took about 25 ad-hoc calls and two failed tags that the new scripts reduce to four calls and a pre-tag stop; a placeholder deprecation message went live because a chat reply used shorthand.
+
 ### C-20260926-5 · 2026-09-26 · Shell inside workflows checked by shellcheck, not only actionlint
 - because: L-030
 - files: scripts/check-workflow-shell.py (new), scripts/README.md, SKILL.md (Phases row 2), references/npm.md (Traps: actionlint), LEARNINGS.md (L-030)
