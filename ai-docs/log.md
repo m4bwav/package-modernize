@@ -26,3 +26,4 @@ Append-only. One line per operation: `## [YYYY-MM-DD] op | title` where op is on
 ## [2026-09-26] add | decision: release hardening from secure-npm-package (C-20260926-8): release.yml id-token job split from the GitHub Release, --ignore-scripts, template .npmrc min-release-age=3 (tested on npm 11.16: blocks resolution, not npm ci), tag ruleset templates/rulesets/tags-admins-only.json via post-merge-cleanup.sh --tag-ruleset (dry run on is-an-image-url; not yet POSTed)
 ## [2026-09-26] update | C-20260926-9: survey-github.sh lists action pins with runtimes; NuGet/login v1.2.0 is node24; context-health has four dead node20 pins
 ## [2026-09-26] verify | T-20260926-1: suite 10/10 (triggers 9/9, decoys 0/9, outcome 3/3, action-1 3/3 after re-pointing to markdown-plain-link-replacer, the two new cases 3/3); baseline fails action-canary, passes action-golden-untouched (L-034)
+## [2026-09-26] index | rebuilt (2 entries)
