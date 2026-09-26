@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-3 · 2026-09-26 · The release tag push is the maintainer's under automatic permission modes
+- because: L-028 (updated)
+- files: LEARNINGS.md (L-028 rule and evidence), references/npm.md (Phase 5 and 6: Rehearsal)
+- With the maintainer's in-session "go", the ruleset went through but `npm version` plus the tag push was refused as creating a public surface; the reference now says to hand those two commands over.
+
 ### C-20260926-2 · 2026-09-26 · Lessons from is-an-image-url Phase 4: read the merge actually made, take the go for GitHub writes in the session
 - because: L-027, L-028
 - files: SKILL.md ("The shape of a run" stops: GitHub writes under automatic permission modes; Phases table row 4: ruleset before the merge, read the merge method and SHA), LEARNINGS.md (L-027, L-028), references/npm.md (Phase 4: ruleset command)

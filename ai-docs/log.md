@@ -18,3 +18,4 @@ Append-only. One line per operation: `## [YYYY-MM-DD] op | title` where op is on
 ## [2026-09-26] update | handoff: future scope, unpublished repositories (example sites) after the packages; needs a no-registry variant
 ## [2026-09-26] update | C-20260926-1: L-022 to L-026 from is-an-image-url Phases 2 and 3 (first-hand rulings, fixture socket reuse, exact inlining, xo --fix traps, network timeouts and SSRF wording) into SKILL.md stops and references/npm.md
 ## [2026-09-26] update | C-20260926-2: L-027 (read the merge method and SHA the maintainer used; ruleset before the merge) and L-028 (under auto mode take the go for GitHub writes in the session, hand over commands) from is-an-image-url Phase 4, into SKILL.md stops and Phases row 4 and references/npm.md Phase 4 (ruleset copy command)
+## [2026-09-26] update | C-20260926-3: L-028 updated; the release tag push is refused under auto mode even after a go; references/npm.md Rehearsal says hand the commands over
