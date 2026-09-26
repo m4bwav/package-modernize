@@ -175,3 +175,43 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: is-an-image-url ai-docs/log.md; references/npm.md Phase 0; C-20260925-6
 - Scope: skill
 - Status: promoted (C-20260925-6) · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+
+### L-022 · 2026-09-26 · Take the plan rulings first-hand from the maintainer, not from a summary of an earlier session
+- Trigger: the maintainer wrote "fix all your recommendations and push" in a fresh session; the recommendations were only in the previous session's closing report. Acting on them (18 branch deletions, 3 webhook deletions, a release) was blocked by the auto-mode check as approvals that came from model output, and the run stopped to ask. One multiple-choice question confirmed every ruling and the OKs in a few seconds (2026-09-26).
+- Hypothesis: "silence means the recommendations stand" works inside one session; across sessions the only record of what was recommended is model output, and deletions need an approval the maintainer can be seen to give.
+- Rule: at the start of a run that continues past the plan review, restate the rulings and the deletion OKs as one question (AskUserQuestion, with "yes, all", "yes, but no deletions" and "I meant something else" options) unless the maintainer wrote them into the plan or the kickoff prompt themselves; then write the answer into the plan's Status with the date.
+- Evidence: is-an-image-url ai-docs/log.md and plan Status (2026-09-26); C-20260926-1
+- Scope: skill
+- Status: promoted (C-20260926-1) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-023 · 2026-09-26 · A test fixture server that destroys its sockets must wait before the next fetch
+- Trigger: on Node 20, 22 and 26 (not 24) every other network case failed with `false` and no request logged. The fixture server's `dropConnections()` destroyed the sockets after each case, and the next fetch went out at once on a pooled keep-alive socket undici had not yet seen close (2026-09-26).
+- Hypothesis: undici notices a server-side close asynchronously; a request issued in the same tick reuses the dead socket and fails without a retry.
+- Rule: after destroying server sockets in a test, wait (30 ms was enough) before the next request, through one helper every suite uses; run the network suites on every Node line locally before trusting a pass on one.
+- Evidence: is-an-image-url test/golden/golden.test.js and test/functional (`dropConnections`), plan Risks; C-20260926-1
+- Scope: skill
+- Status: promoted (C-20260926-1) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-024 · 2026-09-26 · Inlining a dependency: copy its behaviour exactly, flags and platform included, and its licence from the tarball
+- Trigger: three slips while inlining is-url and is-image into is-an-image-url (2026-09-26). The xo rule that requires the `u` flag would have changed is-url's `\S{2,}`, because with `u` an astral character counts once instead of twice. is-image used Node's platform `path.extname`, which splits on backslashes on Windows only, so the POSIX rewrite changed Windows answers. That went unnoticed until the review, because the golden capture had no backslash cases. The first draft of the MIT notice named a copyright holder ("2015 Segment.io") that is-url's LICENSE-MIT does not contain.
+- Hypothesis: an inlined dependency looks like new code, so lint rules and memory get applied to it; its behaviour depends on the regex flags and the runtime platform it ran on.
+- Rule: download the exact version's tarball (`npm pack name@version`) and copy the code and the licence text from it; keep the original regex flags, with a lint disable that gives the reason; list the platform-dependent calls it makes (`path`, `os`, `process.platform`), name in the plan which platform the new code follows, and add golden or unit cases for the difference; record the capture's platform in the golden header.
+- Evidence: is-an-image-url src/url-pattern.ts, src/image-extensions.ts, LICENSE, review finding 1; C-20260926-1
+- Scope: skill
+- Status: promoted (C-20260926-1) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-025 · 2026-09-26 · xo --fix changes public types and comments; read its diff of src/ line by line
+- Trigger: `xo --fix` on is-an-image-url removed `| null` from the public overloads (`@typescript-eslint/no-restricted-types`, an API change: 1.0.4 took null), rewrote `http://` as `https://` inside a comment (`unicorn/prefer-https`), capitalised a package name at the start of a comment (`capitalized-comments`), and turned a string with backslashes into `String.raw` (2026-09-26).
+- Hypothesis: the fixers are safe for style and unsafe for meaning, and a large diff hides the few that matter.
+- Rule: stage before `xo --fix`, then `git diff src/` and restore any change to a signature, a type or a comment's facts; keep an intended `null` with a disable comment that gives the reason. A `String.raw` template cannot end in a backslash (it escapes the closing backtick); write that string as an ordinary quoted string with a doubled backslash.
+- Evidence: is-an-image-url commits on v2; references/npm.md Traps; C-20260926-1
+- Scope: skill
+- Status: promoted (C-20260926-1) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-026 · 2026-09-26 · Network packages: clamp user timeouts, and never offer an input allow-list as SSRF protection
+- Trigger: the review of is-an-image-url found that a timeout above 2147483647 ms overflows `setTimeout` to 1 ms, so the answer was an instant `false`. It also found that README and SECURITY.md advised checking user URLs against an allow-list, which a redirect to an internal host bypasses. A redirect to a URL with credentials also changed its answer under fetch (2026-09-26).
+- Hypothesis: timeouts and redirects are where fetch-based rewrites differ from `request` and from what the docs say.
+- Rule: for every package that takes a timeout, clamp it to 2147483647 or reject larger values, and test it with 3e9. For every package that follows redirects, the docs say an input allow-list is not enough and point to network-level egress control. The functional suite includes a redirect to another port and a redirect to a credentialed URL. A shared `AbortSignal` has 0 listeners after the calls settle (`getEventListeners`). A one-call process exits long before the default timeout.
+- Evidence: is-an-image-url review findings 2, 3, 4, 8; C-20260926-1
+- Scope: skill
+- Status: promoted (C-20260926-1) · helpful 1 · harmful 0 · last_confirmed 2026-09-26

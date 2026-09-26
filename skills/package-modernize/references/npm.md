@@ -44,7 +44,9 @@ Package-specific decisions that recur: every published name keeps working (a mis
 ## Phase 2: rewrite
 
 - Branch `v<major>` from `master`. Remove the dead files (`.travis.yml`, `.snyk`, `.sonarcloud.properties`, `.npmignore`, old lint, build and test configs, `sample/`, the old lockfile) and add the templates from `templates/npm/` (README there says which is which), replacing every `{{...}}` and `TEMPLATE:` block.
-- Write the golden test first; the first build must pass every captured case before any new method is written.
+- Write the golden test first; the first build must pass every captured case before any new method is written. For a callback or network package, build each case's expectation as the recording with the exception's changes applied (answer, request list, throws, Promise), assert the request sequence as method and path, and replay every callback case through the Promise form too (is-an-image-url's test/golden/golden.test.js). A fixture server that destroys its sockets between cases must wait about 30 ms before the next request, or fetch reuses a dead pooled socket on Node 20, 22 and 26 (L-023).
+- Inlined dependencies: code and licence copied from the exact version's tarball, regex flags kept, platform-dependent calls (`path`, `os`) named in the plan with test cases for the platform the new code follows (L-024).
+- Network packages: clamp a user timeout to 2147483647 ms; functional tests for a redirect to another host and to a credentialed URL, listener cleanup on a shared signal, and a one-call process exiting well before the default timeout; the docs never present an input allow-list as SSRF protection, since redirects bypass it (L-026).
 - Then `src/`, the rest of `test/`, README (three live badges: npm version, CI, downloads, and every other image as the plan's table decided, with absolute raw.githubusercontent.com URLs pinned to a tag for kept screenshots; install, usage for ESM, CommonJS, TypeScript, Deno, Bun and browsers; API; behaviour at the edges; migration; limits and what the package is not), CHANGELOG (Keep a Changelog; the first paragraph of the new major states the compatibility promise and lists every exception, rare call patterns included), SECURITY.md, AGENTS.md.
 - Verify on Node 24 (lint, typecheck, build, test, check, coverage, consumers), then the suites on Node 20, 22 and 26 (portable Node builds in the scratchpad), then from a fresh clone. Record each in the log.
 - Push the branch and open the pull request with a "For review" list: departures from the plan and anything the maintainer has not ruled on.
@@ -106,6 +108,10 @@ HANDOFF.md rewritten around standing work (Dependabot merges when `ci` is green,
 - Node 20 and 22 print TAP when stdout is not a terminal (`# pass 172`), Node 24 and later the spec reporter (`ℹ pass 172`); grep for both when checking portable Node builds, or an empty grep looks like a pass (2026-09-25).
 - zizmor: an inline `# zizmor: ignore[...]` inside a `run: |` block is shell text, not a YAML comment, and is ignored; the template's `.github/zizmor.yml` suppresses `adhoc-packages` for verify-published.yml, whose job is installing the version just published. Run `uvx zizmor --offline .` from the repository root so `dependabot.yml` is audited too (it wants a `cooldown`, now in the template) (2026-09-25).
 - `npm exec` and `npx` run in the session's working directory, not the `--prefix` folder; run old tools from a subshell inside the scratch clone.
+- `xo --fix` removes `| null` from public types, rewrites `http://` to `https://` inside comments, capitalises package names that start a comment, and rewrites strings as `String.raw` (which cannot end in a backslash); stage first and read `git diff src/` (L-025, 2026-09-26).
+- `import-x/order` reads a local `const require = createRequire(...)` followed by `require(...)` calls after a blank line as a second import group; name the variable `load` (2026-09-26).
+- Portable Node lines without nvm: `npx -y -p node@20 node --test <files>` runs the built suites on Node 20 (and 22, 26); pass `--test-reporter=spec` so every line prints the `ℹ pass` summary (2026-09-26).
+- actionlint is not on npm: `gh release download -R rhysd/actionlint -p '*windows_amd64.zip'` into the scratchpad, unzip, and run it from the repository root (1.7.12, 2026-09-26).
 
 ## Reference runs
 

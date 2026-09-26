@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-1 · 2026-09-26 · Lessons from is-an-image-url Phases 2 and 3: first-hand rulings, fixture socket reuse, exact inlining, xo --fix traps, network timeouts and SSRF wording
+- because: L-022, L-023, L-024, L-025, L-026 (user request: record the net-positive learnings)
+- files: SKILL.md (stops: rulings taken first-hand in a later session), references/npm.md (Phase 2: golden pattern for callback and network packages, fixture socket wait, inlined dependencies, network package checks; Traps: xo --fix, import-x/order, portable Node lines through npx, actionlint download), LEARNINGS.md (L-022 to L-026)
+- The run got its rulings only after a blocked action, lost a Node-line pass to a test harness race, nearly changed an inlined regex and Windows answers, had public types changed by the lint fixer, and shipped docs with a bypassable SSRF recommendation and an overflowing timeout until the review caught them.
+
 ### C-20260925-6 · 2026-09-25 · Second real run (is-an-image-url, Phases 0 and 1): network and callback capture, run the published bin, stale branches, misspelled dotfiles, sync off for no-push runs
 - because: L-019, L-020, L-021
 - files: references/npm.md (Phase 0: diff the tarball against the repository and count its carriage returns; run a published bin before planning; the capture recipe for asynchronous and network packages with a local fixture server; everlast `--sync off` when the run must not push), SKILL.md ("Golden capture": network, callback and CLI packages; "Community": branches with no pull request), scripts/golden-capture-npm.template.cjs (header points to the async worked example), scripts/survey-github.sh (`.synk` in the dead-file pattern; every root dotfile; branches with no open pull request)
