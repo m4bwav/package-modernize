@@ -14,3 +14,4 @@ Append-only. One line per operation: `## [YYYY-MM-DD] op | title` where op is on
 ## [2026-09-25] index | rebuilt (1 entries)
 ## [2026-09-25] verify | T-20260925-2: action-1 re-run 2 runs; harness 0/2 on a mis-specified heading check, re-graded 2/2 on the webhook id check (script's GitHub section present in both transcripts)
 ## [2026-09-25] update | C-20260925-4: callable CommonJS recipe, 'use strict' banner, TypeScript 5 interop-off fixture, zizmor.yml template, Dependabot cooldown, TAP trap; L-017, L-018 (from the first real run's Phases 2 to 4)
+## [2026-09-25] update | C-20260925-5: badges and images section in SKILL.md, scripts/check-readme-images.mjs (dead services, HTTP errors, badges that say not found, relative paths, nuget.org allow-list), plan-skeleton disposition table, npm and nuget checklist rows; R-20260925-4 (user request)

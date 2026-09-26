@@ -37,6 +37,7 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 | Issues, pull requests (by author and kind), forks | | |
 | Dependabot alerts, webhooks, secrets, security features | | |
 | Dead services (badge, config, webhook, app for each) | | |
+| README images and badges (`scripts/check-readme-images.mjs` on the repository README and the published one) | | |
 | Leaked credentials | | |
 | Baseline: old build and tests as they are | | |
 | Golden capture: cases, quirks, claims confirmed or refuted | | |
@@ -59,7 +60,7 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 | D8 | Node or framework floor and the CI matrix | | | |
 | D9 | Language, build, lint, tests, coverage (the system's defaults unless argued otherwise) | | | |
 | D10 | Lockfile and the old bot pull requests | | | |
-| D11 | Dead services | | | |
+| D11 | Dead services, and each README badge and image: keep, replace (with what) or remove (see the table below) | | | |
 | D12 | Old files to remove | | | |
 | D13 | Release and version, rehearsal | | | |
 | D14 | Default branch and optional extras | | | |
@@ -117,6 +118,13 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 ## Security
 
 <Leaked tokens and their reach; webhooks; scanning; alerts; workflow permissions and pins; publishing; what the library does not do; private vulnerability reporting.>
+
+## Badges and images: disposition
+
+One row per image in the old README (the script's Phase 0 output). New badges or images the new README adds get a row too.
+
+| Image or badge | What it shows now | Decision | New URL or reason |
+|---|---|---|---|
 
 ## Verification checklist (what "done" means)
 

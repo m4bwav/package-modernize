@@ -77,6 +77,13 @@ Newest first. One entry per material finding; a quiet refresh gets one entry say
 - Magnitude: n/a (initial)
 - Applied: C-20260925-1 (SKILL.md "Tools and prior art")
 
+### R-20260925-4 · 2026-09-25 · Subject: how registries render README images and badges
+- Summary: nuget.org renders README images and badges only from an allow-list of about 38 hosts (img.shields.io, raw.githubusercontent.com, GitHub Actions badges, codecov, coveralls and others); images with relative paths or from other hosts are not rendered, and the warning is visible to package owners only; a fix needs a new package version. npmjs.com renders the README from the published tarball, and relative image paths there resolve against npmjs.com, not the repository, so they break; the fix is absolute raw.githubusercontent.com URLs. Badge services such as shields.io answer 200 with an SVG saying "not found" for a retired integration (Travis, David), so a status check alone misses them.
+- Track: subject
+- Sources: https://learn.microsoft.com/en-us/nuget/nuget-org/package-readme-on-nuget-org (updated 2026-07-07); https://github.com/npm/www/issues/119; checked on replace-string-at-position 1.0.4's README, 2026-09-25
+- Magnitude: minor (new guidance, no default changed)
+- Applied: C-20260925-5 (SKILL.md "Badges and images", scripts/check-readme-images.mjs, references)
+
 ### R-20260925-3 · 2026-09-25 · Subject: PyPI, crates.io, Maven Central and Go publishing mechanics
 - Summary: PyPI Trusted Publishing (15-minute tokens; owner, repository, workflow, environment), `pypa/gh-action-pypi-publish@release/v1` with PEP 740 attestations by default (v1.11.0+), no registry gate, yank per release, permanent deletion, 2FA since 2024-01-01, Python 3.10 floor. crates.io trusted publishing since 2025-07-11 (`rust-lang/crates-io-auth-action@v1`, 30-minute tokens, first publish needs a token), yank, no deletion beyond 72 hours or tiny crates, edition 2024, stable 1.98.1. Maven Central: no OIDC, Portal user tokens, GPG mandatory, VALIDATED gate (`USER_MANAGED`), immutable, OSSRH ended 2025-06-30, `central-publishing-maven-plugin` 0.11.0. Go: no publish step, sum.golang.org, `retract` and `Deprecated:`, Go 1.27 and 1.26 supported. Live probes of every verification URL succeeded from this machine. Unverified: PyPI un-yank and API delay, crates index delay, Portal MFA, relocation POMs.
 - Track: subject

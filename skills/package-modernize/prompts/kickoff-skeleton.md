@@ -19,7 +19,7 @@ What the survey found on <date> (verify before relying on it):
 - Bugs and oddities: <misspellings, odd argument orders, wrong README claims, unbounded loops, dead branches, tests asserting the wrong bound, untested public methods>.
 - Dependencies: <each runtime dependency, wanted range, latest, deprecated or not, and whether the package's observable behaviour depends on its internals>.
 - Community: <issues, pull requests by author and kind, forks>.
-- Security: <leaked tokens and where, webhooks with ids, security features off, alert counts, dead services with their badge, config file, webhook and OAuth app>.
+- Security: <leaked tokens and where, webhooks with ids, security features off, alert counts, dead services with their badge, config file, webhook and OAuth app; README images and badges to keep, replace or remove>.
 
 Decisions the plan must settle (recommendation first; the maintainer rules in the plan review, and silence means the recommendation stands):
 - <The compatibility promise: what the golden capture must prove, and the rule for fixes that would change an old result.>

@@ -8,7 +8,7 @@ Coverage: **from two runs plus current docs**. The runs: DotNetJsonPrettyPrinter
 - In the clone: every `.csproj`, `.sln` or `.slnx`, `Directory.Build.props`, `.nuspec`, `packages.config`, `project.json`, `global.json`, the tests, the README, every dotfile. Old projects often carry a checked-in `packages/` folder or a `.nuspec` beside the csproj.
 - Baseline: `dotnet --list-sdks`, then `dotnet restore`, `build`, `test` as they are. A .NET Framework 3.5 or 4.0 project, or a project.json one, will not build on a machine with only the .NET 10 SDK; record that as a fact and use the old test files as the behaviour record. `dotnet list package --outdated --include-transitive` and `dotnet list package --vulnerable --include-transitive` (`dotnet package list` from .NET 10) on the old project if it restores.
 - Golden capture (*unverified*: neither run did it, and both changed observable output without a fixture guarding it: JPP 2.0.0 rewrote its expectation file to System.Text.Json's output, RNG 2.1.0 changed seeded name output). Copy `scripts/golden-capture-nuget.template.cs` into a scratch console project that references the published old version (`dotnet add package ID --version OLD`), fill in every public method with normal, edge and odd inputs (null, empty, whitespace, invalid input, culture-sensitive values under two cultures), run, commit the JSON and the program under `tests/Golden/`. A `PackageValidationBaselineVersion` pointing at the published version covers the API shape, not the behaviour.
-- Dead services on .NET repos: AppVeyor (`appveyor.yml`, badge), Travis, MyGet feeds, Coveralls, codecov, NuGet badges from dead hosts; the VS `.gitignore` template's `[Ll]og/` line, which swallows `ai-docs/log/`.
+- Dead services on .NET repos: AppVeyor (`appveyor.yml`, badge), Travis, MyGet feeds, Coveralls, codecov, NuGet badges from dead hosts (run `node scripts/check-readme-images.mjs README.md --registry nuget`: nuget.org renders images only from its allow-list of hosts and never from relative paths, and shows the warning to package owners only; list checked on learn.microsoft.com, updated 2026-07-07); the VS `.gitignore` template's `[Ll]og/` line, which swallows `ai-docs/log/`.
 
 ## Phase 1: plan defaults
 
@@ -76,6 +76,7 @@ Standing work specific to NuGet: set `PackageValidationBaselineVersion` to the r
 | Symbols | `https://symbols.nuget.org/download/symbols` resolves the PDB | Present |
 | Release exists | `gh release view vX.0.0` | Notes from the changelog, nupkg and snupkg attached |
 | Repo tidy | `gh pr list`, hooks, alerts, `security_and_analysis` | No open pull requests, 0 webhooks, 0 alerts, scanning on |
+| Badges and images work | `node scripts/check-readme-images.mjs README.md --registry nuget` on the `PackageReadmeFile` | Exit 0; nuget.org shows every image |
 
 ## Traps (from the two runs, 2026-09-25)
 

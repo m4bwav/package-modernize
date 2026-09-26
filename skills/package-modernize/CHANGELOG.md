@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260925-5 · 2026-09-25 · Badges and images: a rule for every phase and a checker script
+- because: user request; R-20260925-4
+- files: SKILL.md (new "Badges and images" section; Phase 0 and Phase 2 exit criteria; the plan's questions), scripts/check-readme-images.mjs (new), scripts/README.md, references/plan-skeleton.md (survey row, D11 widened, a badges-and-images disposition table), references/npm.md (Phase 0 bullet, Phase 2 README line, checklist row), references/nuget.md (the allow-list, checklist row), templates/npm/README.template.md, prompts/kickoff-skeleton.md
+- The skill removed dead badges only in passing and said nothing about images: screenshots and GIFs from dead hosts or showing the old API, relative paths that break on npmjs.com and nuget.org, badges that answer 200 but say "not found". Every image now gets a keep, replace or remove decision in the plan, and the script proves the result before and after the release.
+
 ### C-20260925-4 · 2026-09-25 · Second part of the first real run (replace-string-at-position Phases 2 to 4): callable CommonJS recipe, zizmor config, Dependabot cooldown, review lessons
 - because: L-017, L-018
 - files: references/npm.md (Phase 1 export-shape row: the verified two-config tsdown recipe for a `module.exports = function` package; Phase 2 note on a TypeScript 5 fixture with esModuleInterop off; traps: TAP output on Node 20 and 22, zizmor comments inside `run: |`), templates/npm/.github/zizmor.yml (new: adhoc-packages ignored for verify-published.yml), templates/npm/.github/dependabot.yml (cooldown 7 days on both ecosystems; comment no longer names another package's handoff stage), templates/README.md

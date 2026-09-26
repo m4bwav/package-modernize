@@ -41,7 +41,7 @@ const {{DEFAULT_IMPORT}} = require('{{PACKAGE}}');
 
 ## Limits and what it is not
 
-{{Three badges above are the only ones; David, Travis, Snyk, Coveralls and Gitter badges were removed because those services no longer serve this repository.}}
+{{What the package is not. The three badges above are the default; any other badge or image follows the plan's badges-and-images table, kept images use absolute raw.githubusercontent.com URLs pinned to a tag, and `scripts/check-readme-images.mjs README.md` must exit 0.}}
 
 ## License
 
