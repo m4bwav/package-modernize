@@ -295,3 +295,19 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: stack-exchange-markdown-retriever commit ee6e4b0; references/npm.md Phase 0 "Leaked credentials" (C-20260926-10)
 - Scope: skill
 - Status: promoted (C-20260926-10) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-037 · 2026-09-26 · npm deprecate cannot finish from an agent's shell: EOTP without a TTY
+- Trigger: in the stack-exchange-markdown-retriever run, `npm deprecate` from the agent shell exited with EOTP. There is no TTY, `--auth-type=web` does not wait for the browser approval, and the auth URL is masked in the output. The overlay's note that the agent may run 2FA-gated commands did not hold (2026-09-26).
+- Hypothesis: npm's web-auth flow needs an interactive terminal to print the link and poll for the approval. A piped shell gets neither.
+- Rule: never try `npm deprecate` or `npm dist-tag` from the agent. Hand Mark the complete command, with the full message and never a placeholder, for his own terminal, and afterwards check the result with `npm view PACKAGE@OLD deprecated`.
+- Evidence: stack-exchange-markdown-retriever ai-docs/log.md 2026-09-26; references/npm.md Phases 5 and 6 (C-20260926-11)
+- Scope: skill
+- Status: promoted (C-20260926-11) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-038 · 2026-09-26 · Tag pushes run in the main session; a subagent's refusal is not a reason to ask the maintainer
+- Trigger: in a subagent, the permission classifier refused `npm version 2.0.0-beta.1 && git push --follow-tags` as "Create Public Surface", and the run asked Mark for "run it". The main session then ran the same step without trouble under Mark's standing authorization (2026-09-26).
+- Hypothesis: a subagent's classifier judges a tag push without the maintainer's context. The main session holds his standing authorization.
+- Rule: when a subagent is refused a tag push or another release step, it stops and reports to the main session, and the main session runs the step. Do not ask Mark for "run it" on tag pushes. The same goes for deleting a merged branch the go already covered.
+- Evidence: stack-exchange-markdown-retriever log 2026-09-26 (beta.1 tag 9cac49c pushed by the main session)
+- Scope: skill
+- Status: promoted (C-20260926-11) · helpful 1 · harmful 0 · last_confirmed 2026-09-26

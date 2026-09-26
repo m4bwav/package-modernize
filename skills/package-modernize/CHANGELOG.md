@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-11 · 2026-09-26 · npm deprecate is the maintainer's terminal; tag pushes stay in the main session
+- because: L-037, L-038 (stack-exchange-markdown-retriever 2.0.0 release)
+- files: references/npm.md (Phases 5 and 6), LEARNINGS.md
+- npm deprecate exits EOTP without a TTY, so the maintainer runs it with the full message. A subagent refused on a tag push hands the step to the main session instead of asking the maintainer.
+
 ### C-20260926-10 · 2026-09-26 · Fixed-host capture recipe, fixture server under the untouched check, token search in scripts and old versions, four traps
 - because: L-035, L-036; the stack-exchange-markdown-retriever run (first use of check-golden-untouched.sh, watch-run.sh and check-workflow-shell.py)
 - files: scripts/check-golden-untouched.sh (checks `fixture-server*` too), scripts/README.md, references/npm.md (Phase 0: fixed-host HTTPS capture through a CONNECT proxy, error-path claims read from the capture, leaked credentials in npm scripts and old versions; Traps: `npx --no -- <bin>`, `node --import` with a file URL, DecompressionStream differences per Node line, a hanging golden case on its own fixture server), LEARNINGS.md (L-035, L-036)
