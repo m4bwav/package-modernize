@@ -26,7 +26,7 @@ run "Workflows" "gh api repos/$REPO/actions/workflows --jq '.workflows[] | \"\\(
 run "Forks" "gh api repos/$REPO/forks --jq '.[] | \"\\(.full_name) pushed=\\(.pushed_at[:10])\"'"
 run "Releases and tags" "gh release list -R $REPO --limit 20; gh api repos/$REPO/tags --jq '.[].name' | head -30"
 run "Dead-service files in the default branch" "gh api repos/$REPO/git/trees/HEAD?recursive=1 --jq '.tree[].path' | grep -Ei '^(\\.travis\\.yml|\\.snyk|\\.sonarcloud\\.properties|sonar-project\\.properties|\\.coveralls\\.yml|codecov\\.yml|\\.codecov\\.yml|appveyor\\.yml|\\.circleci/|\\.npmignore|\\.nuspec|\\.vscode/)' || echo '(none)'"
-run "Badges in the README" "gh api repos/$REPO/readme --jq .content | base64 -d 2>/dev/null | grep -Eo 'https?://[^ )]*(shields\\.io|travis-ci|david-dm|snyk\\.io|coveralls|codecov|gitter|sonarcloud|badge)[^ )]*' | sort -u || echo '(none)'"
+run "Badges in the README" "gh api repos/$REPO/readme --jq .content | base64 -d 2>/dev/null | grep -Eo 'https?://[^ )]*(shields\\.io|travis-ci|david-dm|snyk\\.io|coveralls|codecov|gitter|sonarcloud|nodei\\.co|badgen|badge)[^ )]*' | sort -u || echo '(none)'"
 
 printf '\n## Things only the maintainer can see\n'
 printf -- '- Installed GitHub Apps and authorized OAuth apps: github.com/settings/installations and github.com/settings/applications (the API refuses the gh token).\n'

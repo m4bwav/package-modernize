@@ -1,0 +1,22 @@
+{
+  "name": "package-modernize",
+  "version": "1.0.0",
+  "description": "An agent skill that takes an old, published library from \"last touched years ago\" to a verified new release: survey and baseline, a golden capture of the published version's behaviour, a plan with a decisions table, a rewrite on a branch with tests for every artifact, an independent review, CI and repository cleanup (dead webhooks and badges, stale bot pull requests, unanswered issues, leaked tokens), a release rehearsal through the registry's trusted publishing with a human approval, verification from the registry, and a handoff. The eight phases are the same for every package system; how each phase is done per system is a reference file. npm is complete, from two finished runs; NuGet is written from two runs plus current docs; PyPI, crates.io, Maven Central and Go modules are documented and marked unverified until a run uses them.",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m4bwav/package-modernize.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/m4bwav/package-modernize/issues"
+  },
+  "homepage": "https://github.com/m4bwav/package-modernize#readme"
+}

@@ -8,6 +8,11 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20260925-2 · 2026-09-25 · claude -p stream-json (evals/run-headless.mjs) · Windows 11, Claude Code 2.1.281 · action-1 2/2 (re-graded)
+- Re-run of `action-1` only (`--case action-1 --runs 2`, about 230 s each) after C-20260925-3 fixed `survey-npm.sh` and added content evidence. The harness reported 0/2: the skill was invoked 2/2 and the script ran 2/2, but the new `and` check looked for the raw output's `## Webhooks` heading, and both runs saved their own written report as survey.txt rather than the raw output. Class `test-defect`, not a skill failure. Both transcripts hold the script's GitHub section (`## Webhooks (dead services leave these)`) in the tool results, and both reports name webhooks 14564189, 278473357 and 83049528, which only the GitHub half yields. The check now matches `14564189`; both saved runs pass it, so the case is recorded as 2/2 on re-grading the stored outputs, not on a fresh run.
+- Contamination to watch: run 1 fetched this morning's committed survey note from the package repository (aef3222), which also holds the ids. The trace check (the script call) still has to pass, but a later run of this case could copy the ids from the note; if the case is re-baselined, point it at a package without an ai-docs survey.
+- led to: L-014 (updated: check a fact only the script's late section produces, not a heading, since the agent may rewrite the output)
+
 ### T-20260925-1 · 2026-09-25 · claude -p stream-json (evals/run-headless.mjs) · Windows 11, Claude Code 2.1.281 · 8/8
 - Three passes in one evening. Baseline first, with the skill junction renamed away: `outcome-1` failed without the skill (a table without the required header), `action-1` passed without it (survey.txt written from ad hoc `gh api` and `curl` calls in 155 s), so its file evidence was dropped and the survey script call in the trace is now the only evidence.
 - Pass 1 (6/8): triggers 9/9 invoked, decoys 0/9 invoked; `action-1` 2/3 and `outcome-1` 0/3, but three of the four failing runs ended with the account's session usage limit ("You've hit your session limit"), class `environment`; the fourth showed the skill globbing for the overlay junction and finding nothing.

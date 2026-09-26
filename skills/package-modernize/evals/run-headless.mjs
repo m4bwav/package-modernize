@@ -136,7 +136,10 @@ function judge(entry, output, cwd) {
     const evidence = entry.evidence ?? {};
     const byTrace = evidence.type === 'trace' && uses.some(use => use.name === evidence.tool && (!evidence.input_match || new RegExp(evidence.input_match, 'u').test(use.input)));
     const byFile = evidence.or?.type === 'file' && existsSync(path.join(cwd, evidence.or.path));
-    return {invoked, passed: byTrace || byFile, byTrace, byFile, tools: uses.map(use => `${use.name}:${use.input.slice(0, 80)}`)};
+    // `and`: the action must also have produced complete output (a script that dies halfway still shows up in the trace).
+    const andPath = evidence.and?.type === 'file_contains' ? path.join(cwd, evidence.and.path) : undefined;
+    const byContent = !evidence.and || (andPath !== undefined && existsSync(andPath) && new RegExp(evidence.and.match, 'u').test(readFileSync(andPath, 'utf8')));
+    return {invoked, passed: (byTrace || byFile) && byContent, byTrace, byFile, byContent, tools: uses.map(use => `${use.name}:${use.input.slice(0, 80)}`)};
   }
 
   // Outcome: regexes in the expectations (written as "regex: ..." or "(regex: ...)") against the files the run wrote plus the final text.

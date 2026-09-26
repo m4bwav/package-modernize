@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260925-3 · 2026-09-25 · First real run (replace-string-at-position, Phases 0 and 1): survey script fixed, golden codec, dependents by name, lint traps
+- because: L-014, L-015, L-016, L-010 (updated)
+- files: scripts/survey-npm.sh (url initialised so the GitHub half runs when OWNER/REPO is passed; dependents by name through `gh search code`; maintainers' emails masked), scripts/survey-github.sh (badge grep adds nodei.co and badgen), scripts/golden-capture-npm.template.cjs and templates/npm/test/golden/golden.test.template.js (use the new templates/npm/test/golden/codec.cjs), templates/npm/CLAUDE.md (plan file name is a placeholder), references/plan-skeleton.md (`## Status` heading; lint traps for future paths, JSDoc tags and `id-token`), references/npm.md (Phase 0 baseline in a scratch clone, each old tool alone, dependents by name; traps: lint headings, GNU tar and `C:`, `npm exec` working directory), SKILL.md ("Survey" dependents by name; "Golden capture" codec), scripts/README.md, templates/README.md, evals/run-headless.mjs and evals/evals.json (action evidence can require output content; action-1 requires the survey's webhook section)
+- The survey had never run to the end with a repository argument, and action-1 could not notice; the capture template would have recorded NaN, Infinity and -0 cases as null and 0. Both would have misled the plan of any package with numeric inputs.
+
 ### C-20260925-2 · 2026-09-25 · First test pass: description tuned for plan and decisions-table asks, overlay read by path, action evidence trace-only
 - because: T-20260925-1, L-013
 - files: SKILL.md (frontmatter description: shortened from 1700 to about 1250 characters so the roster shows the trigger phrases, plus "asks for a modernization plan, survey or decisions table for a package"; Step 0: read the overlay with the Read tool at its full path), evals/evals.json (action-1 evidence is the survey script call only, baselines recorded; outcome-1 prompt phrased as a maintainer would), evals/run-headless.mjs (new harness), TESTS.md

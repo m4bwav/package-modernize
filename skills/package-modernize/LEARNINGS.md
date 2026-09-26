@@ -81,12 +81,12 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Status: promoted (C-20260925-1) · helpful 1 · harmful 0 · last_confirmed 2026-09-25
 
 ### L-010 · 2026-09-25 · The everlast doc lint has three habits to write around
-- Trigger: it read JSDoc tags, the `@AGENTS.md` import and npm scopes as social handles, wanted a `## Reasons` heading in decisions and a `## Next single action` in the handoff, and reported paths of files that did not exist yet as dead (2026-09-25).
+- Trigger: it read JSDoc tags, the `@AGENTS.md` import and npm scopes as social handles, wanted a `## Reasons` heading in decisions and a `## Next single action` in the handoff, and reported paths of files that did not exist yet as dead (2026-09-25). The first run with the skill got 23 findings on its plan and survey note: 16 backticked future paths (the skeleton's rule, not followed), a missing `## Status` in the plan and `## Summary` in the note (not in the skeleton), JSDoc tags in the API sketch, `id-token: write` read as a credential, and the maintainer's email in the survey output (2026-09-25).
 - Hypothesis: the privacy and dead-path checks are regex-based.
-- Rule: write paths of not-yet-existing files without backticks, include the two headings, and phrase around at-sign words in handoffs.
-- Evidence: references/npm.md traps; the playbook's section 8
+- Rule: write paths of not-yet-existing files without backticks, include the four headings, phrase around at-sign words and `token:` in docs, and keep emails out of saved survey output (the script masks them now).
+- Evidence: references/npm.md traps; references/plan-skeleton.md; the playbook's section 8
 - Scope: skill
-- Status: promoted (C-20260925-1) · helpful 2 · harmful 0 · last_confirmed 2026-09-25
+- Status: promoted (C-20260925-1, C-20260925-3) · helpful 3 · harmful 0 · last_confirmed 2026-09-25
 
 ### L-011 · 2026-09-25 · Approvals that the registry or GitHub gate must be the maintainer's clicks; the agent stops and waits
 - Trigger: approving a NuGet deployment through `gh api .../pending_deployments` was refused for the agent; npm staged approvals need 2FA (2026-09-25).
@@ -111,3 +111,27 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: SKILL.md Step 0; evals/run-headless.mjs; T-20260925-1
 - Scope: env:windows, harness
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+
+### L-014 · 2026-09-25 · An eval that only sees the script call passes a script that dies halfway
+- Trigger: the first real run (replace-string-at-position Phase 0) found `survey-npm.sh` exiting on "url: unbound variable" whenever OWNER/REPO was passed, so the whole GitHub half (issues, webhooks, alerts) never ran; action-1 had passed 3 of 3 because its evidence was the call in the trace (2026-09-25).
+- Hypothesis: `set -u` plus a variable set only on one branch; the eval grades that the script ran, not that it finished.
+- Rule: action evidence for a script also checks the saved file for a fact only the script's late section produces (`and: file_contains`, for example a webhook id), never for a heading, because the agent may save its own report instead of the raw output (T-20260925-2); run each script once end to end on a real package before calling it tested.
+- Evidence: C-20260925-3; evals/evals.json action-1; evals/run-headless.mjs; T-20260925-2
+- Scope: skill, harness
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+
+### L-015 · 2026-09-25 · A JSON round trip erases exactly the edge inputs a golden capture is for
+- Trigger: the capture template copied arguments with `JSON.parse(JSON.stringify(...))`, so NaN and Infinity positions became null and -0 became 0 before the call; the recorded case would have claimed NaN behaves like null (2026-09-25).
+- Hypothesis: the template was written for a package whose inputs were seeds and small integers.
+- Rule: store arguments with a tagged codec (`templates/npm/test/golden/codec.cjs`), decode fresh for each call, and record thrown errors with their class, shared by the capture and the golden test.
+- Evidence: C-20260925-3; replace-string-at-position test/golden/1.0.4.json (cases 20, 25, 26, 29)
+- Scope: skill
+- Status: promoted (C-20260925-3) · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+
+### L-016 · 2026-09-25 · The dependents, not the survey count, decide what a major may refuse
+- Trigger: the kickoff and inventory knew one dependent; the registry said 4; `gh search code` found two, a third-party one included, and reading both call sites showed they pass only strings and an in-text index, which is what made refusing every other call safe (2026-09-25).
+- Hypothesis: npm's dependents count has no names; an agent that stops at the number cannot judge a break.
+- Rule: list the dependents by name in Phase 0 and read each call site; write in the plan's D15 which calls they make and whether the new major keeps them exact.
+- Evidence: C-20260925-3; replace-string-at-position survey note, plan D1 and D15
+- Scope: skill
+- Status: promoted (C-20260925-3) · helpful 1 · harmful 0 · last_confirmed 2026-09-25

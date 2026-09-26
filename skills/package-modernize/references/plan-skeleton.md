@@ -1,6 +1,6 @@
 # Plan skeleton
 
-The living plan a run writes in Phase 1 at `ai-docs/plans/YYYY-MM-DD-modernization-and-vN-release.md`, with everlast frontmatter so it indexes. It is ticked as work lands and the evidence (commit, pull request, workflow run id, registry output) goes in `ai-docs/log.md`. Dates are absolute. Paths of files that do not exist yet are written without backticks, so the doc lint does not report them as dead; they get their backticks when the files land. The decisions table is the part the maintainer reads first: recommendation first, the reason, the alternative; silence means the recommendation stands. Two finished plans to copy from: get-title-at-url's (a library with a CLI) and seeded-random-utilities' (a deterministic library), both under `ai-docs/plans/` in those repositories.
+The living plan a run writes in Phase 1 at `ai-docs/plans/YYYY-MM-DD-modernization-and-vN-release.md`, with everlast frontmatter so it indexes. It is ticked as work lands and the evidence (commit, pull request, workflow run id, registry output) goes in `ai-docs/log.md`. Dates are absolute. Paths of files that do not exist yet are written without backticks, so the doc lint does not report them as dead; they get their backticks when the files land (the first run with the skill forgot this and got 16 dead-path findings, so check before running the lint). The same lint reads JSDoc tags in code blocks as social handles and `id-token: write` as a credential: write the API sketch with plain "Throws a TypeError when" sentences and the permission as "id-token set to write". The decisions table is the part the maintainer reads first: recommendation first, the reason, the alternative; silence means the recommendation stands. Two finished plans to copy from: get-title-at-url's (a library with a CLI) and seeded-random-utilities' (a deterministic library), both under `ai-docs/plans/` in those repositories.
 
 ```markdown
 ---
@@ -17,6 +17,10 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 # Modernization and vN.0.0 release plan: <package>
 
 <One paragraph: what this is, where the evidence goes, which skill and reference run it follows.>
+
+## Status
+
+<One line: active, the phase reached and the date, and what it waits for. The everlast lint requires this heading in a plan.>
 
 ## Goal
 

@@ -4,5 +4,5 @@
 
 # Claude notes
 
-- AGENTS.md, imported above, is the source of truth for working in this repository. Handoff and log: `ai-docs/HANDOFF.md`, `ai-docs/log.md`. The plan: `ai-docs/plans/2026-09-25-modernization-and-v2-release.md`.
+- AGENTS.md, imported above, is the source of truth for working in this repository. Handoff and log: `ai-docs/HANDOFF.md`, `ai-docs/log.md`. The plan: `ai-docs/plans/{{PLAN_FILE}}`.
 - Everlast plugin: skills everlast-setup, everlast-capture, everlast-resume, everlast-vault. `everlast.py vault where` prints the vault path; the record lives in `ai-docs/` and the vault, not in auto-memory.

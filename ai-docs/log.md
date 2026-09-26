@@ -9,3 +9,7 @@ Append-only. One line per operation: `## [YYYY-MM-DD] op | title` where op is on
 ## [2026-09-25] handoff | 27 lines
 ## [2026-09-25] verify | eval suite 8/8 (T-20260925-1): triggers 9/9, decoys 0/9 invoked, action 3/3 on the survey script call, outcome 3/3; description tuned (C-20260925-2)
 ## [2026-09-25] index | rebuilt (1 entries)
+## [2026-09-25] update | GitHub repository created 2026-09-25 (public, maintainer's OK) after a grep for private details; master pushed
+## [2026-09-25] update | C-20260925-3 from the first real run (replace-string-at-position Phases 0 and 1): survey-npm.sh unbound variable fixed and rerun end to end (exit 0, 172 lines, both dependents named, nodei.co badge caught), emails masked, codec.cjs for golden capture and test, plan-skeleton Status heading, npm reference baseline and lint traps, eval action-1 now requires the webhook section in survey.txt
+## [2026-09-25] index | rebuilt (1 entries)
+## [2026-09-25] verify | T-20260925-2: action-1 re-run 2 runs; harness 0/2 on a mis-specified heading check, re-graded 2/2 on the webhook id check (script's GitHub section present in both transcripts)

@@ -55,7 +55,8 @@
       "evidence": {
         "type": "trace",
         "tool": "Bash",
-        "input_match": "survey-npm\\.sh|survey-github\\.sh"
+        "input_match": "survey-npm\\.sh|survey-github\\.sh",
+        "and": {"type": "file_contains", "path": "survey.txt", "match": "14564189"}
       },
       "baseline": "2026-09-25, skill absent: the session wrote survey.txt from ad hoc gh api and curl calls in 155 s, so a file-exists check passed without the skill; the evidence is now the survey script call in the trace only",
       "runs": 3
