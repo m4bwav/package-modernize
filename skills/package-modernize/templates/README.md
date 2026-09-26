@@ -11,7 +11,8 @@ Files a run copies into the package repository and adapts; do not write them fro
 - [npm/.github/workflows/release.yml](npm/.github/workflows/release.yml): on a `v*` tag, build, test, stage on npm through trusted publishing, GitHub Release. The trusted publisher on npmjs.com names this file.
 - [npm/.github/workflows/verify-published.yml](npm/.github/workflows/verify-published.yml): after the approval, the registry package on every platform, Bun and Deno, signatures and attestation. Fill the `{{SMOKE_*}}` one-liners; add the npx, bunx and deno CLI steps from get-title-at-url for a package with a bin.
 - [npm/.github/workflows/live.yml](npm/.github/workflows/live.yml): optional weekly live smoke for a package that talks to the internet; delete for a pure library.
-- [npm/.github/dependabot.yml](npm/.github/dependabot.yml): weekly, Monday, minor and patch grouped, held majors with dated comments.
+- [npm/.github/dependabot.yml](npm/.github/dependabot.yml): weekly, Monday, minor and patch grouped, a 7-day cooldown, held majors with dated comments.
+- [npm/.github/zizmor.yml](npm/.github/zizmor.yml): zizmor's one deliberate exception (verify-published installs the version just published); run `uvx zizmor --offline .` from the repository root.
 - [npm/AGENTS.md](npm/AGENTS.md), [npm/CLAUDE.md](npm/CLAUDE.md), [npm/.github/copilot-instructions.md](npm/.github/copilot-instructions.md): the agent rules and the two pointers to them.
 - [npm/SECURITY.md](npm/SECURITY.md), [npm/README.template.md](npm/README.template.md): reporting, supported versions, three live badges.
 - [npm/.editorconfig](npm/.editorconfig), [npm/.gitattributes](npm/.gitattributes), [npm/.gitignore](npm/.gitignore): LF everywhere.

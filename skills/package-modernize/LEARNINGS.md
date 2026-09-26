@@ -135,3 +135,19 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: C-20260925-3; replace-string-at-position survey note, plan D1 and D15
 - Scope: skill
 - Status: promoted (C-20260925-3) · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+
+### L-017 · 2026-09-25 · A callable CommonJS build needs its own entry, a strict banner and a TypeScript 5 interop-off fixture
+- Trigger: replace-string-at-position kept `require()` returning the function (plan D2). Rolldown's `output.exports: 'default'` failed the declaration build; the working build (a second tsdown config whose lone default export cjsDefault turns into `module.exports =`) had no `'use strict'`, which the Phase 3 review caught through `Object.hasOwn(fn, 'caller')`; TypeScript 6 fixtures cannot turn esModuleInterop off, so `import = require()` users were untested (2026-09-25).
+- Hypothesis: tsdown's defaults assume a named-exports CommonJS build; the strict directive comes from ESM semantics that a CommonJS chunk does not inherit.
+- Rule: for a `module.exports = function` package use the recipe in references/npm.md (two configs, hand-written entry points, `banner: {js: "'use strict';"}`), and add a TypeScript 5.9 consumer fixture with esModuleInterop off that compiles and runs `import = require()`, `import * as` and the default import.
+- Evidence: C-20260925-4; replace-string-at-position pull requests #2 and #3
+- Scope: skill
+- Status: promoted (C-20260925-4) · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+
+### L-018 · 2026-09-25 · The maintainer may merge before ruling; treat the merge as the recommendations standing and keep going
+- Trigger: the maintainer merged the v2 pull request while the plan's questions (D3c, D4) were open and the review was still running; the review's fixes went into a second pull request (2026-09-25).
+- Hypothesis: the pull request stop is where a busy maintainer looks; "silence means the recommendations stand" extends to a merge.
+- Rule: after an early merge, record in the plan that the recommendations stand, put the review fixes on a new branch and pull request, and never treat the merge as the OK for a deletion the plan asked about separately (webhooks).
+- Evidence: replace-string-at-position ai-docs/log.md
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-25
