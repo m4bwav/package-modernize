@@ -2,7 +2,9 @@
 // TEMPLATE (package-modernize): records what the PUBLISHED old version of an npm package returns, so the new major can prove
 // what it kept and list what it changed. The seeded-random-utilities run (test/golden/capture-1.1.4.cjs there) is the full
 // worked example, with per-instance state and multi-step scripts; replace-string-at-position (test/golden/ there) is the
-// small one, with the codec.
+// small one, with the codec. This template is synchronous: for a callback, Promise or network package, start from
+// is-an-image-url's test/golden/capture-1.0.4.cjs and fixture-server.cjs instead (a local server, recorded requests,
+// callback timing, uncaught exceptions, CLI runs; references/npm.md, Phase 0).
 //
 // Run it in a scratch project, never inside the repository, before any code change:
 //   mkdir capture && cd capture && npm init -y && npm install {{PACKAGE}}@{{OLD_VERSION}}

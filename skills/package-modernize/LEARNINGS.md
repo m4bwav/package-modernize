@@ -151,3 +151,27 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: replace-string-at-position ai-docs/log.md
 - Scope: skill
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+
+### L-019 · 2026-09-25 · A network or callback package needs a capture built around a local fixture server
+- Trigger: is-an-image-url 1.0.4 answers through a callback after a `request` GET; the capture template is synchronous and records return values only. Written around a fixture server, the capture found non-boolean answers (`undefined`, `''`), a synchronous callback on every no-request path, an uncaught crash for a string callback, the whole body downloaded, and credentials leaked in a Referer header on a cross-host redirect; none of that is visible to a return-value capture or to the old tests, which hit google.com (2026-09-25).
+- Hypothesis: the template was written for pure functions; the behaviour of a network package lives in timing, call counts and the requests it makes.
+- Rule: follow references/npm.md's recipe (fixture server in the capture, placeholders in the arguments, requests with raw headers, callback timing, uncaught exceptions, CLI runs, run twice and diff), then probe the replacement transport on the same routes before the plan.
+- Evidence: is-an-image-url test/golden/ (capture-1.0.4.cjs, fixture-server.cjs, fetch-probe.cjs); C-20260925-6
+- Scope: skill
+- Status: promoted (C-20260925-6) · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+
+### L-020 · 2026-09-25 · Run the published bin before planning; a CLI can be broken for years without an issue
+- Trigger: the inventory and the kickoff said is-an-image-url "has a CLI (meow)"; the published 1.0.4's CLI fails on every call, `--help` included, because meow 5 no longer accepts `help` as an array; 1.0.3 (meow 3.7.0) worked. No issue was filed in six years (2026-09-25).
+- Hypothesis: a survey reads `package.json` and the README, which describe the CLI, not whether it runs; a caret range on a CLI framework moves under the code.
+- Rule: in Phase 0 install the published version in a scratch project and run the bin with `--help` and one input; when it fails, run the previous version to learn the contract; record the CLI runs in the golden file and write the refuted claim into the kickoff prompt.
+- Evidence: is-an-image-url test/golden/1.0.4.json (`cli`); references/npm.md Phase 0; C-20260925-6
+- Scope: skill
+- Status: promoted (C-20260925-6) · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+
+### L-021 · 2026-09-25 · everlast's sync push pushes on its own; a run told not to push registers with sync off
+- Trigger: the is-an-image-url run was told to commit locally and not push; `everlast.py project register --sync push` reported that the SessionEnd hook would commit and push `ai-docs/` whenever it was safe, which would have pushed master behind the maintainer's back (2026-09-25).
+- Hypothesis: the skill's Phase 0 said "sync push" unconditionally, written for runs that push anyway.
+- Rule: when a run must not push, register with `--sync off`, say so in the plan's D14, and re-register with `--sync push` once the maintainer has ruled.
+- Evidence: is-an-image-url ai-docs/log.md; references/npm.md Phase 0; C-20260925-6
+- Scope: skill
+- Status: promoted (C-20260925-6) · helpful 1 · harmful 0 · last_confirmed 2026-09-25

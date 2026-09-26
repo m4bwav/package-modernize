@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260925-6 · 2026-09-25 · Second real run (is-an-image-url, Phases 0 and 1): network and callback capture, run the published bin, stale branches, misspelled dotfiles, sync off for no-push runs
+- because: L-019, L-020, L-021
+- files: references/npm.md (Phase 0: diff the tarball against the repository and count its carriage returns; run a published bin before planning; the capture recipe for asynchronous and network packages with a local fixture server; everlast `--sync off` when the run must not push), SKILL.md ("Golden capture": network, callback and CLI packages; "Community": branches with no pull request), scripts/golden-capture-npm.template.cjs (header points to the async worked example), scripts/survey-github.sh (`.synk` in the dead-file pattern; every root dotfile; branches with no open pull request)
+- The survey missed a misspelled Snyk policy file and a branch no pull request pointed at; the capture template could not record a callback or a request; nothing told the run to try the CLI, which turned out to have crashed on every call since 2019; and "sync push" would have pushed a run that was told not to.
+
 ### C-20260925-5 · 2026-09-25 · Badges and images: a rule for every phase and a checker script
 - because: user request; R-20260925-4
 - files: SKILL.md (new "Badges and images" section; Phase 0 and Phase 2 exit criteria; the plan's questions), scripts/check-readme-images.mjs (new), scripts/README.md, references/plan-skeleton.md (survey row, D11 widened, a badges-and-images disposition table), references/npm.md (Phase 0 bullet, Phase 2 README line, checklist row), references/nuget.md (the allow-list, checklist row), templates/npm/README.template.md, prompts/kickoff-skeleton.md

@@ -25,7 +25,10 @@ run "Environments" "gh api repos/$REPO/environments --jq '.environments[]? | \"\
 run "Workflows" "gh api repos/$REPO/actions/workflows --jq '.workflows[] | \"\\(.name) \\(.path) \\(.state)\"'"
 run "Forks" "gh api repos/$REPO/forks --jq '.[] | \"\\(.full_name) pushed=\\(.pushed_at[:10])\"'"
 run "Releases and tags" "gh release list -R $REPO --limit 20; gh api repos/$REPO/tags --jq '.[].name' | head -30"
-run "Dead-service files in the default branch" "gh api repos/$REPO/git/trees/HEAD?recursive=1 --jq '.tree[].path' | grep -Ei '^(\\.travis\\.yml|\\.snyk|\\.sonarcloud\\.properties|sonar-project\\.properties|\\.coveralls\\.yml|codecov\\.yml|\\.codecov\\.yml|appveyor\\.yml|\\.circleci/|\\.npmignore|\\.nuspec|\\.vscode/)' || echo '(none)'"
+run "Dead-service files in the default branch" "gh api repos/$REPO/git/trees/HEAD?recursive=1 --jq '.tree[].path' | grep -Ei '^(\\.travis\\.yml|\\.snyk|\\.synk|\\.sonarcloud\\.properties|sonar-project\\.properties|\\.coveralls\\.yml|codecov\\.yml|\\.codecov\\.yml|appveyor\\.yml|\\.circleci/|\\.npmignore|\\.nuspec|\\.vscode/)' || echo '(none)'"
+# Every root dotfile, so a misspelled one (is-an-image-url's `.synk`, 2026-09-25) is seen even when the pattern above misses it.
+run "Dotfiles at the root of the default branch" "gh api repos/$REPO/contents --jq '.[].name' | grep '^\\.' || echo '(none)'"
+run "Branches with no open pull request (stale work or bot leftovers; each needs a disposition)" "comm -23 <(gh api repos/$REPO/branches --paginate --jq '.[].name' | sort) <( (gh pr list -R $REPO --state open --limit 200 --json headRefName --jq '.[].headRefName'; gh repo view $REPO --json defaultBranchRef --jq .defaultBranchRef.name) | sort) || echo '(none)'"
 run "Badges in the README" "gh api repos/$REPO/readme --jq .content | base64 -d 2>/dev/null | grep -Eo 'https?://[^ )]*(shields\\.io|travis-ci|david-dm|snyk\\.io|coveralls|codecov|gitter|sonarcloud|nodei\\.co|badgen|badge)[^ )]*' | sort -u || echo '(none)'"
 
 printf '\n## Things only the maintainer can see\n'
