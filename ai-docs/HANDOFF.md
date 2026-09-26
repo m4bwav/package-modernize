@@ -1,16 +1,18 @@
 # Handoff
 
-Updated 2026-09-26 (is-an-image-url released; five scripts added). Earlier, 2026-09-25: the skill is public at github.com/m4bwav/package-modernize (created 2026-09-25 with the maintainer's OK) and its first real run, on replace-string-at-position, has reached the plan-review stop. The run fixed the skill as C-20260925-3. Read [log.md](log.md) for evidence and the decision entry under decisions/ for the layout.
+Updated 2026-09-26, evening: the continuation's A to D are done (C-20260926-7 to -9). Before that, 2026-09-26: is-an-image-url released and five scripts added. Earlier, 2026-09-25: the skill is public at github.com/m4bwav/package-modernize (created 2026-09-25 with the maintainer's OK) and its first real run, on replace-string-at-position, has reached the plan-review stop. The run fixed the skill as C-20260925-3. Read [log.md](log.md) for evidence and the decision entry under decisions/ for the layout.
 
 ## Current state
 
-- `skills/package-modernize/`: SKILL.md (eight phases, shared checklists, per-system table, tools and prior art), references (npm complete; nuget from two runs plus docs; pypi, crates, maven, go unverified; plan-skeleton), scripts (survey-npm, survey-nuget, survey-github, two golden-capture templates, check-line-endings, check-readme-images, check-workflow-shell, preflight-tag-npm, watch-run, verify-registry-npm, post-merge-cleanup), templates/npm (now with test/golden/codec.cjs) and templates/nuget, prompts (kickoff-skeleton, review-subagent), evergreen companions (tier fast; research checked 2026-09-26, next due 2026-10-05), evals with the headless harness.
+- `skills/package-modernize/`: SKILL.md (eight phases, shared checklists, per-system table, tools and prior art), references (npm complete; nuget from two runs plus docs; pypi, crates, maven, go unverified; plan-skeleton), scripts (survey-npm, survey-nuget, survey-github, two golden-capture templates, check-line-endings, check-readme-images, check-workflow-shell, check-golden-untouched, preflight-tag-npm, watch-run, verify-registry-npm, post-merge-cleanup), templates/npm (with test/golden/codec.cjs and .npmrc), templates/nuget and templates/rulesets, prompts (kickoff-skeleton, review-subagent), evergreen companions (tier fast; research checked 2026-09-26, next due 2026-10-05), evals with the headless harness (10 cases; pad-lite fixture; `--selftest`, `--rejudge`).
 - Installed through the junction `~/.claude/skills/package-modernize`. The private overlay is read from `~/.package-modernize/OVERLAY.md` (a junction into the private companion repository, github.com/m4bwav/package-modernization).
 - C-20260925-3: `survey-npm.sh` never reached its GitHub half when given OWNER/REPO (unbound variable), and eval action-1 could not see it; fixed, and the harness can now require output content (`and: file_contains`). The golden capture lost NaN, Infinity and -0 through a JSON round trip; `codec.cjs` fixes it. Dependents are listed by name; maintainers' emails are masked; lint traps documented.
 
 ## Standing work
 
-0. 2026-09-26: second run (is-an-image-url) finished, 2.0.0 released; C-20260926-1 to -6 hold its lessons (L-022 to L-032) and the research (R-20260926-1, -2). Five new scripts are tested on its history but not yet on a fresh run. The next session's prompt: package-modernization/prompts/2026-09-26-skill-improvement-continuation.md (evals for the canary and untouched golden files, Evil Martians checklist items, old action pins in the survey, first real use of the scripts). Research next due 2026-10-05.
+0. 2026-09-26, evening: C-20260926-7 (canary and untouched recording as Phase 2 exit criteria; check-golden-untouched.sh; evals action-canary and action-golden-untouched, 3/3 each, baseline fails only the canary, L-033, L-034), C-20260926-8 (release.yml id-token job split, `--ignore-scripts`, .npmrc `min-release-age=3`, tag ruleset; decision in decisions/), C-20260926-9 (action pins with runtimes in survey-github.sh). Not yet proven by a real run: the split release.yml, the .npmrc, the tag ruleset JSON against the API, and the five scripts of C-20260926-6. The next run (stack-exchange-markdown-retriever, kickoff in package-modernization/prompts/) is their first use.
+0a. action-golden-untouched passes without the skill (L-034); redesign its fixture so the plan states the promise only generally, then re-baseline.
+0b. Immutable releases (secure-npm-package) not decided: check how an immutable GitHub Release behaves when the staged npm version is rejected; at the 2026-10-05 refresh.
 
 1. Runs done: replace-string-at-position 2.0.0 and is-an-image-url 2.0.0 (both 2026-09-25/26). Log each skill fix from the next run as a `C-` entry with the run's date.
 2. action-1 re-graded 2/2 after the evidence change (T-20260925-2); a fresh run of it may copy webhook ids from the package repository's committed survey note, so re-baseline it on another package when convenient.
@@ -20,7 +22,7 @@ Updated 2026-09-26 (is-an-image-url released; five scripts added). Earlier, 2026
 
 ## Next single action
 
-Paste package-modernization/prompts/2026-09-26-skill-improvement-continuation.md into a fresh session (items A to E).
+Paste package-modernization/prompts/2026-09-26-stack-exchange-markdown-retriever-kickoff.md into a fresh session; log each script's first real use and fix what it gets wrong as a C- entry.
 
 ## Dead ends hit
 

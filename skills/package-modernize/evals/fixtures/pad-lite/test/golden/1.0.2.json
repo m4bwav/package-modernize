@@ -1,0 +1,120 @@
+{
+  "package": "pad-lite",
+  "version": "1.0.2",
+  "node": "v22.19.0",
+  "cases": [
+    {
+      "args": [
+        "abc",
+        5
+      ],
+      "result": "  abc"
+    },
+    {
+      "args": [
+        "abc",
+        5,
+        "0"
+      ],
+      "result": "00abc"
+    },
+    {
+      "args": [
+        "abc",
+        2
+      ],
+      "result": "abc"
+    },
+    {
+      "args": [
+        "",
+        3
+      ],
+      "result": "   "
+    },
+    {
+      "args": [
+        "abc",
+        5,
+        "xy"
+      ],
+      "result": "xyabc"
+    },
+    {
+      "args": [
+        "abc",
+        6,
+        "xy"
+      ],
+      "result": "xyxyabc"
+    },
+    {
+      "args": [
+        "abc",
+        6,
+        ""
+      ],
+      "result": "abc"
+    },
+    {
+      "args": [
+        "abc",
+        5,
+        null
+      ],
+      "result": "nullabc"
+    },
+    {
+      "args": [
+        "abc",
+        5,
+        0
+      ],
+      "result": "00abc"
+    },
+    {
+      "args": [
+        null,
+        6
+      ],
+      "result": "  null"
+    },
+    {
+      "args": [
+        true,
+        6
+      ],
+      "result": "  true"
+    },
+    {
+      "args": [
+        42,
+        5,
+        "0"
+      ],
+      "result": "00042"
+    },
+    {
+      "args": [
+        "abc",
+        "6"
+      ],
+      "result": "   abc"
+    },
+    {
+      "args": [
+        "abc",
+        -1
+      ],
+      "result": "abc"
+    },
+    {
+      "args": [
+        "😀",
+        3,
+        "*"
+      ],
+      "result": "*😀"
+    }
+  ]
+}

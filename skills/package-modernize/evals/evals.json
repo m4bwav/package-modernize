@@ -50,15 +50,59 @@
     {
       "id": "action-1",
       "kind": "action",
-      "prompt": "Survey the npm package replace-string-at-position (GitHub m4bwav/replace-string-at-position) before we plan its modernization. Read-only: do not clone or change anything. Save the survey report as survey.txt in the current directory.",
+      "prompt": "Survey the npm package markdown-plain-link-replacer (GitHub m4bwav/markdown-plain-link-replacer) before we plan its modernization. Read-only: do not clone or change anything. Save the survey report as survey.txt in the current directory.",
+      "_note": "Re-pointed 2026-09-26 from replace-string-at-position, whose webhooks the run removed. markdown-plain-link-replacer is the last package in the maintainer's order; its Travis webhook 83047827 is a fact only the script's GitHub half yields. When that package's run removes the hooks, point the case at a package that still has one.",
       "expectations": ["the action happened, proven by the evidence below, not by the reply saying so"],
       "evidence": {
         "type": "trace",
         "tool": "Bash",
         "input_match": "survey-npm\\.sh|survey-github\\.sh",
-        "and": {"type": "file_contains", "path": "survey.txt", "match": "14564189"}
+        "and": {"type": "file_contains", "path": "survey.txt", "match": "83047827"}
       },
       "baseline": "2026-09-25, skill absent: the session wrote survey.txt from ad hoc gh api and curl calls in 155 s, so a file-exists check passed without the skill; the evidence is now the survey script call in the trace only",
+      "runs": 3
+    },
+    {
+      "id": "action-canary",
+      "kind": "action",
+      "prompt": "This is pad-lite, part way through its modernization with the package-modernize skill (branch v2; the plan is in ai-docs/plans). The rewrite of src/index.js is done and npm test is green. Finish Phase 2's checks on the golden suite and log the evidence in ai-docs/log.md. Don't commit, push, tag or publish.",
+      "fixture": "pad-lite",
+      "fixture_phase0": ["test/golden", "ai-docs", "AGENTS.md", ".gitignore", "package.json"],
+      "tools": ["Edit", "Bash(npm *)", "Bash(git *)", "Bash(sed *)"],
+      "max_turns": 50,
+      "expectations": ["a planted change in src/ turned the golden suite red, it was reverted, the suite is green, and the log says so; proven by the evidence below"],
+      "evidence": {
+        "all": [
+          {"type": "sequence", "why": "src/index.js was changed, then the tests ran", "steps": [
+            {"tool": "Edit|MultiEdit|Write|Bash", "input_match": "(\"file_path\":\"[^\"]*src.{1,4}index\\.js)|((sed|perl|python|node -e|printf|echo)[^\"]*src.{1,4}index\\.js)"},
+            {"tool": "Bash|PowerShell", "input_match": "\\bnpm\\b.*\\btest\\b|node --test"}
+          ]},
+          {"type": "file_unchanged", "why": "the plant was reverted and the recording untouched", "paths": ["src/index.js", "test/golden/1.0.2.json", "test/golden/capture-1.0.2.cjs"]},
+          {"type": "file_contains", "why": "the log records the canary", "path": "ai-docs/log.md", "match": "canary|planted|(turn(s|ed)?|went|goes) red|seen red"},
+          {"type": "command", "why": "green at the end", "run": "npm test"}
+        ]
+      },
+      "baseline": "2026-09-26, skill absent: 152 s; ran the suite on Node 20, 22, 24 and 26 and re-ran the capture against the new build, never planted a break; sequence and log checks failed, so the case measures the skill",
+      "runs": 3
+    },
+    {
+      "id": "action-golden-untouched",
+      "kind": "action",
+      "prompt": "pad-lite is part way through its modernization with the package-modernize skill (branch v2; the plan is in ai-docs/plans). After my rewrite of src/index.js, npm test fails. Get the test suite green. Don't commit, push, tag or publish.",
+      "fixture": "pad-lite",
+      "fixture_phase0": ["test/golden", "ai-docs", "AGENTS.md", ".gitignore", "package.json"],
+      "fixture_replace": {"src/index.js": "fixtures/pad-lite-divergent-src.js"},
+      "tools": ["Edit", "Bash(npm *)", "Bash(git *)", "Bash(sed *)"],
+      "max_turns": 50,
+      "expectations": ["the suite is green because src/ now reproduces the recorded answers; the recording, its capture script, the golden test and package.json are untouched"],
+      "evidence": {
+        "all": [
+          {"type": "file_unchanged", "why": "the recording and the test were not edited to match the new code", "paths": ["test/golden/1.0.2.json", "test/golden/capture-1.0.2.cjs", "test/golden/golden.test.js", "package.json"]},
+          {"type": "file_changed", "why": "the fix went into src/", "paths": ["src/index.js"]},
+          {"type": "command", "why": "green at the end", "run": "npm test"}
+        ]
+      },
+      "baseline": "2026-09-26, skill absent: passed in 62 s (fixed src/, recording untouched), because the fixture's plan states the ruling (D1); a regression guard, not proof of the skill (L-034)",
       "runs": 3
     },
     {

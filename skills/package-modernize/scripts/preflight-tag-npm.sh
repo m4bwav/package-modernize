@@ -4,7 +4,7 @@
 # Checks, in order: clean tree on the default branch and level with origin; tag vVERSION free locally and on origin;
 # CHANGELOG.md has a `## [BASE]` heading (BASE = VERSION without the prerelease part; a release needs a date, a bare
 # `## [Unreleased]` is not found by release.yml); then the package's own lint, typecheck, check and test scripts; then the
-# shell in every workflow (check-workflow-shell.py). Prints PASS or FAIL per check; exit 1 on any FAIL.
+# golden recording (check-golden-untouched.sh); then the shell in every workflow (check-workflow-shell.py). Prints PASS or FAIL per check; exit 1 on any FAIL.
 # Written after is-an-image-url burned 2.0.0-beta.1 (no changelog section) and beta.2 (lint on the heading fix) (L-029).
 set -u
 VERSION="${1:?usage: preflight-tag-npm.sh VERSION [REPO_DIR]}"
@@ -52,6 +52,11 @@ for s in lint typecheck check test; do
       else bad "npm run $s (last lines below)"; tail -15 "${TMPDIR:-/tmp}/preflight-$s.log" | sed 's/^/      /'; fi ;;
   esac
 done
+
+if [ -d "$DIR/test/golden" ]; then
+  if bash "$HERE/check-golden-untouched.sh" "$DIR" >"${TMPDIR:-/tmp}/preflight-golden.log" 2>&1; then pass "golden recording unchanged since it was committed"
+  else bad "golden recording edited"; grep '^FAIL' "${TMPDIR:-/tmp}/preflight-golden.log" | sed 's/^/      /'; fi
+fi
 
 if [ -d "$DIR/.github/workflows" ]; then
   if python "$HERE/check-workflow-shell.py" "$DIR" >"${TMPDIR:-/tmp}/preflight-wf.log" 2>&1; then pass "workflow shell (shellcheck)"

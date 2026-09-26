@@ -79,13 +79,13 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 ### Phase 0: survey and baseline (YYYY-MM-DD, no package code changed)
 - [ ] Cloned to <path>; survey script output in ai-docs/notes/...
 - [ ] Old build and tests run as they are: <result>
-- [ ] Golden capture from the published <old version> committed under test/golden/ with its script
+- [ ] Golden capture from the published <old version> committed under test/golden/ with its script (commit <sha>: the golden JSON, the script and the codec stay as they are from here on)
 - [ ] everlast registered (mode repo, sync push); AGENTS.md, CLAUDE.md (@AGENTS.md import), Copilot pointer
 ### Phase 1: plan
 - [ ] This plan and the decision record. **Stop**: the maintainer rules on the table; questions: <deleting on GitHub, applying repo settings, enabling secret scanning>.
 ### Phase 2: rewrite on branch vN
 - [ ] Remove <dead files>; add the templates; deny dev-only install scripts
-- [ ] Golden test first, green on the first build; then src/, the rest of test/, README, CHANGELOG, SECURITY.md, AGENTS.md
+- [ ] Golden test first, green on the first build; canary: a planted line in src/ turns it red, reverted, green (both runs logged); golden files unchanged since <phase-0 sha> (`git diff --exit-code`); then src/, the rest of test/, README, CHANGELOG, SECURITY.md, AGENTS.md
 - [ ] Verified on every supported runtime line and from a fresh clone (log)
 - [ ] Workflows and Dependabot added, actionlint clean
 - [ ] Pushed; pull request opened with a "For review" list. **Stop.**
@@ -93,7 +93,7 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 - [ ] Independent read-only review (prompts/review-subagent.md); findings fixed or answered; summary on the pull request
 ### Phase 4: CI, settings, merge, cleanup
 - [ ] CI green (run id); ruleset on master before the merge; merge after the maintainer's review (read the SHA and method back)
-- [ ] One go from the maintainer for the whole cleanup list (the dry run of `post-merge-cleanup.sh` with ai-docs/notes/dispositions.tsv), then `--apply`: alerts 0; old bot pull requests closed with one comment each; issues answered; webhooks removed; repo settings; secret scanning and push protection; private vulnerability reporting; workflow permissions read
+- [ ] One go from the maintainer for the whole cleanup list (the dry run of `post-merge-cleanup.sh` with ai-docs/notes/dispositions.tsv), then `--apply` (with `--tag-ruleset`): alerts 0; tag ruleset (admins only); old bot pull requests closed with one comment each; issues answered; webhooks removed; repo settings; secret scanning and push protection; private vulnerability reporting; workflow permissions read
 ### Phase 5: release rehearsal
 - [ ] The maintainer adds the trusted publisher (fields in the reference). **Stop.**
 - [ ] `preflight-tag-npm.sh N.0.0-beta.1` READY; tagged; `watch-run.sh` shows the stage id; **stop** for the approval; `verify-registry-npm.sh` VERIFIED (run id)

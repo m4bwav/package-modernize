@@ -2,13 +2,14 @@
 // Runs the cases in evals.json through the Claude Code CLI headlessly (`claude -p --output-format stream-json`), each in a
 // fresh scratch directory, and judges them on evidence: a Skill tool call naming this skill in the trace for trigger cases
 // (none for decoys), the named tool call or file for action cases, the regex expectations for outcome cases. It never grades
-// on the reply's wording. The skill must be installed where the CLI finds it (a junction in ~/.claude/skills); for a baseline
+// on the reply's wording. A case with `fixture` runs in a git repository copied from evals/fixtures/ and can be judged on
+// an `evidence.all` list (ordered tool calls, files unchanged or changed, a command's exit code). The skill must be installed where the CLI finds it (a junction in ~/.claude/skills); for a baseline
 // run, remove or rename that junction first and pass --baseline so the report says so.
 //
-// Usage: node run-headless.mjs [--case id[,id]] [--runs N] [--concurrency N] [--out DIR] [--baseline] [--model MODEL]
+// Usage: node run-headless.mjs [--case id[,id]] [--runs N] [--concurrency N] [--out DIR] [--baseline] [--model MODEL] [--selftest]
 // Output: <out>/results.json and one <out>/<case>-<run>.jsonl transcript per run; a summary on stdout for TESTS.md.
-import {spawn} from 'node:child_process';
-import {existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, readdirSync} from 'node:fs';
+import {spawn, spawnSync} from 'node:child_process';
+import {cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, readdirSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
@@ -61,11 +62,36 @@ function claudeBinary() {
   return 'claude';
 }
 
+// A case with `fixture` starts from a copy of evals/fixtures/<fixture>, with `fixture_replace` files ({dest: source under
+// evals/}) laid over it, committed as one git commit on branch v2, so the run can use git and file_unchanged has a baseline.
+function prepareFixture(entry, cwd) {
+  if (!entry.fixture) {
+    return;
+  }
+
+  cpSync(path.join(here, 'fixtures', entry.fixture), cwd, {recursive: true});
+  for (const [dest, source] of Object.entries(entry.fixture_replace ?? {})) {
+    cpSync(path.join(here, source), path.join(cwd, dest));
+  }
+
+  const git = (...gitArgs) => spawnSync('git', ['-c', 'user.name=eval', '-c', 'user.email=eval@example.invalid', '-c', 'core.autocrlf=false', ...gitArgs], {cwd});
+  git('init', '-q', '-b', 'v2');
+  // `fixture_phase0` paths go in a first commit of their own, so "unchanged since the Phase 0 commit" has a commit to name.
+  if (entry.fixture_phase0) {
+    git('add', '--', ...entry.fixture_phase0);
+    git('commit', '-q', '-m', 'Phases 0 and 1: golden capture of the published version, plan');
+  }
+
+  git('add', '-A');
+  git('commit', '-q', '-m', entry.fixture_phase0 ? 'Phase 2 so far: rewrite' : 'Phases 0 and 1, Phase 2 so far');
+}
+
 function runOnce(entry, run) {
   const cwd = mkdtempSync(path.join(tmpdir(), `${skillName}-${entry.id}-${run}-`));
+  prepareFixture(entry, cwd);
   const kind = entry.kind;
   const cliArgs = ['-p', entry.prompt, '--output-format', 'stream-json', '--verbose', '--no-session-persistence',
-    '--max-turns', String(MAX_TURNS[kind]), '--allowedTools', ...TOOLS[kind]];
+    '--max-turns', String(entry.max_turns ?? MAX_TURNS[kind]), '--allowedTools', ...TOOLS[kind], ...(entry.tools ?? [])];
   if (model) {
     cliArgs.push('--model', model);
   }
@@ -112,6 +138,69 @@ function toolUses(output) {
   return uses;
 }
 
+// One check of an `evidence.all` list. Types: trace (a tool call whose name matches `tool` and input matches `input_match`),
+// sequence (`steps`, each a trace check, found in this order), file_contains (`path`, `match`), file_unchanged and
+// file_changed (`paths`, compared with the fixture as prepared, carriage returns ignored), command (`run` in the case's
+// directory after the session ends, through a shell; passes on exit 0).
+function matchesStep(use, step) {
+  return new RegExp(`^(?:${step.tool})$`, 'u').test(use.name) && (!step.input_match || new RegExp(step.input_match, 'iu').test(use.input));
+}
+
+function fixtureText(entry, relative) {
+  const replaced = entry.fixture_replace?.[relative];
+  const source = replaced ? path.join(here, replaced) : path.join(here, 'fixtures', entry.fixture, relative);
+  return readFileSync(source, 'utf8').replaceAll('\r', '');
+}
+
+function checkEvidence(check, uses, cwd, entry) {
+  const current = relative => {
+    const file = path.join(cwd, relative);
+    return existsSync(file) ? readFileSync(file, 'utf8').replaceAll('\r', '') : undefined;
+  };
+
+  switch (check.type) {
+    case 'trace': {
+      return uses.some(use => matchesStep(use, check));
+    }
+
+    case 'sequence': {
+      let from = 0;
+      for (const step of check.steps) {
+        const found = uses.findIndex((use, index) => index >= from && matchesStep(use, step));
+        if (found === -1) {
+          return false;
+        }
+
+        // Inclusive: one Bash call may both plant and test (`sed -i ... && npm test`).
+        from = found;
+      }
+
+      return true;
+    }
+
+    case 'file_contains': {
+      const text = current(check.path);
+      return text !== undefined && new RegExp(check.match, 'iu').test(text);
+    }
+
+    case 'file_unchanged': {
+      return check.paths.every(relative => current(relative) === fixtureText(entry, relative));
+    }
+
+    case 'file_changed': {
+      return check.paths.every(relative => current(relative) !== undefined && current(relative) !== fixtureText(entry, relative));
+    }
+
+    case 'command': {
+      return spawnSync(check.run, {cwd, shell: true, stdio: 'ignore', timeout: 120_000}).status === 0;
+    }
+
+    default: {
+      throw new Error(`unknown evidence type ${check.type}`);
+    }
+  }
+}
+
 function judge(entry, output, cwd) {
   const uses = toolUses(output);
   const invoked = uses.some(use => use.name === 'Skill' && use.input.includes(skillName));
@@ -130,6 +219,11 @@ function judge(entry, output, cwd) {
 
   if (entry.kind === 'trigger') {
     return {invoked, passed: entry.decoy ? !invoked : invoked, tools: uses.map(use => use.name)};
+  }
+
+  if (entry.kind === 'action' && entry.evidence?.all) {
+    const checks = entry.evidence.all.map(check => ({type: check.type, why: check.why, passed: checkEvidence(check, uses, cwd, entry)}));
+    return {invoked, passed: checks.every(check => check.passed), checks, tools: uses.map(use => `${use.name}:${use.input.slice(0, 80)}`)};
   }
 
   if (entry.kind === 'action') {
@@ -162,6 +256,37 @@ function judge(entry, output, cwd) {
 }
 
 const entries = suite.evals.filter(entry => only.length === 0 || only.includes(entry.id));
+
+// --rejudge DIR: grade a finished run again from its stored transcripts and case directories (after fixing a check that
+// was wrong), without new sessions. Rewrites DIR/results.json and prints the summary as a fresh run would.
+const rejudge = option('--rejudge', undefined);
+if (rejudge) {
+  const stored = JSON.parse(readFileSync(path.join(rejudge, 'results.json'), 'utf8'));
+  for (const result of stored.results) {
+    const entry = suite.evals.find(candidate => candidate.id === result.id);
+    Object.assign(result, judge(entry, readFileSync(result.transcript, 'utf8'), result.cwd), {rejudged: new Date().toISOString()});
+    console.log(`${result.id} run ${result.run}: ${result.passed ? 'pass' : 'FAIL'} (re-judged)`);
+  }
+
+  writeFileSync(path.join(rejudge, 'results.json'), JSON.stringify(stored, null, 2));
+  summarize(stored.results, stored.baseline);
+  process.exit(0);
+}
+
+// --selftest: judge every fixture case on its untouched fixture with an empty transcript. Each must fail (a case that
+// passes when nothing happened proves nothing); the per-check results show which checks carry the verdict.
+if (args.includes('--selftest')) {
+  let bad = 0;
+  for (const entry of entries.filter(candidate => candidate.fixture)) {
+    const cwd = mkdtempSync(path.join(tmpdir(), `${skillName}-selftest-${entry.id}-`));
+    prepareFixture(entry, cwd);
+    const result = judge(entry, '', cwd);
+    bad += result.passed ? 1 : 0;
+    console.log(`${result.passed ? 'BAD ' : 'ok  '} ${entry.id} fails on an idle run: ${result.checks.map(check => `${check.type}=${check.passed}`).join(' ')} (${cwd})`);
+  }
+
+  process.exit(bad === 0 ? 0 : 1);
+}
 const jobs = [];
 for (const entry of entries) {
   const runs = baseline ? 1 : Number(runsOverride ?? entry.runs ?? 3);
@@ -185,30 +310,34 @@ await Promise.all(Array.from({length: concurrency}, () => worker()));
 results.sort((a, b) => a.id.localeCompare(b.id) || a.run - b.run);
 writeFileSync(path.join(out, 'results.json'), JSON.stringify({skill: skillName, baseline, date: new Date().toISOString(), results}, null, 2));
 
-// Summary per case, judged as TESTING.md §7 says: trigger 2 of 3, decoy 0 of 3, action and outcome every run.
-const byCase = new Map();
-for (const result of results) {
-  const list = byCase.get(result.id) ?? [];
-  list.push(result);
-  byCase.set(result.id, list);
-}
+summarize(results, baseline);
 
-let passedCases = 0;
-for (const [id, list] of byCase) {
-  const entry = suite.evals.find(candidate => candidate.id === id);
-  const passes = list.filter(result => result.passed).length;
-  const invoked = list.filter(result => result.invoked).length;
-  let verdict;
-  if (entry.kind === 'trigger' && !entry.decoy) {
-    verdict = invoked >= Math.ceil(list.length * 2 / 3);
-  } else if (entry.decoy) {
-    verdict = invoked === 0;
-  } else {
-    verdict = passes === list.length;
+// Summary per case, judged as TESTING.md §7 says: trigger 2 of 3, decoy 0 of 3, action and outcome every run.
+function summarize(results, isBaseline) {
+  const byCase = new Map();
+  for (const result of results) {
+    const list = byCase.get(result.id) ?? [];
+    list.push(result);
+    byCase.set(result.id, list);
   }
 
-  passedCases += verdict ? 1 : 0;
-  console.log(`${verdict ? 'PASS' : 'FAIL'} ${id} (${entry.kind}${entry.decoy ? ', decoy' : ''}): ${passes}/${list.length} runs passed, skill invoked in ${invoked}/${list.length}`);
-}
+  let passedCases = 0;
+  for (const [id, list] of byCase) {
+    const entry = suite.evals.find(candidate => candidate.id === id);
+    const passes = list.filter(result => result.passed).length;
+    const invoked = list.filter(result => result.invoked).length;
+    let verdict;
+    if (entry.kind === 'trigger' && !entry.decoy) {
+      verdict = invoked >= Math.ceil(list.length * 2 / 3);
+    } else if (entry.decoy) {
+      verdict = invoked === 0;
+    } else {
+      verdict = passes === list.length;
+    }
 
-console.log(`\n${passedCases}/${byCase.size} cases passed${baseline ? ' (baseline, skill absent)' : ''}. Results: ${path.join(out, 'results.json')}`);
+    passedCases += verdict ? 1 : 0;
+    console.log(`${verdict ? 'PASS' : 'FAIL'} ${id} (${entry.kind}${entry.decoy ? ', decoy' : ''}): ${passes}/${list.length} runs passed, skill invoked in ${invoked}/${list.length}`);
+  }
+
+  console.log(`\n${passedCases}/${byCase.size} cases passed${isBaseline ? ' (baseline, skill absent)' : ''}. Results: ${path.join(rejudge ?? out, 'results.json')}`);
+}

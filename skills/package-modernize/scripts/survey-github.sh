@@ -23,6 +23,42 @@ run "Webhooks (dead services leave these)" "gh api repos/$REPO/hooks --jq '.[] |
 run "Actions secrets (count) and variables" "gh api repos/$REPO/actions/secrets --jq '{total_count, names:[.secrets[].name]}'; gh api repos/$REPO/actions/variables --jq '{total_count, names:[.variables[].name]}'"
 run "Environments" "gh api repos/$REPO/environments --jq '.environments[]? | \"\\(.name) reviewers=\\([.protection_rules[]? | select(.type==\"required_reviewers\") | .reviewers[]?.reviewer.login] | join(\",\"))\"'"
 run "Workflows" "gh api repos/$REPO/actions/workflows --jq '.workflows[] | \"\\(.name) \\(.path) \\(.state)\"'"
+
+# Every `uses:` pin in the default branch's workflows with the runtime its action.yml declares at that ref. GitHub stopped
+# running `using: node20` actions on 2026-09-23 (node16 and node12 earlier), so an old pin is a job that fails on day one.
+action_pins() {
+  local files file pins pin action ref owner_repo sub meta using
+  files=$(gh api "repos/$REPO/git/trees/HEAD?recursive=1" --jq '.tree[].path' 2>/dev/null | grep -E '^\.github/workflows/[^/]+\.ya?ml$')
+  [ -z "$files" ] && { echo '(no workflow files)'; return; }
+  pins=$(for file in $files; do
+    gh api "repos/$REPO/contents/$file" --jq .content | base64 -d 2>/dev/null | tr -d '\r' \
+      | sed -nE 's/^[[:space:]-]*uses:[[:space:]]*["'"'"']?([^"'"'"'[:space:]#]+).*$/\1/p' | sed "s|^|$file |"
+  done | sort -u)
+  printf '%s\n' "$pins" | while read -r file pin; do
+    [ -z "$pin" ] && continue
+    case "$pin" in
+      ./*|docker://*) echo "$file $pin (local or docker)"; continue ;;
+    esac
+    action="${pin%@*}"; ref="${pin##*@}"
+    owner_repo=$(printf '%s' "$action" | cut -d/ -f1-2); sub=$(printf '%s' "$action" | cut -d/ -f3-)
+    using='?'
+    for name in action.yml action.yaml; do
+      meta=$(gh api "repos/$owner_repo/contents/${sub:+$sub/}$name?ref=$ref" --jq .content 2>/dev/null | base64 -d 2>/dev/null | tr -d '\r')
+      if [ -n "$meta" ]; then
+        using=$(printf '%s\n' "$meta" | sed -nE 's/^[[:space:]]+using:[[:space:]]*["'"'"']?([A-Za-z0-9]+).*$/\1/p' | head -1)
+        break
+      fi
+    done
+    case "$using" in
+      node12|node16|node20) verdict="DEAD ($using no longer runs)" ;;
+      '?') verdict="unknown (action.yml not found at $ref)" ;;
+      *) verdict="$using" ;;
+    esac
+    echo "$file $pin -> $verdict"
+  done
+}
+section "Action pins in the default branch's workflows, with each action's runtime" "action_pins (git tree, contents API, action.yml at each ref)"
+action_pins
 run "Forks" "gh api repos/$REPO/forks --jq '.[] | \"\\(.full_name) pushed=\\(.pushed_at[:10])\"'"
 run "Releases and tags" "gh release list -R $REPO --limit 20; gh api repos/$REPO/tags --jq '.[].name' | head -30"
 run "Dead-service files in the default branch" "gh api repos/$REPO/git/trees/HEAD?recursive=1 --jq '.tree[].path' | grep -Ei '^(\\.travis\\.yml|\\.snyk|\\.synk|\\.sonarcloud\\.properties|sonar-project\\.properties|\\.coveralls\\.yml|codecov\\.yml|\\.codecov\\.yml|appveyor\\.yml|\\.circleci/|\\.npmignore|\\.nuspec|\\.vscode/)' || echo '(none)'"

@@ -8,15 +8,20 @@ Files a run copies into the package repository and adapts; do not write them fro
 - [npm/tsconfig.json](npm/tsconfig.json), [npm/tsdown.config.ts](npm/tsdown.config.ts): the build. tsdown rewrites `main`, `module`, `types` and `exports` on every build.
 - [npm/xo.config.js](npm/xo.config.js): lint, every override with a reason.
 - [npm/.github/workflows/ci.yml](npm/.github/workflows/ci.yml): lint, shape, coverage, Node 20 to 26 on Linux plus Windows and macOS, Bun, Deno, and the final `ci` job the ruleset requires.
-- [npm/.github/workflows/release.yml](npm/.github/workflows/release.yml): on a `v*` tag, build, test, stage on npm through trusted publishing, GitHub Release. The trusted publisher on npmjs.com names this file.
+- [npm/.github/workflows/release.yml](npm/.github/workflows/release.yml): on a `v*` tag, build, test, stage on npm through trusted publishing (the only `id-token` job: no install, `--ignore-scripts`, first-party actions), then the GitHub Release in its own job. The trusted publisher on npmjs.com names this file.
 - [npm/.github/workflows/verify-published.yml](npm/.github/workflows/verify-published.yml): after the approval, the registry package on every platform, Bun and Deno, signatures and attestation. Fill the `{{SMOKE_*}}` one-liners; add the npx, bunx and deno CLI steps from get-title-at-url for a package with a bin.
 - [npm/.github/workflows/live.yml](npm/.github/workflows/live.yml): optional weekly live smoke for a package that talks to the internet; delete for a pure library.
+- [npm/.npmrc](npm/.npmrc): `min-release-age=3`, a three-day cooldown on resolving new dependency versions (npm 11.10 and later; `npm ci` from the lockfile is unaffected).
 - [npm/.github/dependabot.yml](npm/.github/dependabot.yml): weekly, Monday, minor and patch grouped, a 7-day cooldown, held majors with dated comments.
 - [npm/.github/zizmor.yml](npm/.github/zizmor.yml): zizmor's one deliberate exception (verify-published installs the version just published); run `uvx zizmor --offline .` from the repository root.
 - [npm/AGENTS.md](npm/AGENTS.md), [npm/CLAUDE.md](npm/CLAUDE.md), [npm/.github/copilot-instructions.md](npm/.github/copilot-instructions.md): the agent rules and the two pointers to them.
 - [npm/SECURITY.md](npm/SECURITY.md), [npm/README.template.md](npm/README.template.md): reporting, supported versions, three live badges.
 - [npm/.editorconfig](npm/.editorconfig), [npm/.gitattributes](npm/.gitattributes), [npm/.gitignore](npm/.gitignore): LF everywhere.
 - `npm/test/`: [helpers/builds.js](npm/test/helpers/builds.js) (both builds), [package/shape.test.js](npm/test/package/shape.test.js) (tarball, exports, portability, bare engine), [golden/golden.test.template.js](npm/test/golden/golden.test.template.js) (the contract; the capture script is [../scripts/golden-capture-npm.template.cjs](../scripts/golden-capture-npm.template.cjs); both use [golden/codec.cjs](npm/test/golden/codec.cjs), which keeps NaN, -0, Infinity, undefined and wrapper objects through JSON and records thrown errors with their class), [consumers/consumers.test.js](npm/test/consumers/consumers.test.js) with the `esm-node`, `cjs-node` and four TypeScript fixtures and [consumers/types/assertions.ts](npm/test/consumers/types/assertions.ts).
+
+## Rulesets
+
+- [rulesets/tags-admins-only.json](rulesets/tags-admins-only.json): a tag ruleset (create, update, delete any tag; repository admins bypass), applied in Phase 4 by `scripts/post-merge-cleanup.sh --tag-ruleset`. Any package system: whoever can push a `v*` tag starts the release workflow.
 
 ## NuGet (from DotNetJsonPrettyPrinter 3.0.0 and DotNetRandomNameGenerator 2.1.0, 2026-09-25)
 

@@ -263,3 +263,19 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: scripts tested 2026-09-26 on is-an-image-url runs 36247959799 (failure shown in 7 lines) and 36248115597 (stage id shown), a replay of f2bf891~1 (FAIL on the changelog), 2.0.0 (VERIFIED) and 1.0.4 (FAIL: deprecated, no provenance), and a dry run on PR #25; C-20260926-6
 - Scope: skill
 - Status: promoted (C-20260926-6) · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-033 · 2026-09-26 · Eval evidence must accept every spelling of the action; re-judge stored runs after fixing a check
+- Trigger: the first pass of action-canary graded run 1 as a failure. The run had planted `<=` in src/index.js, seen 10 of 15 golden cases fail, reverted with `git checkout -- src/` and logged it, but it ran the suite as `npm --prefix "<dir>" test`, which the sequence regex `npm (run )?test` did not match (2026-09-26).
+- Hypothesis: a regex written from one imagined command misses the forms an agent actually uses (`--prefix`, `-C`, PowerShell instead of Bash); the grade then measures the regex, not the skill.
+- Rule: write trace checks for the effect (`\bnpm\b.*\btest\b`, Bash or PowerShell), prefer file and command checks over command spelling, and run `run-headless.mjs --selftest` so every fixture case fails on an idle run. When a check turns out wrong, fix it and `--rejudge` the stored transcripts and case directories instead of spending new runs; record both gradings in TESTS.md.
+- Evidence: T-20260926-1; evals/run-headless.mjs (`--rejudge`, `--selftest`); C-20260926-7
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-26
+
+### L-034 · 2026-09-26 · A case that passes without the skill is a regression guard, not proof the skill works
+- Trigger: the baseline (skill junction moved out of ~/.claude/skills) failed action-canary (it ran the suite on four Node lines and never planted a break) but passed action-golden-untouched: the fixture's plan says in D1 that every 1.x answer stays exact, so any careful agent fixes src/ (2026-09-26).
+- Hypothesis: the fixture spells out the ruling the skill exists to supply; RepoRescue's test editing happens when the right answer is not written down next to the failing test.
+- Rule: run a baseline for every new action case and record in evals.json what the skill-less run did. A case the baseline passes stays as a guard against regressions, labelled so; to measure the skill, the fixture must leave the rule to the skill (for golden-untouched: a plan that states the promise only generally, or a divergence that looks like a fix of an old bug).
+- Evidence: T-20260926-1 baseline runs; evals.json `baseline` fields of both cases
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-26

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Phase 4 cleanup after the rewrite's pull request merges (package-modernize). Dry run by default: prints every GitHub
 # write it would make, so the maintainer can give one go for the whole list (L-028); --apply makes them.
-# Usage: post-merge-cleanup.sh OWNER/REPO PR_NUMBER DISPOSITIONS_FILE [--apply] [--ruleset-from OWNER/REPO/RULESET_ID]
+# Usage: post-merge-cleanup.sh OWNER/REPO PR_NUMBER DISPOSITIONS_FILE [--apply] [--ruleset-from OWNER/REPO/RULESET_ID] [--tag-ruleset]
+# --tag-ruleset: create templates/rulesets/tags-admins-only.json (tags created, moved or deleted by repository admins only)
+# unless the repository already has a tag ruleset.
 # DISPOSITIONS_FILE: one line per action, tab-separated, `#` comments allowed; {SHA} becomes the merge commit (7 chars):
 #   pr<TAB>17<TAB>Closed by the 2.0.0 rewrite ({SHA}): ...     close with that comment and delete its branch
 #   branch<TAB>mime-issue                                      delete a branch with no pull request
@@ -12,10 +14,12 @@ REPO="${1:?usage: post-merge-cleanup.sh OWNER/REPO PR_NUMBER DISPOSITIONS_FILE [
 PR="${2:?merged pull request number}"
 FILE="${3:?dispositions file}"
 shift 3
-APPLY=0; RULESET_FROM=""
+HERE="$(cd "$(dirname "$0")" && pwd)"
+APPLY=0; RULESET_FROM=""; TAG_RULESET=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --apply) APPLY=1 ;;
+    --tag-ruleset) TAG_RULESET=1 ;;
     --ruleset-from) shift; RULESET_FROM="${1:-}" ;;
   esac
   shift
@@ -45,8 +49,8 @@ while IFS=$'\t' read -r kind arg comment; do
 done < "$FILE"
 
 if [ -n "$RULESET_FROM" ]; then
-  if [ "$(gh api "repos/$REPO/rulesets" --jq length)" != "0" ]; then
-    echo "rulesets already present: $(gh api "repos/$REPO/rulesets" --jq '[.[] | "\(.id) \(.name)"] | join(", ")')"
+  if [ "$(gh api "repos/$REPO/rulesets" --jq '[.[] | select(.target == "branch")] | length')" != "0" ]; then
+    echo "branch rulesets already present: $(gh api "repos/$REPO/rulesets" --jq '[.[] | select(.target == "branch") | "\(.id) \(.name)"] | join(", ")')"
   else
     src_repo="${RULESET_FROM%/*}"; src_id="${RULESET_FROM##*/}"
     body=$(mktemp)
@@ -54,6 +58,16 @@ if [ -n "$RULESET_FROM" ]; then
     if [ $APPLY -eq 1 ]; then echo "\$ gh api -X POST repos/$REPO/rulesets (copy of $RULESET_FROM)"; gh api -X POST "repos/$REPO/rulesets" --input "$body" --jq '"ruleset \(.id) \(.name) \(.enforcement)"'
     else echo "would create a ruleset on $REPO copied from $RULESET_FROM: $(tr -d '\n' < "$body" | cut -c1-160)..."; fi
     rm -f "$body"
+  fi
+fi
+
+# Whoever can push a v* tag can start release.yml; only repository admins may create, move or delete tags (R-20260926-1).
+if [ $TAG_RULESET -eq 1 ]; then
+  existing=$(gh api "repos/$REPO/rulesets" --jq '[.[] | select(.target == "tag") | "\(.id) \(.name)"] | join(", ")')
+  if [ -n "$existing" ]; then
+    echo "tag rulesets already present: $existing"
+  else
+    do_or_say gh api -X POST "repos/$REPO/rulesets" --input "$HERE/../templates/rulesets/tags-admins-only.json" --jq '"ruleset \(.id) \(.name) \(.enforcement)"'
   fi
 fi
 

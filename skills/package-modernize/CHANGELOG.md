@@ -4,6 +4,21 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-9 · 2026-09-26 · The survey lists every action pin with its runtime
+- because: R-20260926-1 (GitHub stopped running node20 actions on 2026-09-23)
+- files: scripts/survey-github.sh (section "Action pins in the default branch's workflows"), scripts/README.md, SKILL.md ("What every run does the same way": Survey), references/nuget.md (Phase 2: NuGet/login v1.2.0 runtime)
+- Each `uses:` pin in the default branch's workflows is printed with the `runs.using` its action.yml declares at that ref, and node12, node16 and node20 pins are marked DEAD. Tested on is-an-image-url (all node24), DotNetJsonPrettyPrinter (all node24, NuGet/login@v1 included) and context-health (four DEAD pins); stack-exchange-markdown-retriever has no workflows. NuGet/login v1.2.0 (SHA 8d19675, the template's pin) declares node24.
+
+### C-20260926-8 · 2026-09-26 · Release hardening from secure-npm-package: split id-token job, tag ruleset, install cooldown
+- because: R-20260926-1; decision ai-docs/decisions/2026-09-26-release-hardening-from-secure-npm-package.md (in the skill repository)
+- files: templates/npm/.github/workflows/release.yml (publish job `contents: read` with `--ignore-scripts`; new github-release job), templates/npm/.npmrc (new, `min-release-age=3`), templates/rulesets/tags-admins-only.json (new), scripts/post-merge-cleanup.sh (`--tag-ruleset`; the branch-ruleset check counts branch rulesets only), scripts/README.md, templates/README.md, references/npm.md (Phase 1 defaults: install cooldown, release, tag protection; Phase 4 shortcut), references/plan-skeleton.md (Phase 4), SKILL.md (Security)
+- The id-token job no longer holds `contents: write`; the cooldown was tested on npm 11.16 (blocks resolution of versions younger than three days, leaves `npm ci` from the lockfile alone); the tag ruleset goes out with the Phase 4 go. Immutable releases and `ignore-scripts` in `.npmrc` were considered and left out, with reasons in the decision.
+
+### C-20260926-7 · 2026-09-26 · Canary and untouched recording are Phase 2 exit criteria, checked by a script and proven by two evals
+- because: R-20260926-2, T-20260926-1
+- files: SKILL.md (Phases row 2; Golden capture; Tools and prior art), references/npm.md (Phase 2: canary recipe and untouched check), references/plan-skeleton.md (Phases 0 and 2), scripts/check-golden-untouched.sh (new), scripts/preflight-tag-npm.sh (runs it), scripts/README.md, evals/evals.json (action-canary, action-golden-untouched), evals/fixtures/ (pad-lite and a divergent src), evals/run-headless.mjs (fixtures, `evidence.all` checks, `--selftest`, `--rejudge`)
+- A green golden suite now counts only after a planted line in `src/` has turned it red, and the recording, capture script and codec must stay as committed in Phase 0 (fixes go in `src/` or become ruled exceptions). check-golden-untouched.sh passes on the three finished npm packages and fails on a planted edit.
+
 ### C-20260926-6 · 2026-09-26 · Release and cleanup shortcuts as scripts, deprecation by CLI with full messages, research on prior art
 - because: L-031, L-032, R-20260926-1, R-20260926-2
 - files: scripts/preflight-tag-npm.sh, scripts/watch-run.sh, scripts/verify-registry-npm.sh, scripts/post-merge-cleanup.sh (new), scripts/README.md, SKILL.md (Phases row 4: cleanup script; "Tools and prior art": code-modernization 1.0.0 canary, Evil Martians secure-npm-package, Drydock, RepoRescue), references/npm.md (Phase 4 cleanup shortcut; Phases 5 and 6: shortcuts, `next` after the release, deprecation by CLI with the full message), references/plan-skeleton.md (Phases 4 to 6 name the scripts; dispositions.tsv in the appendix), RESEARCH.md (R-20260926-1, R-20260926-2), LEARNINGS.md (L-031, L-032)
