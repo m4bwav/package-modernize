@@ -373,7 +373,44 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 ### L-046 · 2026-09-27 · A package whose output passes through a dependency's new major needs a mechanical exception, not a re-recording
 - Trigger: markdown-plain-link-replacer writes the title get-title-at-url returns; 3.0.0 extracts titles differently from 1.1.8 (article-title), so almost every golden output would differ in the title alone (2026-09-27).
 - Hypothesis: when a consumer adopts its dependency's new major, the dependency's own changelog is the exception, and the golden test can apply it by computing both answers for each fixture (the old extractor as a test-only dev dependency, the new one's exported function) and swapping them in the recorded output, so every other byte stays under test.
-- Rule: plan it as one named exception with the swap described in D1; confirm in Phase 2 that the swap covers every changed case and nothing else.
-- Evidence: markdown-plain-link-replacer plan D1 and E1 (Phase 2 pending)
-- Scope: skill (SKILL.md Golden capture, once Phase 2 proves it)
-- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+- Rule: plan it as one named exception with the swap described in D1; confirm in Phase 2 that the swap covers every changed case and nothing else. Proven in Phase 2 without the old extractor: every ordinary fixture page gave the same old title ("Page"), so the swap replaces that fixed string with the new dependency's answer for each URL, fetched by the golden test itself, and the pages whose reading changed in other ways became named exceptions with explicit outputs. Before planning the swap, run every recorded case through the first build in a scratch script and list the differences: each must map to a plan item or be a bug (three new items, E15 to E17, came from that list).
+- Evidence: markdown-plain-link-replacer test/golden/golden.test.js (swapTitles, exceptions), log "Phase 2: rewrite, golden test, canary"
+- Scope: skill (SKILL.md Golden capture)
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-047 · 2026-09-27 · The canary's `git checkout -- src/` reverts nothing while src/ is untracked
+- Trigger: markdown-plain-link-replacer Phase 2: the canary was planted before src/ had ever been committed, so `git checkout -- src/` left the plant in place and the "reverted" run was still red; the plant came out by hand (2026-09-27).
+- Hypothesis: the recipe assumes a rewrite on top of a tracked src/; a first rewrite has none.
+- Rule: commit src/ (a work-in-progress commit on the branch is fine) before planting the canary, and check `git status --short src` is empty after the revert.
+- Evidence: markdown-plain-link-replacer log "Phase 2: rewrite, golden test, canary" (38fd6d4 then the canary)
+- Scope: skill (references/npm.md Phase 2 canary)
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+
+### L-048 · 2026-09-27 · Taking a young dependency past the cooldown: add it alone, after the tree is locked under the cooldown
+- Trigger: markdown-plain-link-replacer depends on the maintainer's own new majors, released one and two days earlier. One `npm install --min-release-age=0 <four packages>` resolved the whole tree past the cooldown: 35 locked versions younger than three days, 32 of them dev tools. CI's `npm audit signatures` then failed with notarget, because it applies min-release-age to locked versions too (2026-09-27).
+- Hypothesis: `--min-release-age=0` applies to every package that command resolves, not only the ones named.
+- Rule: install everything else under the cooldown first (without the young packages in package.json), then `npm install --min-release-age=0 <young packages>` alone; check the lockfile for versions younger than the cooldown (a packument time per locked version). In ci.yml pass `--min-release-age=0` to `npm audit signatures` while a runtime dependency is younger than the cooldown, with the reason in a comment; `npm install` in a clone fails with notarget until then (`npm ci` works).
+- Evidence: markdown-plain-link-replacer cb59a48, log "Phase 2: verification"
+- Scope: skill (references/npm.md Phase 1 install cooldown)
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+
+### L-049 · 2026-09-27 · xo --fix can bring in APIs newer than the Node floor
+- Trigger: xo --fix rewrote a test's `new Promise(resolve => ...)` into `Promise.withResolvers()` (Node 22+); every golden case failed on Node 20 (304 failures) while Node 22 to 26 passed (2026-09-27).
+- Rule: after `xo --fix`, run the suites on the floor Node line (`npx -p node@20`) before pushing; turn unicorn/prefer-promise-with-resolvers off in the template's xo config while the floor is Node 20 (Array#toSorted and friends are fine on 20; Iterator helpers and Promise.withResolvers are not).
+- Evidence: markdown-plain-link-replacer xo.config.js, log "Phase 2: verification"
+- Scope: skill (templates/npm/xo.config.js, references/npm.md Traps)
+- Status: promoted (templates/npm/xo.config.js, references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+
+### L-050 · 2026-09-27 · Editor-tool content decodes `\u` escapes; `a && grep | b && git commit` commits after failures
+- Trigger: markdown-plain-link-replacer: comments written as `[a-z\u00a1-\uffff]` through the Write tool landed as the literal characters; and a chain `npm run test:dist | grep ... && git commit` committed and pushed while 8 tests had failed, because grep's exit status passed (2026-09-27).
+- Rule: after writing source with the editor tools, grep new files for non-ASCII (`grep -nP '[^\x00-\x7F]'`) and restore escapes written doubled; never gate a commit on a pipeline whose last command is grep: run the tests, check the summary, then commit in a separate call.
+- Evidence: markdown-plain-link-replacer src/scan-links.ts comments; 17b3578 (the failures did not recur in three reruns or CI)
+- Scope: skill (SKILL.md Windows line; references/npm.md Traps)
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+
+### L-051 · 2026-09-27 · A package with runtime dependencies: tests route fetch by URL, and oracles for inlined pieces are recorded, not installed
+- Trigger: markdown-plain-link-replacer is the first run whose new major keeps runtime dependencies (the maintainer's three packages and tldts) and inlines two old ones (url-regex, hogan.js) (2026-09-27).
+- Rule: route the dependencies' fetches in tests through a globalThis.fetch wrapper that sends every URL to the fixture server with the meant URL in a header, following redirects itself; stub fetch in-process for unit suites. For an inlined old dependency, record its answers in a scratch project into a committed JSON oracle with its capture script (hogan.js 3.0.2: 128 entries), or write its own expression into the test as the oracle (url-regex 4.1.1, 3000 generated texts), rather than installing it as a dev dependency (old trees bring alerts). The shape test lists the allowed require() names of the CommonJS build and runs it in a bare vm context with a require that serves only those.
+- Evidence: markdown-plain-link-replacer test/helpers/web.js, stub-fetch.js, test/unit/hogan/, test/unit/find-links.test.js, test/package/shape.test.js
+- Scope: skill (references/npm.md Phase 2)
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-27

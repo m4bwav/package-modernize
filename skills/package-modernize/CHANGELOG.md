@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-3 · 2026-09-27 · Young dependencies past the cooldown, the canary on an untracked src/, xo --fix and the Node floor, runtime-dependency test routing
+- because: L-046 (proven), L-047, L-048, L-049, L-050, L-051 (markdown-plain-link-replacer Phase 2, the first run whose new major keeps runtime dependencies)
+- files: references/npm.md (Phase 1 install cooldown; Phase 2: commit src before the canary, list every recorded difference before writing exceptions, the mechanical swap for a dependency's new major, fetch routing and recorded oracles; Traps: xo --fix and Promise.withResolvers, editor-tool escapes and grep-gated commits), templates/npm/xo.config.js (unicorn/prefer-promise-with-resolvers off), LEARNINGS.md (L-046 promoted, L-047 to L-051)
+- The run's own maintainer packages were younger than the three-day cooldown; installing them alongside the rest resolved 35 young versions, and CI's signature audit refused them.
+
 ### C-20260927-2 · 2026-09-27 · Many-host network capture with a socket guard; npm init writes to the working directory
 - because: L-044, L-045 (markdown-plain-link-replacer Phases 0 and 1); L-046 recorded as active until Phase 2 proves it
 - files: references/npm.md (Phase 0: many-host capture through one proxy, the socket guard; Traps: npm init and --prefix), LEARNINGS.md (L-044 to L-046)
