@@ -605,3 +605,11 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: IsImageUrlDotNet ci.yml "F# analyzers" (061a7de, a524f02)
 - Scope: skill (references/nuget.md F# packages)
 - Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-077 · 2026-09-27 · Apply the repository settings when the pull request opens, not after the review (`settings-before-the-pull-request`)
+- Trigger: IsImageUrlDotNet's plan put the rulesets in Phase 4 "before the merge"; the maintainer reviewed and merged pull request #1 himself (a merge commit, not the squash the skill expects) as soon as he read it, so the rulesets and the required `ci` check never gated that merge (2026-09-27).
+- Hypothesis: the stop at the pull request hands the merge to the maintainer; anything meant to gate it has to be in place when the stop message goes out.
+- Rule: at the end of Phase 3, before the stop message, apply the branch ruleset (required check `ci`), the tag ruleset and the security settings, and say in the stop message that the merge is gated; accept whatever merge method the maintainer used and read it back.
+- Evidence: IsImageUrlDotNet ai-docs/log.md "Phase 4 and the Phase 5 stop" (merge e9e1eb7 at 20:08:58Z, rulesets 24084842 and 24084845 after it)
+- Scope: skill (SKILL.md phases table, Phase 3 and 4)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
