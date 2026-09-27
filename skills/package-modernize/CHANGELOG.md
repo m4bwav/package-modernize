@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-10 · 2026-09-27 · F# on NuGet, one golden recording per runtime, cloud sessions (`fsharp-and-cloud-runs`)
+- because: L-063 `pin-fsharp-core`, L-064 `dotnet-format-skips-fsharp`, L-065 `golden-per-runtime`, L-066 `shared-cases-file`, L-067 `fixture-server-as-proxy`, L-068 `fsharp-ignores-fsharp-extensions`, L-069 `cloud-session-access-check` (IsImageUrlDotNet Phases 0 and 1)
+- files: references/nuget.md (coverage line; Phase 0: recordings per runtime, capturing on Linux, the .NET fixture proxy; new section "F# packages"; Phase 1 defaults row F#; Traps; what it still lacks), SKILL.md (cloud-session line in the shape of a run; NuGet golden-capture and lint cells), scripts/survey-github.sh (stops with exit 2 without a logged-in gh), scripts/survey-nuget.sh (says when the search host is unreachable), scripts/golden-capture-nuget.template.cs (header points at the F# route), LEARNINGS.md (L-063 to L-069)
+- The first F# package: the reference had no F# at all, its format gate is a no-op on F#, the NuGet capture cell still said "unverified", and a Linux cloud session showed the survey scripts reporting "(none)" for checks that never ran.
+
 ### C-20260927-9 · 2026-09-27 · NuGet coverage complete (`nuget-coverage-complete`)
 - because: L-062 `verify-waits-both-indexes`; TrailerClipper 2.0.0 released through every phase
 - files: SKILL.md (description, coverage table), references/nuget.md (coverage line with worked-example workflows, rehearsal verified, Traps, what it still lacks), LEARNINGS.md (L-062)
