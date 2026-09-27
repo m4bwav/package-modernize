@@ -414,3 +414,24 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: markdown-plain-link-replacer test/helpers/web.js, stub-fetch.js, test/unit/hogan/, test/unit/find-links.test.js, test/package/shape.test.js
 - Scope: skill (references/npm.md Phase 2)
 - Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+
+### L-052 · 2026-09-27 · After the review, fuzz against the published package itself, not a restated oracle
+- Trigger: markdown-plain-link-replacer's Phase 3 reviewer found 3 bugs. A later offline differential of the published 1.1.16 (installed in a scratch folder, network modules replaced through Module._load, setTimeout forced to 0, a marker template) against dist/ on 13 000 generated texts found two more: whitespace such as U+3000 that the old code trimmed from its match, and a dot before `)`. The in-repo differential restated the rules and missed both (2026-09-27).
+- Rule: before the release rehearsal, run the published old version and the new build side by side on generated input, with the old side's network stubbed at the module level. Seed the generator with whole links (random pieces almost never form one; the first 2000 texts had 0 links). Group the differences by cause, filter out the numbered exceptions, and read every remaining group. The old code's checks apply to its own trimmed values, so a restated rule is easy to get subtly wrong.
+- Evidence: markdown-plain-link-replacer 7146f05, log "Phase 3: every review finding fixed or recorded"
+- Scope: skill (references/npm.md Phase 3)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-053 · 2026-09-27 · Staggered-timer tests measure from the first event
+- Trigger: a test asserting each title lookup came at least 90 ms after the previous one failed intermittently (86 ms). The code schedules lookup i at i * 100 ms from one start, so one late timer shortens the next gap (2026-09-27).
+- Rule: assert each event against the first (>= i * interval - tolerance), not against the previous one.
+- Evidence: markdown-plain-link-replacer test/functional/replace-plain-links.test.js
+- Scope: skill (references/npm.md Traps)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-054 · 2026-09-27 · Run the GitHub-writing scripts from the agent, and get an allow rule first
+- Trigger: Claude Code's auto-mode classifier blocked post-merge-cleanup.sh, even its dry run, as an external write, despite the maintainer's "run everything". The maintainer's own run from PowerShell failed with "gh: command not found" (PowerShell's `bash` is not Git Bash) and read the PR state as empty. Adding "Bash" to permissions.allow in ~/.claude/settings.json cleared it (2026-09-27).
+- Rule: at Phase 4, if the harness classifies GitHub writes as blocked, ask the maintainer once for a Bash allow rule rather than handing the script over; if they run it themselves, give the Git Bash path and the repository directory. verify-registry-npm.sh takes PACKAGE VERSION [OWNER/REPO]; passing the version first gives a 404.
+- Evidence: markdown-plain-link-replacer HANDOFF 2026-09-27
+- Scope: skill (SKILL.md Phase 4; overlay for the settings detail)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-27

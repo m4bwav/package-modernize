@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-4 · 2026-09-27 · Differential against the published old version after the review; staggered-timer tests; auto-mode limits at Phase 4
+- because: L-052, L-053, L-054 (markdown-plain-link-replacer Phases 3 to 6, 2.0.0 released)
+- files: references/npm.md (Phase 3; Phase 4 permission-mode bullet), LEARNINGS.md (L-052 to L-054)
+- The review found 3 bugs, and an offline differential against the published 1.1.16 found 2 more; Phase 4 records what Claude Code's auto mode blocks and what the maintainer must run.
+
 ### C-20260926-12 · 2026-09-26 · Description cut from 1,380 to 1,001 characters, under the spec's 1,024 cap
 - because: user request (description over the Agent Skills spec limit, which some hosts enforce by dropping the skill; over 200 words); T-20260926-2
 - files: SKILL.md front matter `description`
