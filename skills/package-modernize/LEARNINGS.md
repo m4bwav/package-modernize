@@ -493,3 +493,59 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: verify-published 36336494800 (failed, then green on rerun); TrailerClipperLib #4 (b4c6b9d)
 - Scope: skill (references/nuget.md Traps)
 - Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-063 · 2026-09-27 · An F# library pins FSharp.Core; old F# packages often never declared it (`pin-fsharp-core`)
+- Trigger: IsImageUrlDotNet 1.0.2's DLL references FSharp.Core 4.4.0.0 (monodis --assemblyref) while its nuspec declares no dependency; in the capture project the SDK's implicit FSharp.Core resolved to 10.0.112, the SDK's own version, where CI's SDK 10.0.4xx would give 10.1.401 (2026-09-27).
+- Hypothesis: the implicit FSharp.Core reference follows the SDK feature band, so a library that keeps it publishes a floor chosen by whichever machine packed it; and nuspec-era F# packages relied on callers having FSharp.Core already.
+- Rule: in Phase 0 read an F# package's assembly references, not only its nuspec; in Phase 1 pin FSharp.Core (`DisableImplicitFSharpCoreReference` plus an explicit `PackageReference`) at the lowest version the code needs (6.0.7 for `task { }`, 4.7.2 for net45), never bundle it, and take "latest" from the registration index (FSharp.Core 11.0.100 is in the flat container but unlisted).
+- Evidence: IsImageUrlDotNet ai-docs/notes/2026-09-27-phase-0-survey-baseline-and-capture.md and plan D5 (commits 57cf1aa, 5e82b7c, local until the repository grants push access); dotnet/fsharp docs/fsharp-core-notes.md
+- Scope: skill (references/nuget.md "F# packages", Phase 1 defaults)
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-064 · 2026-09-27 · `dotnet format` passes F# without checking it; F# needs Fantomas (`dotnet-format-skips-fsharp`)
+- Trigger: `dotnet format Capture.fsproj --verify-no-changes` on a file with `let   f  x=x+1` printed "Format currently supports only C# and Visual Basic projects" and exited 0; `dotnet fantomas --check .` 8.0.4 exited 99 on the same folder (2026-09-27).
+- Hypothesis: the NuGet reference and templates were written from C# runs; their format gate is a no-op for F#, and the .NET analyzers settings do nothing there either.
+- Rule: for an F# package, CI runs Fantomas (`dotnet fantomas --check .`, a local tool, with `.fantomasignore` for the frozen capture) instead of `dotnet format`; treat the analyzer settings as C#-only and try the F# analyzers (G-Research, Ionide through `fsharp-analyzers`) before promising them.
+- Evidence: IsImageUrlDotNet ai-docs/log.md "Phase 1" (scratch probe); plan D9
+- Scope: skill (references/nuget.md "F# packages", Traps; SKILL.md lint row)
+- Status: promoted (references/nuget.md and SKILL.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-065 · 2026-09-27 · Record the old package once per runtime; Mono is a reference, not .NET Framework (`golden-per-runtime`)
+- Trigger: IsImageUrlDotNet 1.0.2 (lib/net45) restored into a net10.0 console (NU1701) and ran; its answers depend on Path, Uri and WebRequest, and the same capture under Mono 6.8 disagreed with .NET 10 in 12 of 117 results and 48 request lists (2026-09-27).
+- Hypothesis: TrailerClipper needed net48 because its DLL could not load on .NET 10; a DLL that does load still answers per runtime, so one recording would force runtime exceptions into the golden test.
+- Rule: multi-target the capture (`net10.0;net48`) and commit one recording per runtime and OS, each from the published package by the same program, with the loaded DLL's SHA-256 in the header; the golden test compares each runtime with its own file. On Linux, a Mono recording is a reference only; the .NET Framework recording comes from a windows-latest runner.
+- Evidence: IsImageUrlDotNet tests/Golden/1.0.2.net10.0-linux.json and 1.0.2.mono-6.8-linux.reference.json (57cf1aa); the Windows recordings are pending push access
+- Scope: skill (references/nuget.md Phase 0)
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-066 · 2026-09-27 · An F# capture splits its cases into a file the golden test compiles unchanged (`shared-cases-file`)
+- Trigger: the IsImageUrlDotNet capture had to be written in F# (the brief) and the golden replay must ask exactly the capture's questions; TrailerClipper generated its C# runner by a mechanical rewrite (L-059 `golden-replay-from-capture`) (2026-09-27).
+- Hypothesis: when the cases touch only public names that the new library keeps, the test can compile the committed case file itself, so there is nothing to generate and nothing to drift.
+- Rule: split the capture into Json.fs (hand-written writer), FixtureServer.fs, Cases.fs and Program.fs; put empty Directory.Build.props, Directory.Build.targets and Directory.Packages.props beside it so repository-wide MSBuild changes cannot reach it; plan the golden test to link Cases.fs, FixtureServer.fs and Json.fs. Proven for the capture (117 cases, two runs identical per runtime); the test side is unverified until Phase 2.
+- Evidence: IsImageUrlDotNet tests/Golden/Capture (4160a65, 57cf1aa)
+- Scope: skill (references/nuget.md "F# packages")
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-067 · 2026-09-27 · A .NET network capture: the fixture server is the proxy, and every host is a .test name (`fixture-server-as-proxy`)
+- Trigger: IsImageUrlDotNet sends a GET through WebRequest for any URL its extension lists do not decide, including ones with query strings, and follows redirects to other hosts; the capture had to see every request without DNS or the internet (2026-09-27).
+- Hypothesis: a proxy sees absolute-form requests for every host, so one local server can answer any host name, and .test names fail closed if a runtime bypasses the proxy.
+- Rule: a raw TcpListener server on 127.0.0.1 set as `WebRequest.DefaultWebProxy` (and later as the proxy of the test's HttpClient), routes by host and path, CONNECT answered 403, each case's request heads recorded, port, work folder and current directory normalised to tokens, non-HTTP schemes on 127.0.0.1. .NET 10 proxies loopback too.
+- Evidence: IsImageUrlDotNet tests/Golden/Capture/FixtureServer.fs, Cases.fs
+- Scope: skill (references/nuget.md Phase 0; the .NET counterpart of L-019 and L-045)
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-068 · 2026-09-27 · F# cannot call an F# library's extension methods as extensions (`fsharp-ignores-fsharp-extensions`)
+- Trigger: the capture's case `"http://fixture.test/a.png".IsImageUrl()` failed with FS0039 against 1.0.2, whose module and method carry ExtensionAttribute (2026-09-27).
+- Hypothesis: F# reads an F# assembly's own signature data, where the member is a module function, and ignores the C#-style attributes.
+- Rule: record the extension attributes by reflection in an F# capture, and test the extension form from a small C# project; put C#-friendly additions on a static class, since module functions cannot take optional or overloaded parameters.
+- Evidence: IsImageUrlDotNet tests/Golden/Capture/Cases.fs ("extension attributes" case)
+- Scope: skill (references/nuget.md "F# packages")
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-069 · 2026-09-27 · A cloud session can hold a repository read-only, and survey-github.sh printed "(none)" without gh (`cloud-session-access-check`)
+- Trigger: in a Claude Code cloud session the package repository was attached, but `git push` returned 403 ("Claude doesn't have GitHub access") while the skill and overlay repositories accepted pushes; the throwaway Windows capture could not run. The same session had no gh, and survey-github.sh printed "(none)" and "(no classic branch protection)" under failed commands. Microsoft's .NET and Mono download hosts and nuget.org's search host were denied by the egress policy (2026-09-27).
+- Hypothesis: the survey script's fallbacks assume gh works; the skill assumed a maintainer's machine with gh and full network.
+- Rule: check push access with `git push --dry-run` at the start of Phase 0 and put a failure first in the next stop message; survey-github.sh now stops with exit 2 without gh, and survey-nuget.sh says when the search host is unreachable; take GitHub facts from the GitHub tools; install .NET from Ubuntu's archive (`dotnet-sdk-10.0`, `mono-complete`) when the vendor hosts are blocked.
+- Evidence: IsImageUrlDotNet ai-docs/log.md "Phase 0"; scripts/survey-github.sh and survey-nuget.sh (this change)
+- Scope: skill (SKILL.md shape of a run; scripts)
+- Status: promoted (SKILL.md and scripts, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27

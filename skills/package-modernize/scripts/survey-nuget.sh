@@ -18,7 +18,14 @@ section "Versions (flat container, includes unlisted)" "curl -s https://api.nuge
 curl -s "https://api.nuget.org/v3-flatcontainer/$LOWER/index.json" | json 'console.log(r.versions.join(" "))'
 
 section "Search entry: total downloads, verified owner, listed versions" "curl -s 'https://azuresearch-usnc.nuget.org/query?q=packageid:$ID&prerelease=true'"
-curl -s "https://azuresearch-usnc.nuget.org/query?q=packageid:$ID&prerelease=true" | json 'const p=r.data[0]; if(!p){console.log("(not found)");return} console.log(JSON.stringify({id:p.id, latest:p.version, totalDownloads:p.totalDownloads, verified:p.verified, owners:p.owners, authors:p.authors, license:p.licenseUrl, project:p.projectUrl, tags:p.tags, deprecation:p.deprecation??null, vulnerabilities:p.vulnerabilities??[]},null,1)); for(const v of p.versions) console.log(" "+v.version+" downloads="+v.downloads)'
+search=$(curl -s "https://azuresearch-usnc.nuget.org/query?q=packageid:$ID&prerelease=true")
+if [ -z "$search" ]; then
+  # The search host can be unreachable (a cloud session's egress policy denied it on 2026-09-27); say so rather than
+  # print a parse error, and point at the page that shows the same numbers.
+  printf '(search API unreachable; read total downloads, per-version downloads and "Used By" at https://www.nuget.org/packages/%s)\n' "$ID"
+else
+  printf '%s' "$search" | json 'const p=r.data[0]; if(!p){console.log("(not found)");return} console.log(JSON.stringify({id:p.id, latest:p.version, totalDownloads:p.totalDownloads, verified:p.verified, owners:p.owners, authors:p.authors, license:p.licenseUrl, project:p.projectUrl, tags:p.tags, deprecation:p.deprecation??null, vulnerabilities:p.vulnerabilities??[]},null,1)); for(const v of p.versions) console.log(" "+v.version+" downloads="+v.downloads)'
+fi
 
 section "Registration index: per-version listed flag, published date, deprecation, target frameworks" "curl -s --compressed https://api.nuget.org/v3/registration5-gz-semver2/$LOWER/index.json"
 curl -s --compressed "https://api.nuget.org/v3/registration5-gz-semver2/$LOWER/index.json" | json 'for(const page of r.items){ if(!page.items){console.log("(page not inlined: "+page["@id"]+")");continue} for(const it of page.items){const c=it.catalogEntry; console.log(c.version+" listed="+c.listed+" published="+(c.published||"").slice(0,10)+(c.deprecation?" DEPRECATED("+c.deprecation.reasons.join(",")+")":"")+(c.vulnerabilities?" VULN="+c.vulnerabilities.length:"")); for(const g of c.dependencyGroups||[]) console.log("   "+(g.targetFramework||"(any)")+": "+(g.dependencies||[]).map(d=>d.id+" "+d.range).join(", "))}}'

@@ -4,6 +4,8 @@
 // assembly that needs a Framework-only reference (System.Web.Extensions and the like), target net48 instead of net10.0 and add
 // Microsoft.NETFramework.ReferenceAssemblies (PrivateAssets all) and System.Text.Json; top-level records then need IsExternalInit,
 // so plain classes are simpler.
+// An F# package, or one whose answers depend on the runtime: see references/nuget.md "F# packages" and the capture in
+// m4bwav/IsImageUrlDotNet tests/Golden/Capture (F#, net10.0 and net48, one recording per runtime, a fixture server as proxy).
 //
 // Run it in a scratch console project, never inside the repository, before any code change:
 //   dotnet new console -n Capture -f net10.0 && cd Capture

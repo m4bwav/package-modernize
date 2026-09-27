@@ -5,6 +5,14 @@
 set -u
 REPO="${1:?usage: survey-github.sh OWNER/REPO}"
 
+# Without a logged-in gh every section below fails, and the "|| echo '(none)'" fallbacks would then print reassuring
+# "(none)" lines that are not evidence (IsImageUrlDotNet, 2026-09-27, a cloud session without gh). Stop instead.
+if ! command -v gh >/dev/null 2>&1 || ! gh auth status >/dev/null 2>&1; then
+  printf '# GitHub survey: %s\n\nSKIPPED: gh is missing or not logged in; nothing below this line was checked.\n' "$REPO"
+  printf 'Collect the same facts another way (the GitHub MCP tools, the web UI) and say which in the survey note.\n'
+  exit 2
+fi
+
 section() { printf '\n## %s\n$ %s\n' "$1" "$2"; }
 run() { section "$1" "$2"; eval "$2" 2>&1 || printf '(command failed: exit %s)\n' "$?"; }
 
