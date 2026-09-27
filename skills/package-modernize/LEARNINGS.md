@@ -353,3 +353,27 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: format-json-files test/golden/, the Phase 3 comment on pull request #2
 - Scope: skill (references/npm.md Phase 0, the recipe asked for in continuation-2 item F)
 - Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-26
+
+### L-044 · 2026-09-27 · `npm --prefix DIR init -y` writes package.json in the working directory, not DIR
+- Trigger: markdown-plain-link-replacer Phase 0: a scratch project was made with `npm --prefix <scratch> init -y` after an earlier shell call had cd'd into the repository. npm init ignored the prefix, normalised the repository's own package.json (git+ URL, bin object, directories, type), and the change went into the Phase 0 commit (87e88c6, restored in 8b977db). It also made the tarball diff report package.json as different when it was identical (2026-09-27).
+- Hypothesis: npm init, like npm exec, works on the current directory; `--prefix` only moves install targets.
+- Rule: make a scratch project with `mkdir DIR && cd DIR && npm init -y` inside a subshell `( ... )`, never with `--prefix`; run `git status --short` before every Phase 0 commit and account for each modified tracked file.
+- Evidence: markdown-plain-link-replacer ai-docs/log.md "package.json restored"
+- Scope: skill (references/npm.md Traps)
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+
+### L-045 · 2026-09-27 · Guard the capture at the socket, not by counting requests per case
+- Trigger: markdown-plain-link-replacer's capture, adapted from stack-exchange-markdown-retriever's, aborted three times on cases that legitimately make no request (a www link that throws first, ftp and mailto links, a non-ASCII path request refuses). Marking them one by one guessed at behaviour the capture exists to record (2026-09-27).
+- Hypothesis: "every case must reach the proxy" is a proxy for the real rule, "nothing leaves 127.0.0.1".
+- Rule: in a network capture, wrap `net.Socket.prototype.connect` so any host but 127.0.0.1 or localhost throws, list the cases without a request on stderr for review, and grep the golden file for the guard's message (0 expected). For many hosts, request 2.88 honours HTTP_PROXY for http links (absolute-form requests) as well as HTTPS_PROXY (CONNECT), so one fixture proxy routed by path serves every host with no DNS changes; an `x-fixture-url` header lets the new code's fetch wrapper reach the same routes directly.
+- Evidence: markdown-plain-link-replacer test/golden/capture-1.1.16.cjs and fixture-server.cjs (164 cases, guard never fired, two runs byte-identical)
+- Scope: skill (references/npm.md Phase 0)
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+
+### L-046 · 2026-09-27 · A package whose output passes through a dependency's new major needs a mechanical exception, not a re-recording
+- Trigger: markdown-plain-link-replacer writes the title get-title-at-url returns; 3.0.0 extracts titles differently from 1.1.8 (article-title), so almost every golden output would differ in the title alone (2026-09-27).
+- Hypothesis: when a consumer adopts its dependency's new major, the dependency's own changelog is the exception, and the golden test can apply it by computing both answers for each fixture (the old extractor as a test-only dev dependency, the new one's exported function) and swapping them in the recorded output, so every other byte stays under test.
+- Rule: plan it as one named exception with the swap described in D1; confirm in Phase 2 that the swap covers every changed case and nothing else.
+- Evidence: markdown-plain-link-replacer plan D1 and E1 (Phase 2 pending)
+- Scope: skill (SKILL.md Golden capture, once Phase 2 proves it)
+- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-27

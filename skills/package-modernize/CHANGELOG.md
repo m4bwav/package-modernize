@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-2 · 2026-09-27 · Many-host network capture with a socket guard; npm init writes to the working directory
+- because: L-044, L-045 (markdown-plain-link-replacer Phases 0 and 1); L-046 recorded as active until Phase 2 proves it
+- files: references/npm.md (Phase 0: many-host capture through one proxy, the socket guard; Traps: npm init and --prefix), LEARNINGS.md (L-044 to L-046)
+- The per-case "must reach the proxy" check of the fixed-host recipe aborted on cases that send nothing; a guard on net.Socket.prototype.connect enforces the actual rule. A stray npm init changed a tracked package.json during Phase 0.
+
 ### C-20260927-1 · 2026-09-27 · format-json-files lessons: filesystem capture recipe, export = namespace traps, xo cache cleared in preflight
 - because: L-039, L-040, L-041, L-042, L-043 (format-json-files 2.0.0 release, the first package that writes files)
 - files: references/npm.md (Phase 0: filesystem capture and Windows symlinks; Phase 1 export shape: CommonJS entry with types; Traps: xo cache, release-notes.md lint, text-scanning review findings), scripts/preflight-tag-npm.sh (clears xo's cache before the lint), LEARNINGS.md (L-039 to L-043 promoted)
