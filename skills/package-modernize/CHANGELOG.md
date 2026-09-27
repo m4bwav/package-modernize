@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-11 · 2026-09-27 · F# Phases 2 and 3, package icons, .NET Framework consumers (`fsharp-phase-2-and-icons`)
+- because: L-070 `generate-missing-icon` (user request), L-071 `netfx-needs-system-net-http`, L-072 `golden-alone-in-process`, L-073 `windows-paths-for-dotnet-nuget`, L-074 `commit-before-canary`, L-075 `recording-names-the-drive`, L-076 `fsharp-analyzers-verified`; L-003 confirmed again (IsImageUrlDotNet Phases 2 and 3)
+- files: SKILL.md (golden capture canary; badges and images: icon), references/nuget.md (coverage line; Phase 0 network capture; F# packages: analyzers verified, tests, Dependabot, APIs that make requests; Phase 1 target frameworks and metadata rows; Traps; what it still lacks), scripts/make-icon.py (new), scripts/README.md, LEARNINGS.md (L-070 to L-076, L-003)
+- The first F# package through the rewrite and the review: the review found that .NET Framework consumers could not compile against the netstandard2.0 build, the golden test needed a process of its own, and the canary instruction could destroy an uncommitted rewrite; the maintainer asked that every package that can show an icon gets one.
+
 ### C-20260927-10 · 2026-09-27 · F# on NuGet, one golden recording per runtime, cloud sessions (`fsharp-and-cloud-runs`)
 - because: L-063 `pin-fsharp-core`, L-064 `dotnet-format-skips-fsharp`, L-065 `golden-per-runtime`, L-066 `shared-cases-file`, L-067 `fixture-server-as-proxy`, L-068 `fsharp-ignores-fsharp-extensions`, L-069 `cloud-session-access-check` (IsImageUrlDotNet Phases 0 and 1)
 - files: references/nuget.md (coverage line; Phase 0: recordings per runtime, capturing on Linux, the .NET fixture proxy; new section "F# packages"; Phase 1 defaults row F#; Traps; what it still lacks), SKILL.md (cloud-session line in the shape of a run; NuGet golden-capture and lint cells), scripts/survey-github.sh (stops with exit 2 without a logged-in gh), scripts/survey-nuget.sh (says when the search host is unreachable), scripts/golden-capture-nuget.template.cs (header points at the F# route), LEARNINGS.md (L-063 to L-069)
