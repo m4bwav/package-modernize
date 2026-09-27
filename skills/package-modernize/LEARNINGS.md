@@ -318,7 +318,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Rule: the xo config ignores `release-notes.md`, and .gitignore lists it (template fix pending: templates/npm/xo.config.js and .gitignore). Until then, check the template xo ignores before the first tag.
 - Evidence: format-json-files pull request #3 (50ff9f1); beta.2 staged in run 36281483946
 - Scope: skill
-- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+- Status: promoted (templates fixed 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
 
 ### L-040 · 2026-09-27 · xo's cache hides lint errors in edited files; CI finds them
 - Trigger: format-json-files: local `npx xo` was clean, and CI's lint failed on two rules in src/require.ts. The cache in node_modules/.cache/xo-linter predated the edit (2026-09-26).

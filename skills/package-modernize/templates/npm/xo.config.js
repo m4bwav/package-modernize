@@ -7,7 +7,8 @@ const xoConfig = [
   {
     // The type fixture imports the built package, so it only resolves after a build; the consumer fixtures type-check it against the installed tarball instead.
     // The capture scripts ran in scratch projects against the old package and are kept exactly as they were run; the golden JSON files are captured data.
-    ignores: ['ai-docs/**', 'test/consumers/types/**', 'test/golden/*.cjs', 'test/golden/*.json'],
+    // release-notes.md is written by release.yml from CHANGELOG.md before it lints; its link definition may go unused there (L-039).
+    ignores: ['ai-docs/**', 'release-notes.md', 'test/consumers/types/**', 'test/golden/*.cjs', 'test/golden/*.json'],
   },
   {
     files: ['**/*.md'],
