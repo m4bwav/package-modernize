@@ -28,3 +28,4 @@ Append-only. One line per operation: `## [YYYY-MM-DD] op | title` where op is on
 ## [2026-09-26] verify | T-20260926-1: suite 10/10 (triggers 9/9, decoys 0/9, outcome 3/3, action-1 3/3 after re-pointing to markdown-plain-link-replacer, the two new cases 3/3); baseline fails action-canary, passes action-golden-untouched (L-034)
 ## [2026-09-26] index | rebuilt (2 entries)
 ## [2026-09-26] update | C-20260926-12: description 1,380 -> 1,001 chars (spec cap 1,024), all triggers kept (skill-tidy check OK); T-20260926-2 trigger cases 6/6; body left at ~7K tokens (ST016, report only)
+## [2026-09-26] fix | privacy: machine host name removed from evergreen.json tests.env (now "Windows 11 development machine"); history not rewritten, the name remains in commits 01ab2c9 through the previous HEAD

@@ -56,7 +56,7 @@
   "tests": {
     "last_run": "2026-09-26T11:43",
     "harness": "claude -p stream-json (evals/run-headless.mjs)",
-    "env": "DESKTOP-7KS2S6E, Windows 11, Claude Code 2.1.281",
+    "env": "Windows 11 development machine, Claude Code 2.1.281",
     "cases": 10,
     "passed": 10,
     "failed": 0,
