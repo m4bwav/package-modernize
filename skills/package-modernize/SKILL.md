@@ -87,7 +87,7 @@ At each stop, one message: the phase reached, the evidence (ids and paths), the 
 
 ## While working: capture learnings
 
-If the user corrects you, the same error happens twice, a workaround is found, an environment fact is discovered, or a phase's evidence turns out weaker than this file claims, write it to `LEARNINGS.md` now (format in the protocol; check existing entries first: add, update, retire, or nothing). A trap or a changed default also goes into the system's reference with the date. If a learning proves a claim above wrong, fix it here, log it in `CHANGELOG.md`, and set `contradiction` in `evergreen.json`.
+If the user corrects you, the same error happens twice, a workaround is found, an environment fact is discovered, or a phase's evidence turns out weaker than this file claims, write it to `LEARNINGS.md` now, and wherever an ID is cited (replies, commits, handoffs, changelog) add a two-to-four-word code name after it, for example L-058 `tool-unescapes-backslash-u`; the number stays the key (format in the protocol; check existing entries first: add, update, retire, or nothing). A trap or a changed default also goes into the system's reference with the date. If a learning proves a claim above wrong, fix it here, log it in `CHANGELOG.md`, and set `contradiction` in `evergreen.json`.
 
 ## Maintenance
 

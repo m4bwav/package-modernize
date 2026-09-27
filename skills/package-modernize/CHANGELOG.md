@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-8 · 2026-09-27 · Cite IDs with code names (`cite-ids-with-code-names`)
+- because: user request
+- files: SKILL.md (While working: capture learnings)
+- Bare IDs such as L-058 were unmemorable; a code name now follows every cited ID, and the numbers stay the stable key.
+
 ### C-20260927-7 · 2026-09-27 · NuGet Phase 2 and 3 from TrailerClipper: generated golden replay, public API baseline, tool packages, external programs, CI traps
 - because: L-058, L-059, L-060, L-061 (TrailerClipper Phases 2 and 3)
 - files: references/nuget.md (Phase 2 bullets; Phase 5 policy scope; Traps), templates/nuget/.editorconfig (tests section glob), LEARNINGS.md (L-058 to L-061)
