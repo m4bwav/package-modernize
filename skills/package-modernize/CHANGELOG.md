@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-9 · 2026-09-27 · NuGet coverage complete (`nuget-coverage-complete`)
+- because: L-062 `verify-waits-both-indexes`; TrailerClipper 2.0.0 released through every phase
+- files: SKILL.md (description, coverage table), references/nuget.md (coverage line with worked-example workflows, rehearsal verified, Traps, what it still lacks), LEARNINGS.md (L-062)
+- The first NuGet run through all eight phases; the reference now points at TrailerClipperLib's workflows as the worked example until templates are copied.
+
 ### C-20260927-8 · 2026-09-27 · Cite IDs with code names (`cite-ids-with-code-names`)
 - because: user request
 - files: SKILL.md (While working: capture learnings)

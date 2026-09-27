@@ -486,3 +486,10 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: CI runs 36334471273 (failed) and 36335032052 (green); TrailerClipperLib 127f399
 - Scope: skill (references/nuget.md Traps)
 - Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-062 · 2026-09-27 · verify-published waits for both nuget.org indexes (`verify-waits-both-indexes`)
+- Trigger: TrailerClipper 2.0.0-beta.1's verify-published passed on Windows and failed on Linux and macOS: `dotnet tool install` said the version was not found although the wait loop had seen it in the flat container; the registration index committed it at 17:23:35, after those steps (2026-09-27).
+- Rule: the wait loop polls the flat container and the registration index for every package id before any restore or tool install; a failure right after publishing is rerun once before it is treated as real.
+- Evidence: verify-published 36336494800 (failed, then green on rerun); TrailerClipperLib #4 (b4c6b9d)
+- Scope: skill (references/nuget.md Traps)
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
