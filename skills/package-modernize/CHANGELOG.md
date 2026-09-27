@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-1 · 2026-09-27 · format-json-files lessons: filesystem capture recipe, export = namespace traps, xo cache cleared in preflight
+- because: L-039, L-040, L-041, L-042, L-043 (format-json-files 2.0.0 release, the first package that writes files)
+- files: references/npm.md (Phase 0: filesystem capture and Windows symlinks; Phase 1 export shape: CommonJS entry with types; Traps: xo cache, release-notes.md lint, text-scanning review findings), scripts/preflight-tag-npm.sh (clears xo's cache before the lint), LEARNINGS.md (L-039 to L-043 promoted)
+- The templates already ignore release-notes.md (e690577); the rest of the run's lessons were still only in LEARNINGS.md and now sit where the next run reads them.
+
 ### C-20260926-11 · 2026-09-26 · npm deprecate is the maintainer's terminal; tag pushes stay in the main session
 - because: L-037, L-038 (stack-exchange-markdown-retriever 2.0.0 release)
 - files: references/npm.md (Phases 5 and 6), LEARNINGS.md

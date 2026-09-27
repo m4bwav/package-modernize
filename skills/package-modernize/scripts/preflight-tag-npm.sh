@@ -4,7 +4,7 @@
 # Checks, in order: clean tree on the default branch and level with origin; tag vVERSION free locally and on origin;
 # CHANGELOG.md has a `## [BASE]` heading (BASE = VERSION without the prerelease part; a release needs a date, a bare
 # `## [Unreleased]` is not found by release.yml); then the package's own lint, typecheck, check and test scripts; then the
-# golden recording (check-golden-untouched.sh); then the shell in every workflow (check-workflow-shell.py). Prints PASS or FAIL per check; exit 1 on any FAIL.
+# golden recording (check-golden-untouched.sh); xo's cache is cleared before the lint (L-040); then the shell in every workflow (check-workflow-shell.py). Prints PASS or FAIL per check; exit 1 on any FAIL.
 # Written after is-an-image-url burned 2.0.0-beta.1 (no changelog section) and beta.2 (lint on the heading fix) (L-029).
 set -u
 VERSION="${1:?usage: preflight-tag-npm.sh VERSION [REPO_DIR]}"
@@ -44,6 +44,8 @@ else
   fi
 fi
 
+# xo caches per file and its cache can predate an edit, so a stale cache passes locally what CI fails (L-040).
+rm -rf "$DIR/node_modules/.cache/xo-linter" "$DIR/node_modules/.cache/eslint"
 scripts=$(node -e "const p=require(require('path').resolve('$DIR','package.json'));console.log(Object.keys(p.scripts||{}).join(' '))" 2>/dev/null)
 for s in lint typecheck check test; do
   case " $scripts " in

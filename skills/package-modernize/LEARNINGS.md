@@ -315,7 +315,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 ### L-039 · 2026-09-27 · The generated release-notes.md fails lint in release.yml
 - Trigger: format-json-files v2.0.0-beta.1: release.yml wrote release-notes.md from CHANGELOG.md, then `npm run lint` linted it, and xo failed on the unused `[2.0.0]` link definition (run 36281331934). Nothing was staged, and the tag was burned. stack-exchange-markdown-retriever passed only because its section happened to use the definition (2026-09-27).
 - Hypothesis: the template writes the notes into the checkout before the lint step, and xo lints Markdown.
-- Rule: the xo config ignores `release-notes.md`, and .gitignore lists it (template fix pending: templates/npm/xo.config.js and .gitignore). Until then, check the template xo ignores before the first tag.
+- Rule: the xo config ignores `release-notes.md`, and .gitignore lists it (templates/npm/xo.config.js and .gitignore, fixed 2026-09-27). A package written before the fix: check its xo ignores before the first tag.
 - Evidence: format-json-files pull request #3 (50ff9f1); beta.2 staged in run 36281483946
 - Scope: skill
 - Status: promoted (templates fixed 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
@@ -325,21 +325,21 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Rule: `rm -rf node_modules/.cache` before the last local lint before a push (or add it to preflight-tag-npm.sh and the Phase 2 exit).
 - Evidence: format-json-files CI runs 36277483722 (fail) and 36277589680
 - Scope: skill
-- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-26
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-26
 
 ### L-041 · 2026-09-26 · A golden capture made on Windows lacks file symlinks; CI runners make them
 - Trigger: the format-json-files capture could not create file symbolic links (EPERM without developer mode). The golden test then failed on every CI runner, including windows-latest, because there the link existed and 2.x reported it (2026-09-26).
 - Rule: a filesystem capture records which links it could not make (`unavailable`), and the golden test names the link behaviour as an exception by reason, not by the recording. Or capture on Linux (CI or WSL) when links matter.
 - Evidence: format-json-files test/golden/golden.test.js (SKIPPED_LINK), capture-fixtures.cjs
 - Scope: skill
-- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-26
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-26
 
 ### L-042 · 2026-09-26 · export = with a namespace: two tsdown declaration traps
 - Trigger: format-json-files' CommonJS entry, the function plus types under `export =`. (1) Aliasing imported types under their own names inside the merged namespace became `type FormatOptions = FormatOptions`. (2) `fn.default = fn` became `var formatJsonFiles: typeof formatJsonFiles` inside the namespace, which is TS2502 for every CommonJS consumer; attw did not catch it, and the consumer fixtures did (2026-09-26).
 - Rule: declare the types under short internal names and export them under the public ones. Write `declare namespace fn { export {fn as default, fn}; export type X = Y; }` and set the properties with Object.assign. Keep the four TypeScript consumer fixtures: they are the check that caught it.
 - Evidence: format-json-files src/require.ts, dist/index.d.cts
 - Scope: skill (references/npm.md export shape)
-- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-26
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-26
 
 ### L-043 · 2026-09-26 · Filesystem packages: capture recipe and review lessons
 - Trigger: format-json-files was the first package that writes files.
@@ -352,4 +352,4 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
   - The review found a regex backtrack-stack overflow at about 10M characters, and exact doubles above 2^53 that JSON.stringify writes with other digits. Scan strings with indexOf loops, and test sizes in the millions.
 - Evidence: format-json-files test/golden/, the Phase 3 comment on pull request #2
 - Scope: skill (references/npm.md Phase 0, the recipe asked for in continuation-2 item F)
-- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-26
+- Status: promoted (references/npm.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-26
