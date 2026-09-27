@@ -22,7 +22,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Rule: in Phase 1 test every requested fix against the promise; when they clash, recommend keeping the old name exact and adding the fix under a new name, and let the maintainer rule.
 - Evidence: SKILL.md "Plan"; seeded-random-utilities plan D6
 - Scope: skill
-- Status: promoted (C-20260925-1) · helpful 1 · harmful 0 · last_confirmed 2026-09-25
+- Status: promoted (C-20260925-1) · helpful 2 · harmful 0 · last_confirmed 2026-09-27 (IsImageUrlDotNet: 10 findings after every test passed)
 
 ### L-003 · 2026-09-25 · An independent read-only review finds what hundreds of passing tests miss
 - Trigger: a fresh subagent reviewing the seeded-random-utilities branch for 37 minutes found 12 real issues after 905 tests passed (2026-09-25).
@@ -549,3 +549,59 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: IsImageUrlDotNet ai-docs/log.md "Phase 0"; scripts/survey-github.sh and survey-nuget.sh (this change)
 - Scope: skill (SKILL.md shape of a run; scripts)
 - Status: promoted (SKILL.md and scripts, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-070 · 2026-09-27 · A package that can show an icon and has none gets a generated one (`generate-missing-icon`)
+- Trigger: the maintainer's nuget.org profile showed the default icon on four of six packages; only the two modernized with an icon had one, and the maintainer asked that every modernization add one (2026-09-27, during IsImageUrlDotNet Phase 2).
+- Hypothesis: the plan skeleton decided badges and images but never asked about the package icon, so runs skipped it unless the package had one.
+- Rule: Phase 1 decides the icon with the badges: when the registry shows one (NuGet `PackageIcon`; npm and the others show none) and the package has none, Phase 2 draws a basic one with `scripts/make-icon.py` in the maintainer's style (their overlay names it), 128 by 128 PNG, packed at the package root, and looks at it before committing. Richer art only when the maintainer asks (their generation tools, if the overlay lists any).
+- Evidence: IsImageUrlDotNet icon.png (fb93673); scripts/make-icon.py reproduces it byte for byte (`--picture image`)
+- Scope: skill (SKILL.md badges and images; references/nuget.md Phase 1 metadata; scripts/make-icon.py)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-071 · 2026-09-27 · A netstandard2.0 library that exposes HttpClient breaks .NET Framework consumers (`netfx-needs-system-net-http`)
+- Trigger: IsImageUrlDotNet 2.0.0 with `netstandard2.0;net10.0` passed every test; the independent review built an F# net48 consumer from the package and it failed to compile even the 1.0.2 call (FS1108 "HttpClient is required", then FS0039), and a C# net48 consumer failed on the HttpClient overloads (CS0012). The plan had said "System.Net.Http is in netstandard2.0" (2026-09-27).
+- Hypothesis: the tests referenced the project, not the package, and an SDK-style .NET Framework 4.7.2+ project references no System.Net.Http by default; the netstandard2.0 lib carries no framework reference for it.
+- Rule: a library whose public API names a type from System.Net.Http (or another assembly .NET Framework does not reference by default) adds a `net462` target with `<Reference Include="System.Net.Http" />`. Pack writes no `frameworkAssembly` for it, because the SDK resolves System.Net.Http for net462 from its own net461 copy (`ResolvedFrom={HintPathFromItem}`) and pack keeps only `{TargetFrameworkDirectory}` references; add a target before `_GetFrameworkAssemblyReferences` that adds a `TfmSpecificFrameworkAssemblyReferences` item, and check the nuspec in CI. F# also adds a System.ValueTuple dependency to .NET Framework builds (`DisableImplicitSystemValueTupleReference`). CI builds C# and F# consumers from the packed package on net48, not only net10.0.
+- Evidence: IsImageUrlDotNet a524f02 (src/IsImageUrlDotNet/IsImageUrlDotNet.fsproj, ci.yml "Fresh consumers of the packed package"), CI run 36345678841
+- Scope: skill (references/nuget.md Phase 1 target frameworks, Phase 2, F# packages)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-072 · 2026-09-27 · A .NET Framework network golden test runs alone in its own test process (`golden-alone-in-process`)
+- Trigger: after new redirect tests joined the IsImageUrlDotNet test project, the net48 golden test failed deterministically in the full suite: two cases after the dropped-connection case lost `Proxy-Connection: Keep-Alive`. It passed alone, failed alone once its fixture server started from an NUnit SetUpFixture, and a server reserved for the whole run did not help (2026-09-27).
+- Hypothesis: .NET Framework's HttpWebRequest keeps process-wide connection state whose effect on later request heads depends on what the process did before; the capture ran in a fresh process with the golden cases first.
+- Rule: put the golden test of a package that makes requests in a test project of its own, with nothing else in it, so it runs in a fresh process as the capture did; never add tests to that project. Other network tests may still link the fixture server.
+- Evidence: IsImageUrlDotNet tests/IsImageUrlDotNet.GoldenTests (a524f02): 5 of 5 runs green on net48 and net10.0; ai-docs/log.md "Phase 2 CI and Phase 3 review"
+- Scope: skill (references/nuget.md Phase 0 network capture, Phase 2)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-073 · 2026-09-27 · dotnet nuget sources from Git Bash need Windows paths, and a consumer needs its own packages folder (`windows-paths-for-dotnet-nuget`)
+- Trigger: a CI step building a consumer from `artifacts/` failed on windows-latest only: `dotnet nuget add source "$PWD/artifacts"` got `/d/a/...` and then `D:/a/...` ("The source specified is invalid"); `D:\a\...` works. Locally, `dotnet restore DIR --source <folder> --source https://api.nuget.org/v3/index.json` on SDK 10.0.401 read the URL as a local folder (NU1301). The review also noted that setup-dotnet's cache can hand the consumer a copy of the same version restored by an earlier run (2026-09-27).
+- Hypothesis: MSYS paths reach native programs untranslated in arguments that do not look like paths to MSYS, and NuGet validates a local source strictly.
+- Rule: in bash steps on Windows, pass `cygpath -w` paths to dotnet (`if command -v cygpath >/dev/null; then p=$(cygpath -w "$p"); fi`); give a consumer a nuget.config (`dotnet new nugetconfig`, `dotnet nuget add source`) instead of two `--source` flags; set `NUGET_PACKAGES` to a fresh folder for the consumer so a cached package cannot stand in for the one just packed.
+- Evidence: IsImageUrlDotNet CI runs 36344049351 and 36344259584 (failed), 36344421229 (green); ci.yml at a524f02
+- Scope: skill (references/nuget.md Traps)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-074 · 2026-09-27 · Commit the rewrite before planting the canary (`commit-before-canary`)
+- Trigger: in IsImageUrlDotNet Phase 2 the first canary was planted while the new `src/` was uncommitted; SKILL.md says to revert with `git checkout -- src/`, which would have restored the 2016 source file over the whole rewrite. It was reverted with the inverse edit instead (2026-09-27).
+- Hypothesis: the rule was written for runs whose source was already committed when the canary ran.
+- Rule: commit the rewrite before the canary, then revert the plant with `git checkout -- <file>`; if the source is not committed, revert with the inverse edit and check `git diff` shows no change in that line.
+- Evidence: IsImageUrlDotNet ai-docs/log.md "Phase 2: rewrite on v2"
+- Scope: skill (SKILL.md golden capture)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-075 · 2026-09-27 · A Windows recording can name the drive the capture ran on (`recording-names-the-drive`)
+- Trigger: IsImageUrlDotNet's `file:///nonexistent-isimageurl/file` case resolves against the current drive on Windows, and 1.0.2's exception message names it: both Windows recordings say `D:\` because this machine's clone and GitHub's windows-latest workspace are both on D:. A clone on C: gets the same answer with C: (2026-09-27).
+- Hypothesis: the capture normalises the work folder, the current directory and the port, but not a drive root that appears on its own.
+- Rule: after a Windows capture, grep the recording for drive letters; when one appears, name it as an environment entry in the golden test's exception table (swap in the current drive for that case only), prove it from a clone on another drive, and add the drive to the capture's normalisation next time (the recording itself never changes).
+- Evidence: IsImageUrlDotNet tests/IsImageUrlDotNet.GoldenTests/GoldenTests.fs exception table; fresh clone on C: green
+- Scope: skill (references/nuget.md Phase 0 network capture)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-076 · 2026-09-27 · The F# analyzers run with SDK 10; exclude only the frozen file (`fsharp-analyzers-verified`)
+- Trigger: the F# section said to try G-Research.FSharp.Analyzers and Ionide.Analyzers before promising them; with fsharp-analyzers 0.39.2 they loaded (13 G-Research analyzers) and ran on SDK 10.0.401. Ionide flagged IONIDE-005 on 1.0.2's kept code and IONIDE-006 on new code (an unsafe `.Value`) (2026-09-27).
+- Hypothesis: the tool is pinned to a compiler version, so it can break when the SDK moves; for now it works.
+- Rule: run them in CI on Linux: the tool in the local tool manifest, the analyzer packages as `PackageDownload` in the library project (not in the lock file or the package), `--treat-as-error '*'`, and `--exclude-files` only for the file the golden promise freezes; find the packages folder with `dotnet nuget locals global-packages --list`.
+- Evidence: IsImageUrlDotNet ci.yml "F# analyzers" (061a7de, a524f02)
+- Scope: skill (references/nuget.md F# packages)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27

@@ -16,5 +16,6 @@ Deterministic helpers the skill runs; each prints the command it ran above its o
 - [check-golden-untouched.sh](check-golden-untouched.sh): `[REPO_DIR] [GOLDEN_DIR]`; proves every recording file under `test/golden/` (`*.json`, `capture*`, `codec*`, `fixture-server*`) is unchanged since the commit that added it, so a failing golden test was fixed in `src/`, not in the recording. Phase 2 exit and, through preflight-tag-npm.sh, before every tag; exits 1 on any change.
 - [check-next-tag-npm.sh](check-next-tag-npm.sh): `PACKAGE [PACKAGE...]`; read-only, no login; flags a `next` dist-tag below `latest` (semver order) and prints the move or remove command for the maintainer; exit 1 if any is stale.
 - [check-line-endings.mjs](check-line-endings.mjs): counts byte 13 in files, since Git Bash's grep cannot; run before every commit on Windows.
+- [make-icon.py](make-icon.py): `OUTPUT.png --text GLYPH | --picture image [--color #RRGGBB]`; draws a basic 128 by 128 package icon (a white glyph on a rounded square) for a package whose registry shows an icon and that has none (L-070 `generate-missing-icon`). Needs Pillow; look at the PNG before committing it.
 
 Related: builds on [../SKILL.md](../SKILL.md); see also [../templates/README.md](../templates/README.md).
