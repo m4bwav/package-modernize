@@ -117,3 +117,6 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## C-20260927-3 · 2026-09-27 · Stale next detection script
 - scripts/check-next-tag-npm.sh: read-only semver check of `next` against `latest` for any list of packages; references/npm.md cites it with the research (OIDC cannot edit dist-tags yet, npm/cli#8547; move-to-stable is the common alternative to removal).
+
+## C-20260927-4 · 2026-09-27 · next rule: never below latest
+- Rule restated per Mark: `next` may equal `latest`, lead it, or be absent, never trail it. check-next-tag-npm.sh flags only `next < latest` and prints `dist-tag add PKG@latest next` (default) or `rm`; npm.md, SKILL.md Phase 6 and the overlay match.

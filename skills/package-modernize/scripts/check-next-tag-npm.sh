@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Find a stale `next` dist-tag (package-modernize, Phase 6 after the release, and any audit of the maintainer's packages).
 # Usage: check-next-tag-npm.sh PACKAGE [PACKAGE...]
-# Prints each package's dist-tags and STALE when `next` points at or below `latest` (semver order, so X.0.0-beta.1 < X.0.0),
+# Prints each package's dist-tags and STALE when `next` points below `latest` (semver order, so X.0.0-beta.1 < X.0.0),
 # with the fix command for the maintainer's terminal. Exit 1 if any is stale. Read-only; no login needed.
 set -u
 [ $# -ge 1 ] || { echo "usage: check-next-tag-npm.sh PACKAGE [PACKAGE...]" >&2; exit 2; }
@@ -22,8 +22,8 @@ for PKG in "$@"; do
         const c = cmpId(a.pre[i], b.pre[i]); if (c) return c; }
       return 0; };
     console.log(`${pkg}: ${Object.entries(t).map(([k, v]) => `${k} ${v}`).join(", ")}`);
-    if (t.next && t.latest && cmp(t.next, t.latest) <= 0) {
-      console.log(`STALE: next ${t.next} <= latest ${t.latest}; maintainer runs: npm dist-tag rm ${pkg} next`);
+    if (t.next && t.latest && cmp(t.next, t.latest) < 0) {
+      console.log(`STALE: next ${t.next} < latest ${t.latest}; maintainer runs: npm dist-tag add ${pkg}@${t.latest} next  (or: npm dist-tag rm ${pkg} next)`);
       process.exit(1);
     }'; then stale=1; fi
 done
