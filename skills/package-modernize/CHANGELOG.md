@@ -114,3 +114,6 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## C-20260927-2 · 2026-09-27 · Remove the stale next dist-tag after release
 - references/npm.md and SKILL.md Phase 6: after X.0.0 is live the maintainer runs `npm dist-tag rm PACKAGE next` and the agent reads back `npm dist-tag ls`; the old note that `next` may stay on the beta is gone. Mark asked for it after seeing `next` below `latest` on seeded-random-utilities, format-json-files and is-an-image-url.
+
+## C-20260927-3 · 2026-09-27 · Stale next detection script
+- scripts/check-next-tag-npm.sh: read-only semver check of `next` against `latest` for any list of packages; references/npm.md cites it with the research (OIDC cannot edit dist-tags yet, npm/cli#8547; move-to-stable is the common alternative to removal).
