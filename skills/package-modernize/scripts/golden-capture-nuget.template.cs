@@ -1,6 +1,9 @@
 // TEMPLATE (package-modernize): records what the PUBLISHED old version of a NuGet package returns, so the new major can prove
-// what it kept and list what it changed. Unverified by a run as of 2026-09-25: the two NuGet runs (DotNetJsonPrettyPrinter,
-// DotNetRandomNameGenerator) kept their old test files as the behaviour record instead. Use it, then fix what is wrong here.
+// what it kept and list what it changed. First used on TrailerClipper 1.1.0 (2026-09-27; its tests/Golden/Capture/Program.cs is
+// a worked example with filesystem fixtures, console capture and ffprobe measurements). If the old package is a .NET Framework
+// assembly that needs a Framework-only reference (System.Web.Extensions and the like), target net48 instead of net10.0 and add
+// Microsoft.NETFramework.ReferenceAssemblies (PrivateAssets all) and System.Text.Json; top-level records then need IsExternalInit,
+// so plain classes are simpler.
 //
 // Run it in a scratch console project, never inside the repository, before any code change:
 //   dotnet new console -n Capture -f net10.0 && cd Capture

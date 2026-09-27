@@ -4,6 +4,16 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-6 · 2026-09-27 · NuGet golden capture proven on a run: net48 for Framework-era packages, fixtures for packages that run a program, bundled DLLs in the survey
+- because: L-056, L-057 (TrailerClipper Phases 0 and 1)
+- files: references/nuget.md (Phase 0: golden capture, nupkg file list), scripts/golden-capture-nuget.template.cs (header), LEARNINGS.md (L-056, L-057)
+- The first NuGet capture ran on net48 against WAV and MP3 fixtures measured with ffprobe; the template and reference now say when and how.
+
+### C-20260927-5 · 2026-09-27 · Widest audience as a plan rule
+- because: L-055 (user request)
+- files: SKILL.md (Plan (Phase 1): the runtime floor and matrix), LEARNINGS.md (L-055)
+- Latest tooling does not justify narrowing the audience; a dropped runtime, platform or target needs a named reason.
+
 ### C-20260927-4 · 2026-09-27 · Differential against the published old version after the review; staggered-timer tests; auto-mode limits at Phase 4
 - because: L-052, L-053, L-054 (markdown-plain-link-replacer Phases 3 to 6, 2.0.0 released)
 - files: references/npm.md (Phase 3; Phase 4 permission-mode bullet), LEARNINGS.md (L-052 to L-054)

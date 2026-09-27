@@ -435,3 +435,25 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: markdown-plain-link-replacer HANDOFF 2026-09-27
 - Scope: skill (SKILL.md Phase 4; overlay for the settings detail)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-055 · 2026-09-27 · Latest tooling, widest audience
+- Trigger: maintainer's direction during the TrailerClipper run (2026-09-27): update everything to latest, but the widest audience the package or repository can work for is desirable.
+- Rule: tooling, language level, dependencies and CI move to current; the floor and the target list stay as wide as costs nothing in safety or upkeep (for NuGet keep netstandard2.0 beside the current TFM; for npm the lowest supported Node line; every OS the code can run on). Each dropped runtime, platform or framework needs a named reason in the plan's decisions table. Width is measured among current users: prefer newer tools and trends over stale or forgotten ones (a live, maintained dependency or channel over an abandoned one, even if the abandoned one once had more users; maintainer's follow-up the same day).
+- Evidence: user request, TrailerClipper session 2026-09-27
+- Scope: skill (SKILL.md Plan paragraph)
+- Status: promoted (SKILL.md, 2026-09-27) · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+
+### L-056 · 2026-09-27 · Capture a .NET Framework package on net48, and a package that runs a program against real fixtures
+- Trigger: TrailerClipper 1.1.0 (net40, JavaScriptSerializer from System.Web.Extensions, MediaToolkit's ffmpeg) could not be loaded by the template's net10.0 console; its behaviour is files written by ffmpeg, not return values (2026-09-27).
+- Hypothesis: the capture template assumed a pure library on modern .NET.
+- Rule: capture on net48 when the old assembly needs a Framework-only reference; for a package that shells out, run each case in a fresh fixture copy, record the file tree with a measured property per output file, keep console output, replace the scratch path with a token, and run the capture twice to prove it deterministic. Read the old nupkg's file list for bundled third-party DLLs.
+- Evidence: TrailerClipperLib tests/Golden/Capture/Program.cs, commit 8e59145; ai-docs/log.md Phase 0
+- Scope: skill (references/nuget.md Phase 0; scripts/golden-capture-nuget.template.cs header)
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-057 · 2026-09-27 · A heredoc through Git Bash still breaks backslash escapes inside a Python script
+- Trigger: a quoted `<<'EOF'` Python heredoc that wrote `"\r\n"` into a C# file produced real line breaks and a CS1010 build error, although memory already warned about heredocs (2026-09-27).
+- Rule: any edit whose text holds a backslash escape goes through the editor tool; Python heredocs are fine only for text without backslashes. SKILL.md's Windows line already says so; follow it for script-driven edits too.
+- Evidence: TrailerClipper capture Program.cs build error, session 2026-09-27
+- Scope: skill (SKILL.md shape of a run, Windows line; already covered)
+- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-27
