@@ -8,6 +8,10 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20260926-2 · 2026-09-26 · claude -p stream-json (evals/run-headless.mjs) · Windows 11 · 6/6 (trigger cases only)
+- Re-run after the description edit C-20260926-12: `--case trigger-1,trigger-2,trigger-3,decoy-1,decoy-2,decoy-3 --runs 1`. Triggers invoked 3/3, decoys 0/3. Action and outcome cases not re-run (the body did not change).
+- led to: none
+
 ### T-20260926-1 · 2026-09-26 · claude -p stream-json (evals/run-headless.mjs) · Windows 11, Claude Code 2.1.281 · 10/10
 - New cases `action-canary` and `action-golden-untouched` run in a git copy of `evals/fixtures/pad-lite` (a Phase 0 commit, then the rewrite) and are judged on `evidence.all`: an ordered trace (src/ changed, then the tests ran), files unchanged or changed against the fixture, `ai-docs/log.md` content, `npm test` exit 0. `--selftest` first: both fail on an idle run.
 - First pass 5/6 runs: canary run 1 failed only the sequence check. It had planted `<=`, seen 10 of 15 red, reverted and logged, but ran `npm --prefix "<dir>" test`, which the regex missed. Class `test-defect`; the regex was widened and `--rejudge` re-graded the stored runs 6/6 (L-033). The fixture then got its own Phase 0 commit, after run 1 noted that the untouched check had no Phase 0 commit to compare with. Fresh pass: 6/6, 71 to 97 s a run.

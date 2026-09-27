@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260926-12 · 2026-09-26 · Description cut from 1,380 to 1,001 characters, under the spec's 1,024 cap
+- because: user request (description over the Agent Skills spec limit, which some hosts enforce by dropping the skill; over 200 words); T-20260926-2
+- files: SKILL.md front matter `description`
+- Every quoted trigger and every package system, phase and boundary is kept; the phase list is shorter (CI moved into the tooling clause, badges and images left to the body) and the coverage note reads "npm complete, NuGet partly, others unverified". The body is unchanged, still about 7K tokens (over the spec's 5K guidance; not restructured here).
+
 ### C-20260927-3 · 2026-09-27 · Young dependencies past the cooldown, the canary on an untracked src/, xo --fix and the Node floor, runtime-dependency test routing
 - because: L-046 (proven), L-047, L-048, L-049, L-050, L-051 (markdown-plain-link-replacer Phase 2, the first run whose new major keeps runtime dependencies)
 - files: references/npm.md (Phase 1 install cooldown; Phase 2: commit src before the canary, list every recorded difference before writing exceptions, the mechanical swap for a dependency's new major, fetch routing and recorded oracles; Traps: xo --fix and Promise.withResolvers, editor-tool escapes and grep-gated commits), templates/npm/xo.config.js (unicorn/prefer-promise-with-resolvers off), LEARNINGS.md (L-046 promoted, L-047 to L-051)
