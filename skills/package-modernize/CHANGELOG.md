@@ -111,3 +111,6 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## C-20260927-1 · 2026-09-27 · Template ignores the generated release notes
 - templates/npm/xo.config.js ignores `release-notes.md` and templates/npm/.gitignore lists it: release.yml writes the file before `npm run lint`, and xo failed on its unused link definition in the format-json-files beta.1 run (L-039).
+
+## C-20260927-2 · 2026-09-27 · Remove the stale next dist-tag after release
+- references/npm.md and SKILL.md Phase 6: after X.0.0 is live the maintainer runs `npm dist-tag rm PACKAGE next` and the agent reads back `npm dist-tag ls`; the old note that `next` may stay on the beta is gone. Mark asked for it after seeing `next` below `latest` on seeded-random-utilities, format-json-files and is-an-image-url.
