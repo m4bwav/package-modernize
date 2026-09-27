@@ -40,5 +40,5 @@ dotnet_naming_style.underscore_camel.required_prefix = _
 dotnet_diagnostic.CA1510.severity = none
 
 # CA1707: test names use underscores on purpose.
-[*Tests/**.cs]
+[{tests/**.cs,*Tests/**.cs}]
 dotnet_diagnostic.CA1707.severity = none

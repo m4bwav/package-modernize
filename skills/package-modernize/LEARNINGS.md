@@ -457,3 +457,32 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: TrailerClipper capture Program.cs build error, session 2026-09-27
 - Scope: skill (SKILL.md shape of a run, Windows line; already covered)
 - Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+
+### L-058 · 2026-09-27 · The editor tools decode backslash-u escapes too
+- Trigger: in the TrailerClipper run, a C# escape for "<" written through the Write and Edit tools, and through a Python heredoc, arrived as a literal "<" three times; the config text escaping it was meant to restore became a no-op that compiled and passed the unit build (2026-09-27).
+- Hypothesis: the tool layer unescapes JSON-style sequences in the text it is handed, and Git Bash heredocs halve backslashes; both happen before the file is written.
+- Rule: any text holding a backslash followed by u and four hex digits (C# or JSON escapes, markdown that quotes them) is written through Python with chr(92), then grepped in the file. A test that asserts the escaped output (built with (char)92 in the test source) catches the silent version.
+- Evidence: TrailerClipperLib d033b12 (TrailerClipper.ConfigText, ReviewTests.Config_text_escapes_what_JavaScriptSerializer_escaped)
+- Scope: skill (references/nuget.md Traps); memory note bash-tool-heredoc-apostrophes
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-059 · 2026-09-27 · Generate the golden replay from the capture program
+- Trigger: TrailerClipper's golden test needed the capture's 148 cases, their arguments and recording rules against the new build (2026-09-27).
+- Rule: produce the test's runner from the committed capture program by a mechanical rewrite with a header saying how, mark it generated for the formatter, compare case by case, and keep every allowed difference in one exception table keyed by method, culture and arguments, with a test that each key matches a recorded case. First build: 138 of 150; the 12 were one real named exception (E9) and a test-side key order.
+- Evidence: TrailerClipperLib tests/TrailerClipperLib.Tests/GoldenRunner.cs, GoldenTests.cs (f0f9c94)
+- Scope: skill (references/nuget.md Phase 2)
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-060 · 2026-09-27 · A reflection baseline of the old public API, with parameter names
+- Trigger: the Phase 3 review found that the class method RemoveTrailers(string directoryPath, decimal milliseconds) had taken the interface's parameter names; the golden replay calls by position and could not see it, and package validation could not use the net40 1.1.0 as a baseline (2026-09-27).
+- Rule: when package validation has no usable baseline, list the published DLL's public members with parameter names by reflection into a committed file and test that 2.x keeps every line.
+- Evidence: TrailerClipperLib tests/TrailerClipperLib.Tests/PublicApi-1.1.0.txt, ReviewTests.cs PublicApiTests (d033b12)
+- Scope: skill (references/nuget.md Phase 2)
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-061 · 2026-09-27 · CI for a package that measures an external program: current build on every OS, sorted listings, resolved temp paths
+- Trigger: the first CI run of TrailerClipper v2 passed on Windows and failed on Ubuntu (apt ffmpeg 6.1 measures MP3 files differently) and macOS (directory order, /private temp prefix) (2026-09-27).
+- Rule: install the same current major of the external program on every runner (checksum-verified when it comes from a release page), sort directory listings in the library when their order is observable, and resolve the working directory before replacing it in recorded text.
+- Evidence: CI runs 36334471273 (failed) and 36335032052 (green); TrailerClipperLib 127f399
+- Scope: skill (references/nuget.md Traps)
+- Status: promoted (references/nuget.md, 2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27

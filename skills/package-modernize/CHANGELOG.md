@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-7 · 2026-09-27 · NuGet Phase 2 and 3 from TrailerClipper: generated golden replay, public API baseline, tool packages, external programs, CI traps
+- because: L-058, L-059, L-060, L-061 (TrailerClipper Phases 2 and 3)
+- files: references/nuget.md (Phase 2 bullets; Phase 5 policy scope; Traps), templates/nuget/.editorconfig (tests section glob), LEARNINGS.md (L-058 to L-061)
+- The first NuGet run with a golden replay, a reflection API baseline and an independent review; the review again found 12 real issues after every test passed.
+
 ### C-20260927-6 · 2026-09-27 · NuGet golden capture proven on a run: net48 for Framework-era packages, fixtures for packages that run a program, bundled DLLs in the survey
 - because: L-056, L-057 (TrailerClipper Phases 0 and 1)
 - files: references/nuget.md (Phase 0: golden capture, nupkg file list), scripts/golden-capture-nuget.template.cs (header), LEARNINGS.md (L-056, L-057)
