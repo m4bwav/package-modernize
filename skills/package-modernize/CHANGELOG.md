@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-12 · 2026-09-27 · Settings before the pull request; F# coverage complete (`settings-before-pr`)
+- because: L-077 `settings-before-the-pull-request`; IsImageUrlDotNet 2.0.0 released and verified
+- files: SKILL.md (phases table, Phase 3 exit), references/nuget.md (coverage line; what it still lacks), LEARNINGS.md (L-077)
+- The maintainer merged the pull request as soon as he had read it, before Phase 4's rulesets existed; the settings now go on at the Phase 3 stop.
+
 ### C-20260927-11 · 2026-09-27 · F# Phases 2 and 3, package icons, .NET Framework consumers (`fsharp-phase-2-and-icons`)
 - because: L-070 `generate-missing-icon` (user request), L-071 `netfx-needs-system-net-http`, L-072 `golden-alone-in-process`, L-073 `windows-paths-for-dotnet-nuget`, L-074 `commit-before-canary`, L-075 `recording-names-the-drive`, L-076 `fsharp-analyzers-verified`; L-003 confirmed again (IsImageUrlDotNet Phases 2 and 3)
 - files: SKILL.md (golden capture canary; badges and images: icon), references/nuget.md (coverage line; Phase 0 network capture; F# packages: analyzers verified, tests, Dependabot, APIs that make requests; Phase 1 target frameworks and metadata rows; Traps; what it still lacks), scripts/make-icon.py (new), scripts/README.md, LEARNINGS.md (L-070 to L-076, L-003)
