@@ -1,6 +1,6 @@
 # Retrofit: a package modernized before this skill existed
 
-A retrofit brings a package that already has current tooling up to this skill's standard: the golden contract, the gated release path, verification from the registry, the repository settings and the docs. It is not a rewrite; the code is presumed sound until the audit says otherwise. First run: RandomNameGeneratorLibrary 2.2.0 to 2.3.0 (NuGet, 2026-09-28; its plan, gap audit and log are under `ai-docs/` in m4bwav/DotNetRandomNameGenerator). The phases and rules are in [../SKILL.md](../SKILL.md); this file says what changes when the package was modernized by hand first.
+A retrofit brings a package that already has current tooling up to this skill's standard: the golden contract, the gated release path, verification from the registry, the repository settings and the docs. It is not a rewrite; the code is presumed sound until the audit says otherwise. First run: RandomNameGeneratorLibrary 2.2.0 to 2.3.0 (NuGet, 2026-09-28; its plan, gap audit and log are under `ai-docs/` in m4bwav/DotNetRandomNameGenerator). Second run: JsonPrettyPrinter 3.0.1 to 3.0.2 (NuGet, 2026-09-28, m4bwav/DotNetJsonPrettyPrinter), no library change; its capture also records the old versions (below). The phases and rules are in [../SKILL.md](../SKILL.md); this file says what changes when the package was modernized by hand first.
 
 ## When it is a retrofit
 
@@ -19,12 +19,14 @@ The latest published version already builds on the current SDK or runtime, has C
 ## The gap audit (Phase 0)
 
 1. Run the survey scripts and read every version's package files: old versions of a hand-modernized package can still be broken (RandomNameGeneratorLibrary 1.1.0 shipped sources and obj caches and no DLL; 1.1.1 to 1.2.1 had the DLL outside a framework folder). Each gets a deprecation recommendation for the maintainer.
-2. List every gap against the phases table and the system's reference: golden capture, API list with parameter and protected names, validation baseline, workflows and pins, consumers, release gate, verify-published, Dependabot, rulesets and security settings, README badges and images, icon, SECURITY.md, AGENTS.md with the import, everlast docs, the GitHub wiki (none, a placeholder, or pages for an older version). A table of item, current state, standard is the note's core.
+2. List every gap against the phases table and the system's reference: golden capture, API list with parameter, protected and init-only names, validation baseline, workflows and pins (and third-party jobs the template drops, such as a test-report action with checks set to write), consumers, release gate, verify-published, Dependabot, rulesets and security settings, the repository homepage, tags that never published, stale branches, README badges and images, icon, SECURITY.md, AGENTS.md with the import, everlast docs, the GitHub wiki (none, a placeholder, pages for an older version, or pages without a saved verification output). A table of item, current state, standard is the note's core.
 3. Read the earlier pass's own notes and changelog for what it decided and what it changed without guarding it (RandomNameGeneratorLibrary 2.1.0 changed every seeded place name; its changelog said the list changed, not that seeded output did).
 4. **Data provenance** (L-093 `data-provenance-check`): rebuild every embedded data file from its source with the old tool's logic. Equal output proves where it came from; a corrected rebuild beside it lists the defects. Integrity tests (counts, blanks, encoding) and the golden capture cannot see a wrong tool. Record the sources' URLs and hashes next to the tool.
-5. **The popular version** (L-094 `diff-the-popular-version`): when most downloads are on an old version, run the capture's deterministic cases that its API allows against it and write every difference into the next changelog.
+5. **The popular version** (L-094 `diff-the-popular-version`): when most downloads are on an old version, run the capture's deterministic cases that its API allows against it and write every difference into the next changelog. Do it with the capture itself (L-110 `one-capture-many-versions`): a version property on the package reference and `#if` blocks for the oldest API, recordings in `tests/Golden/upgrade/`, a compare script that reports CRLF-only differences apart. JsonPrettyPrinter's showed that its 2.0.0 serializer switch changed about fifteen things the changelog did not name, and that every 1.x version answered alike.
 6. Baseline: the current build and tests as they are, and the package list for outdated and vulnerable dependencies.
-7. **Old majors** (L-108 `run-old-majors-for-docs`): install the latest version of each old major in a scratch folder and import it once; one that no longer loads is a deprecation recommendation.
+7. **Old majors** (L-108 `run-old-majors-for-docs`): install the latest version of each old major in a scratch folder and import it once; one that no longer loads is a deprecation recommendation. Load it on every runtime a caller can have: JsonPrettyPrinter 1.x loads on .NET 10, but half its API throws there.
+8. **ai-docs in the old layout**: register with everlast (mode repo), `git mv` the old `log/` files to `notes/` with frontmatter and a Summary heading, give the old plan a dated name with Status, Goal and Next single action headings, fold one-paragraph logs into `log.md`, then `everlast.py index` and `lint` (its false positives: L-082, L-097, L-114).
+9. Before the Phase 0 commit, look in the recordings for anything the capture's OS chose: a CRLF, a path, a time zone (L-119 `os-newline-through-a-dependency`; a dependency's default can write Environment.NewLine).
 
 ## A ruled data or behaviour fix in a retrofit
 
@@ -42,6 +44,12 @@ When the maintainer rules that a defect is fixed in place (RandomNameGeneratorLi
 - Not for workflow or test changes alone, unless the maintainer wants the release path proven now.
 - The trusted publishing policy usually names the old workflow file: the maintainer changes it after the merge and before the prerelease tag.
 
+## Templates over an existing layout
+
+- A root `Directory.Build.props` from the template sets `IsPackable` false and repeats settings the csproj files already carry; when they do, add only the audit switches (JsonPrettyPrinter) rather than move settings and risk an unpackable library.
+- Adapt workflow templates with a byte-safe script (they hold sed patterns and `$'...'` strings with backslashes), then grep for `{{[A-Z_]+}}` and `TEMPLATE`.
+- Run actionlint with shellcheck (L-118): the template's verify-published loop had an unused variable that two runs without shellcheck had missed.
+
 ## What the first retrofit's review found
 
 The independent review ran a differential of the new package against the published one over 5,000 seeds and every call kind on both runtimes (144,891 comparisons per runtime, no difference outside the ruled list). Its 10 findings were in the new machinery, not the library: a CI check that died silently, consumers that could restore the registry's copy of the same version (L-104 `consumer-source-mapping`), an overstated changelog claim ("every seeded place name differs": 2 percent do not), a too-broad exception filter, a partial oracle and wrong commands in AGENTS.md. Expect the same in a retrofit: review the new tests and workflows as hard as the code.
@@ -56,5 +64,8 @@ The independent review ran a differential of the new package against the publish
 - The package content check in ci.yml died without a message on a package with no dependencies: the nuspec's empty groups are self-closing, and a grep with no match ends a step under `-e` and pipefail. Run each new check locally with `bash -e -o pipefail` on the real nupkg, with a right and a wrong expectation (L-103 `empty-dependency-group`).
 - A new test project must carry every extension the workflow's test flags need (`--coverage` needs Microsoft.Testing.Extensions.CodeCoverage), or Microsoft.Testing.Platform exits 5 with "Zero tests ran" (L-101 `ci-command-locally`).
 - xunit.v3 4.x made `CollectionBehavior(DisableTestParallelization = true)` an error (CS0619); a replay in one test class needs no attribute.
+- JsonElement.GetString() throws on .NET Framework for a recorded lone surrogate; with one recording per runtime, compare strings by raw JSON text (L-117).
+- A hidden overload in an older major (JsonPrettyPrinter 2.x kept a constructor taking its old context) makes `new X(null)` ambiguous when the capture compiles against it: cast every null (L-110).
+- The Linux leg is where an OS-dependent answer shows; push early so CI runs the replay on Ubuntu before the review (L-119).
 
 Related: builds on [../SKILL.md](../SKILL.md); see also [nuget.md](nuget.md), [plan-skeleton.md](plan-skeleton.md).
