@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-15 · 2026-09-27 · Differential test against a reimplemented dependency (`differential-against-the-original`)
+- because: L-086 `differential-against-the-original` (CachingServiceWithAOPSupport Phase 3: 12 review findings, 7 in the reimplemented key writer)
+- files: references/nuget.md (Phase 2), LEARNINGS.md (L-086)
+- The golden capture covers the old package's inputs, not those of a dependency the rewrite reimplements.
+
 ### C-20260927-14 · 2026-09-27 · NuGet workflow, consumer and golden-test templates from proven runs (`nuget-templates-current`)
 - because: L-083 `bcl-shape-differs-by-runtime`, L-084 `blame-hang-names-the-test`, L-085 `templates-marked-unverified`; the maintainer's request in the CachingServiceWithAOPSupport kickoff
 - files: templates/nuget/.github/workflows/ci.yml, release.yml, verify-published.yml (replaced), templates/nuget/.github/dependabot.yml, templates/nuget/Directory.Build.props (updated), templates/nuget/tests/consumers/run.sh, Program.cs and templates/nuget/tests/GoldenTests.cs.template (new), templates/README.md, references/nuget.md (Traps; what it still lacks), LEARNINGS.md (L-083 to L-085)
