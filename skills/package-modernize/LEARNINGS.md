@@ -160,6 +160,22 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (templates/nuget)
 - Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
+### L-105 · 2026-09-28 · Log only what the maintainer said, quoted (`log-maintainer-quotes`)
+- Trigger: after Mark said "I merged everything", the RandomNameGeneratorLibrary log recorded that he had also edited the nuget.org Trusted Publishing policy, which he had not said; a later entry corrected it (2026-09-28). The beta's push job was the real evidence.
+- Hypothesis: a stop lists several maintainer actions, and a short "done" reads as covering all of them.
+- Rule: log the maintainer's words as a quote; any action they did not name stays unconfirmed in the log, with the step that will prove it (here: the push job's NuGet login).
+- Evidence: DotNetRandomNameGenerator ai-docs/log.md, 881ddec
+- Scope: skill (SKILL.md, the rules that hold everywhere)
+- Status: promoted: C-20260928-4 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
+
+### L-106 · 2026-09-28 · check-readme-images.mjs defaults to npm (`readme-images-registry-flag`)
+- Trigger: the 2.3.0 README check ran first without `--registry nuget` and printed "checked for npm"; references/nuget.md has the flag, the agent typed the command from memory (2026-09-28). The rerun with the flag also passed.
+- Hypothesis: the script is shared by both registries and the default hides which allow-list was applied.
+- Rule: copy the command from the registry's reference; for NuGet it is `node scripts/check-readme-images.mjs README.md --registry nuget`, and the output line must say "checked for nuget".
+- Evidence: this run's DotNetRandomNameGenerator log, 2.3.0 entry
+- Scope: skill (references/nuget.md verification table already correct)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

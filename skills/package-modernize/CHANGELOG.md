@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260928-4 · 2026-09-28 · Log maintainer statements as quotes (`log-maintainer-quotes`)
+- because: L-105 `log-maintainer-quotes`, L-106 `readme-images-registry-flag` (RandomNameGeneratorLibrary 2.3.0 released and verified, m4bwav/DotNetRandomNameGenerator#14 and #15)
+- files: SKILL.md (the shape of a run: rules that hold everywhere), LEARNINGS.md
+- The evidence rule now says the maintainer's words go into the log as a quote and anything they did not confirm stays marked unconfirmed until the run proves it.
+
 ### C-20260928-3 · 2026-09-28 · The retrofit path and the lessons of its first run (`retrofit-path`)
 - because: user request (a retrofit path for packages modernized before the skill); L-098 `record-process-bitness`, L-099 `ruled-exception-file`, L-100 `template-adaptation-traps`, L-101 `ci-command-locally`, L-102 `known-traps-repeated`, L-103 `empty-dependency-group`, L-104 `consumer-source-mapping` (RandomNameGeneratorLibrary 2.3.0, pull request m4bwav/DotNetRandomNameGenerator#13)
 - files: references/retrofit.md (new), SKILL.md (the shape of a run: retrofit pointer; Windows line; Phase 2 exit criteria), references/nuget.md (Phase 0 bitness; Traps), templates/nuget/.github/dependabot.yml (seven days everywhere), templates/nuget/.github/workflows/ci.yml (C-locale note; greps tolerate empty dependency groups), templates/nuget/.github/workflows/verify-published.yml (provenance line), templates/nuget/tests/consumers/run.sh (source mapping, whole-line checks), templates/README.md (placeholder grep), LEARNINGS.md (L-098 to L-104)
