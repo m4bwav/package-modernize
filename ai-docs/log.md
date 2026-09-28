@@ -29,3 +29,4 @@ Append-only. One line per operation: `## [YYYY-MM-DD] op | title` where op is on
 ## [2026-09-26] index | rebuilt (2 entries)
 ## [2026-09-26] update | C-20260926-12: description 1,380 -> 1,001 chars (spec cap 1,024), all triggers kept (skill-tidy check OK); T-20260926-2 trigger cases 6/6; body left at ~7K tokens (ST016, report only)
 ## [2026-09-26] fix | privacy: machine host name removed from evergreen.json tests.env (now "Windows 11 development machine"); history not rewritten, the name remains in commits 01ab2c9 through the previous HEAD
+## [2026-09-28] update | C-20260928-1: first LEARNINGS.md consolidation (710 -> 132 lines): 13 near-duplicates merged into their lowest ID, L-052/L-053/L-066 promoted, 4 active (L-013, L-014, L-018, L-034); full entries in skills/package-modernize/LEARNINGS-ARCHIVE.md, one index line per ID kept in LEARNINGS.md; pre-existing duplicate IDs (R-20260925-4, C-20260927-1 to 4) left for a separate fix

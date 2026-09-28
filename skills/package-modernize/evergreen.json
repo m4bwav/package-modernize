@@ -47,12 +47,13 @@
     }
   ],
   "counts": {
-    "learnings": 21,
-    "changes": 6,
-    "research": 6,
-    "tests": 3
+    "learnings": 89,
+    "changes": 35,
+    "research": 8,
+    "tests": 4
   },
   "consolidate_every": 25,
+  "last_consolidated": "2026-09-28",
   "tests": {
     "last_run": "2026-09-26T11:43",
     "harness": "claude -p stream-json (evals/run-headless.mjs)",
