@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-13 · 2026-09-27 · Every version's nupkg, old tests against the published package, the cooldown helper (`survey-every-version`)
+- because: L-078 `survey-every-version-nupkg`, L-079 `old-tests-against-published`, L-080 `net10-record-of-failure`, L-081 `nuget-latest-cooldown`, L-082 `lint-reads-csharp-generics` (CachingServiceWithAOPSupport Phases 0 and 1)
+- files: scripts/survey-nuget.sh (newest ten versions' files, warning for assemblies outside lib/), scripts/nuget-latest.py (new), scripts/README.md, references/nuget.md (Phase 0 bullets; Traps), references/plan-skeleton.md (lint note), LEARNINGS.md (L-078 to L-082)
+- A 2015 package whose first version installed nothing and whose old projects cannot build on the .NET 10 SDK: the survey missed the first, the baseline had nothing to run for the second.
+
 ### C-20260927-12 · 2026-09-27 · Settings before the pull request; F# coverage complete (`settings-before-pr`)
 - because: L-077 `settings-before-the-pull-request`; IsImageUrlDotNet 2.0.0 released and verified
 - files: SKILL.md (phases table, Phase 3 exit), references/nuget.md (coverage line; what it still lacks), LEARNINGS.md (L-077)

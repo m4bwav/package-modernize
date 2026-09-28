@@ -30,13 +30,30 @@ fi
 section "Registration index: per-version listed flag, published date, deprecation, target frameworks" "curl -s --compressed https://api.nuget.org/v3/registration5-gz-semver2/$LOWER/index.json"
 curl -s --compressed "https://api.nuget.org/v3/registration5-gz-semver2/$LOWER/index.json" | json 'for(const page of r.items){ if(!page.items){console.log("(page not inlined: "+page["@id"]+")");continue} for(const it of page.items){const c=it.catalogEntry; console.log(c.version+" listed="+c.listed+" published="+(c.published||"").slice(0,10)+(c.deprecation?" DEPRECATED("+c.deprecation.reasons.join(",")+")":"")+(c.vulnerabilities?" VULN="+c.vulnerabilities.length:"")); for(const g of c.dependencyGroups||[]) console.log("   "+(g.targetFramework||"(any)")+": "+(g.dependencies||[]).map(d=>d.id+" "+d.range).join(", "))}}'
 
-section "Package files of the latest version (nupkg is a zip)" "curl -s -o pkg.nupkg https://api.nuget.org/v3-flatcontainer/$LOWER/<version>/$LOWER.<version>.nupkg; unzip -l pkg.nupkg"
-latest=$(curl -s "https://api.nuget.org/v3-flatcontainer/$LOWER/index.json" | json 'console.log(r.versions.at(-1))')
+section "Package files of every version, newest ten (nupkg is a zip); a DLL outside lib/ installs nothing" "curl -s -o pkg.nupkg https://api.nuget.org/v3-flatcontainer/$LOWER/<version>/$LOWER.<version>.nupkg; unzip -l pkg.nupkg"
+# Every version, not only the latest: CachingServiceWithAOPSupport 1.0.0 packed its DLL under bin/Debug, so it installed
+# no reference at all, and only its own file list showed it (L-078 `survey-every-version-nupkg`, 2026-09-27).
+versions=$(curl -s "https://api.nuget.org/v3-flatcontainer/$LOWER/index.json" | json 'console.log(r.versions.slice(-10).join(" "))')
+latest=${versions##* }
 tmp=$(mktemp -d)
-if curl -s -o "$tmp/pkg.nupkg" "https://api.nuget.org/v3-flatcontainer/$LOWER/$latest/$LOWER.$latest.nupkg"; then
-  (cd "$tmp" && (unzip -l pkg.nupkg 2>/dev/null || python -c "import zipfile,sys;[print(i.file_size, i.filename) for i in zipfile.ZipFile('pkg.nupkg').infolist()]"))
-  printf 'nuspec:\n'; (cd "$tmp" && (unzip -p pkg.nupkg '*.nuspec' 2>/dev/null || python -c "import zipfile;z=zipfile.ZipFile('pkg.nupkg');print(z.read([n for n in z.namelist() if n.endswith('.nuspec')][0]).decode())"))
-fi
+for v in $versions; do
+  printf '
+### %s
+' "$v"
+  if curl -s -o "$tmp/pkg.nupkg" "https://api.nuget.org/v3-flatcontainer/$LOWER/$v/$LOWER.$v.nupkg"; then
+    (cd "$tmp" && python -c "
+import zipfile
+names = [i for i in zipfile.ZipFile('pkg.nupkg').infolist()]
+for i in names: print(i.file_size, i.filename)
+stray = [i.filename for i in names if i.filename.lower().endswith(('.dll', '.exe')) and not i.filename.lower().startswith(('lib/', 'runtimes/', 'tools/', 'build/', 'buildtransitive/', 'analyzers/', 'ref/'))]
+if stray: print('WARNING: assemblies outside lib/ (a consumer gets no reference to them): ' + ', '.join(stray))
+")
+    if [ "$v" = "$latest" ]; then
+      printf 'nuspec:
+'; (cd "$tmp" && python -c "import zipfile;z=zipfile.ZipFile('pkg.nupkg');print(z.read([n for n in z.namelist() if n.endswith('.nuspec')][0]).decode('utf-8-sig'))")
+    fi
+  fi
+done
 rm -rf "$tmp"
 
 REPO="${2:-}"
