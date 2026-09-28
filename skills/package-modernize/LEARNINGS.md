@@ -456,7 +456,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Rule: any edit whose text holds a backslash escape goes through the editor tool; Python heredocs are fine only for text without backslashes. SKILL.md's Windows line already says so; follow it for script-driven edits too.
 - Evidence: TrailerClipper capture Program.cs build error, session 2026-09-27
 - Scope: skill (SKILL.md shape of a run, Windows line; already covered)
-- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-09-27
+- Status: active · helpful 2 · harmful 0 · last_confirmed 2026-09-27 (hit twice more in CachingServiceWithAOPSupport: a printf format in run.sh and a template generator; both fixed by writing the script with the editor tool)
 
 ### L-058 · 2026-09-27 · The editor tools decode backslash-u escapes too
 - Trigger: in the TrailerClipper run, a C# escape for "<" written through the Write and Edit tools, and through a Python heredoc, arrived as a literal "<" three times; the config text escaping it was meant to restore became a no-op that compiled and passed the unit build (2026-09-27).
@@ -684,4 +684,27 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Rule: when the rewrite replaces a dependency's behaviour, add a test that compares the two over edge cases and seeded random inputs on a runtime where the original still runs (net48 for a .NET Framework assembly), and keep it in the suite.
 - Evidence: CachingServiceWithAOPSupport ai-docs/notes/2026-09-27-phase-3-review-findings.md, tests ReviewTests.R12
 - Scope: skill (SKILL.md golden capture; references/nuget.md Phase 2)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-087 · 2026-09-27 · "Cannot create ref due to creations being restricted" on a tag push is the admin bypass, not a failure (`tag-bypass-message`)
+- Trigger: pushing v2.0.0-beta.1 to CachingServiceWithAOPSupport printed "remote: - Cannot create ref due to creations being restricted." after the admins-only tag ruleset was on; the tag was created and release.yml started. The v2.0.0 push printed the same line under "Bypassed rule violations for refs/tags/v2.0.0" (2026-09-27).
+- Hypothesis: GitHub reports every rule an admin bypasses; the first push's output was cut before the "Bypassed" header by a tail.
+- Rule: after a tag push, read `gh api repos/OWNER/REPO/git/refs/tags/TAG` and the release run, not the push's remote lines; never retag on that message.
+- Evidence: CachingServiceWithAOPSupport ai-docs/log.md (Phases 5 and 6)
+- Scope: skill (references/nuget.md Traps)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-088 · 2026-09-27 · `gh attestation verify` prints nothing on success outside a terminal (`attestation-verify-silent`)
+- Trigger: verifying the 2.0.0-beta.1 nupkg from the GitHub Release printed nothing and exited 0 (gh 2.100, Git Bash through the agent's shell) (2026-09-27).
+- Rule: verify with `--format json --jq '.[0].verificationResult.statement.predicate.buildDefinition.externalParameters.workflow'` and log the workflow path and ref it names (release.yml at refs/tags/vX); verify the file attached to the GitHub Release or the run artifact, not the nuget.org download (repository-signed, other hash).
+- Evidence: CachingServiceWithAOPSupport ai-docs/log.md (Phase 5)
+- Scope: skill (references/nuget.md Phase 5 and 6)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-089 · 2026-09-27 · Put a needed working directory in a subshell (`cd-only-in-a-subshell`)
+- Trigger: in CachingServiceWithAOPSupport three shell calls started with `cd DIR;` despite the rule in SKILL.md, and the session's working directory moved each time (to /, to TrailerClipperLib, to a scratch folder); one later glob then resolved in the wrong repository (2026-09-27).
+- Hypothesis: the rule says what not to do but not what to do when a tool needs a working directory (actionlint, zizmor, a relative glob).
+- Rule: use `(cd DIR && cmd)` (a subshell, the session stays where it was), a tool flag (`git -C`, `--project`), or absolute paths; a bare `cd` never starts a call.
+- Evidence: CachingServiceWithAOPSupport session, 2026-09-27
+- Scope: skill (SKILL.md Windows line)
 - Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
