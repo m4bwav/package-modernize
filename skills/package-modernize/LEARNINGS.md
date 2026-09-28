@@ -78,7 +78,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Rule: in a retrofit, run the capture's seeded or deterministic cases (as far as the old API allows) against the version with the most downloads and state every difference in the changelog of the next release.
 - Evidence: DotNetRandomNameGenerator ai-docs/log.md (Phase 0)
 - Scope: skill (the retrofit path)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+- Status: active · helpful 2 · harmful 0 · last_confirmed 2026-09-28 (JsonPrettyPrinter: 2.0.0 swapped the serializer and rewrote its expectation file; the CHANGELOG named two of about fifteen changes)
 
 ### L-095 · 2026-09-28 · A path token in a recording also needs forward slashes (`portable-path-token`)
 - Trigger: the first RandomNameGeneratorLibrary recordings held `{WORK}` followed by a Windows separator and a file name in FileNotFoundException messages; the replay on Ubuntu would have failed on every path case (2026-09-28, caught before the Phase 0 commit).
@@ -198,6 +198,62 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Rule: Phase 6 leaves the wiki on (or switches it on); capture scripts stay runnable from a scratch folder (the build path as an argument, no import from the repository), so the wiki run can replay them.
 - Evidence: seeded-random-utilities ai-docs/notes/2026-09-28-github-wiki.md and its log (Stage 2 settings); wikiwright L-020 `replay-the-golden-capture`
 - Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-110 · 2026-09-28 · One capture program records every published version (`one-capture-many-versions`)
+- Trigger: JsonPrettyPrinter's retrofit needed 3.0.1 (the contract), 2.1.1 and the popular 1.0.1.1 recorded with the same cases (L-094). An `OldVersion` MSBuild property (`Version="[$(OldVersion)]"`) and a define for the oldest API (`JPP_V1` when the version starts with "1.") let one Cases.cs compile against all three; same case names, so a 90-line compare script diffs versions case by case. 1.0.0 and 1.0.1 then took two seconds each and answered all 446 cases as 1.0.1.1 did, so one deprecation message covers all three. A hidden 2.x constructor overload made `new JsonPrettyPrinter(null)` ambiguous against 2.1.1 only (2026-09-28).
+- Hypothesis: the popular-version check was written as a separate scratch program; putting it in the capture makes it exact, repeatable and reusable by the wiki (L-109).
+- Rule: write the capture with a version property and `#if` blocks for older APIs; record the popular and the latest old major on every runtime into an `upgrade/` folder beside the contract, never replayed; cast every null argument to its parameter type; run every version of the popular major once before writing a deprecation message.
+- Evidence: DotNetJsonPrettyPrinter 08b777a (tests/Golden/Capture, tests/Golden/upgrade)
+- Scope: skill (references/retrofit.md, references/nuget.md Phase 0, scripts/golden-capture-nuget.template.cs)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-111 · 2026-09-28 · Record the parameter name, the dependency that worded a message, and the time zone (`record-param-and-source`)
+- Trigger: on net48 the first line of an ArgumentNullException message is "Value cannot be null." without the parameter, so a renamed parameter would pass the replay; System.Text.Json's messages on net10.0 come from the runner's runtime, not the package, and can move with a patch; 1.x's JavaScriptSerializer read ISO dates as local time, so its recording held "-06:00 Local" (2026-09-28).
+- Hypothesis: the first-line rule was written for messages the library words itself.
+- Rule: exception records carry `$param` (ParamName) and `$from` when the throwing method's assembly is a dependency (System.Text.Json, System.Web.Extensions); the header records the time zone and the dependency's version; the plan names "dependency-worded message, compared by type when the dependency's version differs" as the one exception class.
+- Evidence: DotNetJsonPrettyPrinter tests/Golden/Capture/Cases.cs (AddException), Program.cs (header)
+- Scope: skill (references/nuget.md Phase 0, the capture template)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-112 · 2026-09-28 · A recording is ASCII and its inputs use placeholders (`lossless-capture-text`)
+- Trigger: a JSON printer's capture needs lone surrogates, NUL, BOM and backslash escapes as inputs and outputs. The template writer copies non-ASCII characters raw, and a UTF-8 file turns a lone surrogate into U+FFFD without a word; typing the inputs as C# escapes puts backslashes through the editor tools (L-050) (2026-09-28).
+- Hypothesis: the earlier packages had no such text.
+- Rule: the capture's JSON writer escapes every character outside printable ASCII; inputs are verbatim strings with a backtick for a backslash and `{U+XXXX}` for a code unit, expanded by a helper; long outputs are recorded as length, SHA-256 of the UTF-16LE bytes, head and tail.
+- Evidence: DotNetJsonPrettyPrinter tests/Golden/Capture/Json.cs and Cases.cs (J, Text)
+- Scope: skill (capture template)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-113 · 2026-09-28 · The API lister shows init accessors as set (`api-list-init-accessors`)
+- Trigger: JsonPrettyPrintOptions has init-only properties; the template ApiList wrote `{ get; set; }`, which would let a later change from init to set pass the API test unnoticed (2026-09-28).
+- Hypothesis: RandomNameGeneratorLibrary had no init accessors.
+- Rule: the lister writes `init;` when the setter's return parameter has the IsExternalInit required modifier, marks static properties and const fields, and loads the assembly by name so an `OldVersion` property lists any published version.
+- Evidence: DotNetJsonPrettyPrinter tests/Golden/ApiList/Program.cs
+- Scope: skill (templates/nuget/tests/Golden/ApiList)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-114 · 2026-09-28 · The everlast lint reads an MSBuild element in prose as a placeholder (`lint-reads-msbuild-elements`)
+- Trigger: the converted wiki note named the baseline property as an XML element with its value; `everlast.py lint` reported "template placeholder text still present" (its pattern is a capital letter and ten characters inside angle brackets) (2026-09-28).
+- Hypothesis: same family as L-082 (C# generics) and L-097 (the lazy type).
+- Rule: in ai-docs, write "the PackageValidationBaselineVersion property set to X", never the element.
+- Evidence: DotNetJsonPrettyPrinter 366b93a
+- Scope: skill (references/plan-skeleton.md lint note)
+- Status: active · extends L-082 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-115 · 2026-09-28 · Three known traps again in the first hour (`known-traps-first-hour`)
+- Trigger: in the JsonPrettyPrinter retrofit, after reading SKILL.md and LEARNINGS.md: (a) a one-off lookup `cd <records repo>; grep ...` moved the session's working directory (L-089, L-090); (b) the first csproj written had a usage line with the double dash before the program arguments inside an XML comment, MSB4025 (L-102); (c) a Phase 0 note quoted the CHANGELOG's escape for a quote, and the Write tool decoded it into a bare quote (L-091) (2026-09-28).
+- Hypothesis: each rule is read as a rule about a kind of task (a pull, a props file, a code string), and the first hour's small writes do not look like that task.
+- Rule: never start a shell command with `cd`; never write a usage line in an MSBuild comment (say "then the arguments"); never type an escape sequence in any text a tool writes, code or prose: name it (U+0022) or build it with chr(92). After writing a doc that mentions escapes, grep it for the intended text, not only for chr(92)+"u".
+- Evidence: this session; DotNetJsonPrettyPrinter tests/Golden/ApiList/ApiList.csproj (fixed before commit); ai-docs/notes/2026-09-28-phase-0-gap-audit.md (fixed before commit)
+- Scope: skill (SKILL.md Windows line)
+- Status: active · recurrence of L-089, L-102, L-091 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
+
+### L-116 · 2026-09-28 · Python output redirected on Windows is CRLF (`python-redirect-crlf`)
+- Trigger: `python compare.py a b > report.txt` from Git Bash wrote CRLF reports into a repository with `eol=lf` (2026-09-28).
+- Hypothesis: Python's stdout is in text mode and translates newlines on Windows.
+- Rule: a report meant for the repository is written by the script with `newline="\n"`, or normalised by byte before `git add`.
+- Evidence: DotNetJsonPrettyPrinter tests/Golden/upgrade/diff-*.txt (normalised before 08b777a)
+- Scope: env:windows
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
 ## Archived entries
