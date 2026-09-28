@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-16 · 2026-09-27 · Release-phase traps and the cd rule (`release-traps`)
+- because: L-087 `tag-bypass-message`, L-088 `attestation-verify-silent`, L-089 `cd-only-in-a-subshell`; L-057 confirmed twice (CachingServiceWithAOPSupport Phases 5 and 6)
+- files: SKILL.md (Windows line), references/nuget.md (Phase 5 rehearsal line, Traps), LEARNINGS.md
+- Two messages that looked like failures were not, and a rule without its alternative was broken three times.
+
 ### C-20260927-15 · 2026-09-27 · Differential test against a reimplemented dependency (`differential-against-the-original`)
 - because: L-086 `differential-against-the-original` (CachingServiceWithAOPSupport Phase 3: 12 review findings, 7 in the reimplemented key writer)
 - files: references/nuget.md (Phase 2), LEARNINGS.md (L-086)
