@@ -20,7 +20,8 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Only pull request runs are cancelled: every master commit keeps its ci result, which release.yml checks (L-120).
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 defaults:
   run:
@@ -45,6 +46,9 @@ jobs:
           global-json-file: global.json
           cache: true
           cache-dependency-path: '**/packages.lock.json'
+      # TEMPLATE: the Phase 0 commit that added the golden files (L-120 `release-checks-what-it-pushes`).
+      - name: The golden recordings are unchanged since the Phase 0 commit
+        run: git diff --exit-code {{PHASE0_COMMIT}} -- tests/Golden
       - run: dotnet restore --locked-mode
       - run: dotnet format --no-restore --verify-no-changes
       - run: dotnet build --no-restore -c Release

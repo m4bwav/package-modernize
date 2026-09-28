@@ -280,6 +280,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (references/nuget.md Phase 0; the capture template)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
+### L-120 · 2026-09-28 · The release workflow pushed a package no check had run on (`release-checks-what-it-pushes`)
+- Trigger: the independent review of JsonPrettyPrinter's retrofit (pull request #8) found that the template release.yml packs in its Linux job and pushes that nupkg after approval, while nothing checked its contents or ran the consumers on it (test-windows tested its own build), the "on master" check was ancestry only, and ci.yml cancelled master runs, so a tag on a commit whose ci was cancelled would publish unchecked. It also found that no workflow enforced the untouched golden files (2026-09-28). Its differential: 525,778 comparisons per runtime, 0 differences.
+- Hypothesis: the template was proven by releases that happened to follow a green master; the gate checks who approves, not what is approved.
+- Rule: release.yml requires a successful `ci` check run on the tagged SHA (check-runs API, checks read), runs the content check and the consumers on the artifact it will push (Linux, and Windows with net48 after downloading it); ci.yml cancels in-progress runs only for pull requests and runs `git diff --exit-code <phase-0> -- tests/Golden`. The templates carry all of it.
+- Evidence: DotNetJsonPrettyPrinter 637c6c3 (CI run 36490775529 green); templates/nuget ci.yml and release.yml (C-20260928-6)
+- Scope: skill (templates/nuget)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
