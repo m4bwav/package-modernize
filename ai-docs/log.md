@@ -33,3 +33,4 @@ Append-only. One line per operation: `## [YYYY-MM-DD] op | title` where op is on
 
 ## [2026-09-28] update | C-20260928-4: lessons from the RandomNameGeneratorLibrary 2.3.0 release
 - L-105 `log-maintainer-quotes` (promoted into the SKILL.md evidence rule) and L-106 `readme-images-registry-flag`. 2.3.0 released and verified; inventory row 4 done in package-modernization #10.
+## [2026-09-28] update | C-20260928-5 wiki-step merged (PR #11, 9704c9d): Phase 7 starts with the wiki via wikiwright; L-107, L-108
