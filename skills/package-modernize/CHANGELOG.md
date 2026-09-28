@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260928-1 · 2026-09-28 · First learnings consolidation, L-001 to L-089 (`consolidate-learnings-1`)
+- because: consolidation pass (LEARNINGS-FORMAT, budgets and consolidation): LEARNINGS.md was 710 lines against a 200-line budget, 4 active entries lacked a Hypothesis, and it had never been consolidated
+- files: LEARNINGS.md (rewritten as 4 active entries plus a one-line index per archived ID), LEARNINGS-ARCHIVE.md (new: full text of every promoted and merged entry), evergreen.json (counts, last_consolidated)
+- Merged 13 near-duplicates into their lowest ID, the absorbed trigger, hypothesis and rule appended to the survivor and the absorbed entry retired as merged: L-035 into L-001, L-057 into L-008, L-082 into L-010, L-062 into L-012, L-033 into L-014, L-049 into L-025, L-077 into L-027, L-054 into L-028, L-039 into L-029, L-037 into L-031, L-074 into L-047, L-058 into L-050, L-086 into L-052. L-052, L-053 and L-066 were still marked active although references/npm.md Phase 3 and references/nuget.md "F# packages" carry them; they are now promoted. Every promoted status names its C- change and where the rule lives. Active: L-013, L-014, L-018, L-034. No rule's meaning changed, no ID was renumbered, and every code name is kept (L-058 `tool-unescapes-backslash-u` and L-059 `golden-replay-from-capture`, cited only in the references until now, appear in the index).
+
 ### C-20260927-16 · 2026-09-27 · Release-phase traps and the cd rule (`release-traps`)
 - because: L-087 `tag-bypass-message`, L-088 `attestation-verify-silent`, L-089 `cd-only-in-a-subshell`; L-057 confirmed twice (CachingServiceWithAOPSupport Phases 5 and 6)
 - files: SKILL.md (Windows line), references/nuget.md (Phase 5 rehearsal line, Traps), LEARNINGS.md
