@@ -677,3 +677,11 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: package-modernize C-20260927-14
 - Scope: skill (templates/README.md)
 - Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-086 · 2026-09-27 · A rewrite that reimplements a dependency is tested against the real one (`differential-against-the-original`)
+- Trigger: CachingServiceWithAOPSupport 2.0.0 reimplements JavaScriptSerializer (Framework-only) for its cache keys; the 50 golden key cases and 37 unit tests passed, and the Phase 3 review's differential fuzz against the real serializer on net48 still found seven differences (IntPtr, double.MaxValue on .NET Framework, DateTimeOffset, Uri escaping, __type order, long enums, TimeSpan depth) (2026-09-27).
+- Hypothesis: a golden capture samples the old package's own inputs; a reimplemented dependency has a far larger input space, which only a comparison with the original covers.
+- Rule: when the rewrite replaces a dependency's behaviour, add a test that compares the two over edge cases and seeded random inputs on a runtime where the original still runs (net48 for a .NET Framework assembly), and keep it in the suite.
+- Evidence: CachingServiceWithAOPSupport ai-docs/notes/2026-09-27-phase-3-review-findings.md, tests ReviewTests.R12
+- Scope: skill (SKILL.md golden capture; references/nuget.md Phase 2)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
