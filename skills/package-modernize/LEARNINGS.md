@@ -40,6 +40,70 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-26
 
+### L-090 · 2026-09-28 · Pull the skill with git -C; its shell rules are not loaded yet (`pull-without-cd`)
+- Trigger: the RandomNameGeneratorLibrary kickoff said "pull master first"; the first shell call was `cd <skill> && git pull`, which moved the session's working directory into the skill repository before SKILL.md (and its rule L-089 `cd-only-in-a-subshell`) had been read. A second `cd /` followed a few calls later (2026-09-28).
+- Hypothesis: a rule inside the skill cannot govern the commands a kickoff asks for before the skill is read; the promoted rule held in the previous run only once it was loaded.
+- Rule: the kickoff skeleton names the pull as `git -C <skill repository> pull --ff-only`; runs use `git -C` for every repository they do not work in.
+- Evidence: RandomNameGeneratorLibrary retrofit session, 2026-09-28 (the harness reported the working directory change)
+- Scope: skill (prompts/kickoff-skeleton.md)
+- Status: promoted: C-20260928-2 (kickoff skeleton) · recurrence of L-089 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
+
+### L-091 · 2026-09-28 · Backslash-u in prose is decoded too; name code points as U+XXXX (`prose-escapes-decode-too`)
+- Trigger: a Phase 0 note written with the Write tool quoted the recorded string "Mu", then a backslash-u escape for U+FFFD, then "oz"; the file held the replacement character itself, although the rule (L-050, which absorbed L-058) was known and followed in the code written the same hour (2026-09-28).
+- Hypothesis: the rule reads as a code rule; markdown that quotes an escape is text like any other to the tool layer.
+- Rule: in documents, write code points as U+FFFD and never quote a backslash-u escape; in code, build it from (char)92. Check a written file with Python for chr(0xFFFD) and for chr(92)+"u" when the text mentions encodings.
+- Evidence: DotNetRandomNameGenerator ai-docs/notes/2026-09-28-phase-0-gap-audit.md (fixed before commit bdb53b3)
+- Scope: skill (references/nuget.md Traps)
+- Status: promoted: C-20260928-2 (nuget.md Traps) · recurrence of L-050 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
+
+### L-092 · 2026-09-28 · The public API list includes protected members and class kinds (`api-list-protected-members`)
+- Trigger: the ApiList program copied from CachingServiceWithAOPSupport listed public members only; RandomNameGeneratorLibrary's public abstract BaseNameGenerator has protected constructors and a protected readonly field that callers' subclasses use, and the list did not say "abstract" (2026-09-28).
+- Hypothesis: the first package that needed the lister had no public unsealed base class, so the gap never showed.
+- Rule: the lister takes constructors and fields with IsPublic, IsFamily or IsFamilyOrAssembly, marks them "protected", and writes the kind as static, abstract, sealed or plain class; templates/nuget/tests/Golden/ApiList is the corrected program.
+- Evidence: DotNetRandomNameGenerator 84dbc6b (tests/Golden/ApiList; PublicApi-2.2.0.txt 101 lines, 98 before the fix)
+- Scope: skill (templates/nuget/tests/Golden/ApiList)
+- Status: promoted: C-20260928-2 (template) · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-093 · 2026-09-28 · Rebuild embedded data from its source with the old tool's logic (`data-provenance-check`)
+- Trigger: RandomNameGeneratorLibrary embeds a place list that 2.1.0 hand-fixed; running the 2014 stripper's logic on the Census 2000 file reproduced the list exactly, and a correct strip showed 150 entries that are not names ("Feli" from Felicity, "Hagers" from Hagerstown) and 246 missing names. Neither the golden capture (it records what is there) nor 146 unit tests (counts, blanks, U+FFFD, duplicates, Title case) could see it (2026-09-28).
+- Hypothesis: a data file is the output of a program; integrity tests check its shape, not whether the program that made it was right.
+- Rule: in Phase 0, for every embedded data file, find its source and rebuild it with the old tool's logic; equal output proves provenance, and a corrected rebuild beside it lists the defects. A data fix changes seeded or indexed output, so it is a plan decision (fix under a new name or at the next major), never a chore.
+- Evidence: DotNetRandomNameGenerator ai-docs/notes/2026-09-28-phase-0-gap-audit.md
+- Scope: skill (SKILL.md survey; the retrofit path)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-094 · 2026-09-28 · Compare the most-downloaded old version with the contract, not only the latest (`diff-the-popular-version`)
+- Trigger: RandomNameGeneratorLibrary's contract is 2.2.0, but 1.2.2 has 3.79 million of its 3.89 million downloads; a scratch program on 1.2.2 showed seeded person names unchanged and every seeded place name different since 2.1.0, which the changelog never said (2026-09-28).
+- Hypothesis: the retrofit's contract protects the next upgrade; the callers who matter most upgrade from the popular version, whose drift nobody recorded.
+- Rule: in a retrofit, run the capture's seeded or deterministic cases (as far as the old API allows) against the version with the most downloads and state every difference in the changelog of the next release.
+- Evidence: DotNetRandomNameGenerator ai-docs/log.md (Phase 0)
+- Scope: skill (the retrofit path)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-095 · 2026-09-28 · A path token in a recording also needs forward slashes (`portable-path-token`)
+- Trigger: the first RandomNameGeneratorLibrary recordings held `{WORK}` followed by a Windows separator and a file name in FileNotFoundException messages; the replay on Ubuntu would have failed on every path case (2026-09-28, caught before the Phase 0 commit).
+- Hypothesis: the work-folder token hides the machine, not the OS's separator.
+- Rule: when a recorded text contains the work folder, replace it with the token and replace the directory separator in the same text with "/", inside the case, so the replay normalises the same way.
+- Evidence: DotNetRandomNameGenerator tests/Golden/Capture/Cases.cs (Normalize)
+- Scope: skill (references/nuget.md Phase 0)
+- Status: promoted: C-20260928-2 (nuget.md Phase 0) · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-096 · 2026-09-28 · Two survey helpers printed errors as findings (`helpers-say-none-plainly`)
+- Trigger: `nuget-latest.py --help` looked up a package called "--help" and died with an HTTPError traceback; `survey-github.sh` printed GitHub's 404 JSON before "(no classic branch protection)" and nothing at all for an empty ruleset list (2026-09-28).
+- Hypothesis: both were written against packages that had the thing asked about.
+- Rule: helpers print a usage on no argument or -h, a one-line "not on nuget.org" with exit 1 for an unknown id, and "(no rulesets)" or "(no classic branch protection)" instead of an API error body.
+- Evidence: scripts/nuget-latest.py, scripts/survey-github.sh (C-20260928-2)
+- Scope: skill (scripts)
+- Status: promoted: C-20260928-2 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-097 · 2026-09-28 · The everlast lint also reads the C# lazy type as an opinion about people (`lint-reads-lazy`)
+- Trigger: `everlast.py lint` flagged "privacy: opinion about people or politics" on two notes that named the lazily initialised name lists by their C# type (2026-09-28).
+- Hypothesis: the privacy pattern matches the word as an adjective about a person.
+- Rule: in ai-docs, describe such fields as "lazily initialised"; the plan skeleton's lint note lists it with the other false positives.
+- Evidence: DotNetRandomNameGenerator bdb53b3 (lint clean after rewording)
+- Scope: skill (references/plan-skeleton.md)
+- Status: promoted: C-20260928-2 · extends L-082 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

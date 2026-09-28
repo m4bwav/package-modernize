@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260928-2 · 2026-09-28 · Lessons from the RandomNameGeneratorLibrary retrofit, Phases 0 and 1 (`rng-retrofit-lessons-1`)
+- because: L-090 `pull-without-cd`, L-091 `prose-escapes-decode-too`, L-092 `api-list-protected-members`, L-093 `data-provenance-check`, L-094 `diff-the-popular-version`, L-095 `portable-path-token`, L-096 `helpers-say-none-plainly`, L-097 `lint-reads-lazy`
+- files: LEARNINGS.md (L-090 to L-097), prompts/kickoff-skeleton.md (read-first list), references/plan-skeleton.md (lint note), references/nuget.md (Phase 0 bullet, Traps), scripts/nuget-latest.py (usage, unknown ids), scripts/survey-github.sh (rulesets and protection lines), templates/nuget/tests/Golden/ApiList (new), templates/README.md
+- The first retrofit of a package modernized before the skill: two of the agent's own slips against promoted rules (a cd before the skill was read, a quoted escape in prose), a lister gap, two helper scripts that printed errors as findings, and two Phase 0 checks (data provenance, the popular version's drift) that the retrofit path will carry.
+
 ### C-20260928-1 · 2026-09-28 · First learnings consolidation, L-001 to L-089 (`consolidate-learnings-1`)
 - because: consolidation pass (LEARNINGS-FORMAT, budgets and consolidation): LEARNINGS.md was 710 lines against a 200-line budget, 4 active entries lacked a Hypothesis, and it had never been consolidated
 - files: LEARNINGS.md (rewritten as 4 active entries plus a one-line index per archived ID), LEARNINGS-ARCHIVE.md (new: full text of every promoted and merged entry), evergreen.json (counts, last_consolidated)

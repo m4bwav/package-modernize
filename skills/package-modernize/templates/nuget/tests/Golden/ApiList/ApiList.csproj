@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Lists the public API of the PUBLISHED {{OLD_VERSION}} by reflection, on both builds (TEMPLATE: list the targets a caller can load).
+       Run: dotnet run -c Release -f net48 (or net10.0) with the output path as the argument. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net10.0;net48</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="{{PACKAGE_ID}}" Version="[{{OLD_VERSION}}]" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
