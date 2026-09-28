@@ -192,6 +192,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
+### L-109 · 2026-09-28 · The golden capture feeds the wiki, and cleanup must not switch the wiki off (`golden-capture-feeds-the-wiki`)
+- Trigger: the seeded-random-utilities wiki (wikiwright's second run) replayed `test/golden/capture-1.1.4.cjs` against 1.1.4 from npm (322 of 322 cases identical to the recording) and against 2.0.0 (316 of 322; the six are the documented emoji exception), and `capture-2.0.0.cjs` against the published build (150 of 150): the Versions and upgrading page's evidence. The same repository's Phase 6 cleanup had switched the wiki off, following references/npm.md ("wiki and projects off"), so Phase 7 had to switch it back on (2026-09-28).
+- Hypothesis: a capture recorded for the rewrite's tests is also the most exact upgrade documentation the package has; the cleanup line predates the wiki step (C-20260928-5).
+- Rule: Phase 6 leaves the wiki on (or switches it on); capture scripts stay runnable from a scratch folder (the build path as an argument, no import from the repository), so the wiki run can replay them.
+- Evidence: seeded-random-utilities ai-docs/notes/2026-09-28-github-wiki.md and its log (Stage 2 settings); wikiwright L-020 `replay-the-golden-capture`
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

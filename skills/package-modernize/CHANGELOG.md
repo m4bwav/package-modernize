@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260928-6 · 2026-09-28 · Phase 6 leaves the wiki on; the golden capture feeds the wiki (`golden-capture-wiki`)
+- because: L-109 `golden-capture-feeds-the-wiki`; wikiwright 0.2.0's second run (seeded-random-utilities)
+- files: references/npm.md (Phase 6 cleanup, `gh repo edit`), SKILL.md ("Wiki (Phase 7, first)"), references/retrofit.md (phases table row 7), LEARNINGS.md (L-109)
+- The npm cleanup line switched the wiki off, which Phase 7 then had to undo; it now leaves it on. The wiki step says that enabling the feature does not create the wiki repository, and that the golden capture is the Versions page's evidence.
+
 ### C-20260928-5 · 2026-09-28 · A wiki step in Phase 7 (`wiki-step`)
 - because: user request (every modernization run adds a wiki to a repository that can have one and does not yet); L-107 `wiki-after-release`, L-108 `run-old-majors-for-docs`
 - files: SKILL.md (phases table row 7; "Documents"; new "Wiki (Phase 7, first)"; Output), references/retrofit.md (phases table, gap audit item and step 7), prompts/kickoff-skeleton.md (survey "Wiki" line, the wiki paragraph, deliverables), LEARNINGS.md (L-107, L-108), README.md
