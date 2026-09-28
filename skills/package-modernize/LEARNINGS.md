@@ -256,6 +256,30 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: env:windows
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
+### L-117 · 2026-09-28 · The template replay's string comparison throws on a recorded lone surrogate (`raw-text-for-lone-surrogates`)
+- Trigger: JsonPrettyPrinter's golden replay, adapted from templates/nuget/tests/GoldenTests.cs.template, failed on net48 with InvalidOperationException "Cannot read incomplete UTF-16 JSON text as string with missing low surrogate": JsonElement.GetString() refuses the lone surrogates the capture recorded (2026-09-28).
+- Hypothesis: earlier packages recorded no invalid UTF-16; the template compares strings through GetString() so it can strip the .NET parameter suffix.
+- Rule: with one recording per runtime, compare strings by raw JSON text (both sides come from the capture's writer, which escapes every character outside ASCII); keep GetString() only where the suffix must be stripped, and never for a package whose inputs include lone surrogates.
+- Evidence: DotNetJsonPrettyPrinter 7cbc419 (GoldenTests.cs); template comment added (C-20260928-6)
+- Scope: skill (templates/nuget/tests/GoldenTests.cs.template)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-118 · 2026-09-28 · actionlint found nothing in shell because shellcheck was missing; with it, a template bug (`actionlint-needs-shellcheck`)
+- Trigger: actionlint and shellcheck are not installed here; with both release zips in the scratchpad (actionlint 1.7.12, shellcheck 0.11.0, passed by absolute path with `-shellcheck`; a PATH entry written as C:/... does not work in Git Bash) actionlint reported SC2034 in templates/nuget verify-published.yml (an unused loop variable), which the earlier NuGet runs had linted without shellcheck (2026-09-28).
+- Hypothesis: L-030 said so for npm; the NuGet template never met shellcheck.
+- Rule: download both zips (`gh release download -R rhysd/actionlint -p '*windows_amd64.zip'`, `gh release download -R koalaman/shellcheck -p '*.zip'`), run `actionlint.exe -shellcheck <abs path>/shellcheck.exe` from the repository root, and log both versions. The template loop now uses `_`.
+- Evidence: DotNetJsonPrettyPrinter 613cc69; templates/nuget/.github/workflows/verify-published.yml (C-20260928-6)
+- Scope: skill (references/nuget.md Phase 4; the template)
+- Status: active · recurrence of L-030 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-119 · 2026-09-28 · A dependency's default can write the OS newline into a recording (`os-newline-through-a-dependency`)
+- Trigger: the first Ubuntu CI run of JsonPrettyPrinter's replay failed one case of 1174: `ToJson` with `JsonSerializerOptions { WriteIndented = true }`, whose System.Text.Json output uses Environment.NewLine; the recording made on Windows holds CRLF. The capture had avoided Environment.NewLine in its own option cases but not inside a dependency (2026-09-28).
+- Hypothesis: a Windows capture replays on Linux only when no answer holds the OS newline, and a dependency's defaults are easy to miss.
+- Rule: before the Phase 0 commit, grep the recordings for CRLF (the ASCII writer shows it as an escape pair) and ask of each case whether the OS chose it; either record it with a token (as RandomNameGeneratorLibrary's {NL}) or, once frozen, add one exactly keyed exception (compare with CRLF read as LF off Windows) with a test that the key exists and holds a CRLF. Run the replay on Linux before calling it green (CI does, so push early).
+- Evidence: CI run 36489418546 (failed), fix on pull request m4bwav/DotNetJsonPrettyPrinter#8
+- Scope: skill (references/nuget.md Phase 0; the capture template)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

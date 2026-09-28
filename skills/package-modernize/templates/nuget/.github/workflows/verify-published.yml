@@ -41,7 +41,7 @@ jobs:
           dotnet-version: 10.0.x
       - name: nuget.org lists the version in both indexes (they can lag about 15 to 25 minutes)
         run: |
-          for attempt in $(seq 1 40); do
+          for _ in $(seq 1 40); do
             # The flat container (downloads) updates first; the registration index, which restores read, can lag.
             if curl -fsS "https://api.nuget.org/v3-flatcontainer/{{PACKAGE_ID_LOWER}}/index.json" | grep -q "\"$VERSION\"" \
               && curl -fsS --compressed "https://api.nuget.org/v3/registration5-gz-semver2/{{PACKAGE_ID_LOWER}}/index.json" | grep -q "\"version\":\"$VERSION\""; then
