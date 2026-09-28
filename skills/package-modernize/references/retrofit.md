@@ -14,7 +14,7 @@ The latest published version already builds on the current SDK or runtime, has C
 | 1 | The plan's first question is whether any library code changes at all (default: none). Decisions on everything the audit found. Recommend a release only for a reason (below). |
 | 2 | Templates adapted over the existing files, not a new layout: keep the project folders where they are (moving them breaks links for no caller benefit). Golden replay first, canary after the commit. |
 | 3 to 6 | As in SKILL.md. The review's differential compares the new build with the latest published version. |
-| 7 | As in SKILL.md, including the wiki: a retrofit without a release still gets one (wikiwright, verified against the latest published version); with a release, after it is verified. |
+| 7 | As in SKILL.md, including the wiki: a retrofit without a release still gets one (wikiwright, verified against the latest published version); with a release, after it is verified. A golden capture made in the retrofit feeds the wiki's Versions and upgrading page (L-109). |
 
 ## The gap audit (Phase 0)
 
