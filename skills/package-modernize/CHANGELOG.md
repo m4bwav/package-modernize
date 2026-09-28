@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260928-5 · 2026-09-28 · A wiki step in Phase 7 (`wiki-step`)
+- because: user request (every modernization run adds a wiki to a repository that can have one and does not yet); L-107 `wiki-after-release`, L-108 `run-old-majors-for-docs`
+- files: SKILL.md (phases table row 7; "Documents"; new "Wiki (Phase 7, first)"; Output), references/retrofit.md (phases table, gap audit item and step 7), prompts/kickoff-skeleton.md (survey "Wiki" line, the wiki paragraph, deliverables), LEARNINGS.md (L-107, L-108), README.md
+- The wiki is the first item of Phase 7, not a step of its own: it must follow Phase 6 because its examples are verified against the published package, and it must precede the handoff because the shipped-doc errors it finds belong in HANDOFF.md and the kickoff corrections. A new wiki is written with the wikiwright skill (m4bwav/wikiwright); an existing one gets wikiwright's update mode for the new version.
+
 ### C-20260928-4 · 2026-09-28 · Log maintainer statements as quotes (`log-maintainer-quotes`)
 - because: L-105 `log-maintainer-quotes`, L-106 `readme-images-registry-flag` (RandomNameGeneratorLibrary 2.3.0 released and verified, m4bwav/DotNetRandomNameGenerator#14 and #15)
 - files: SKILL.md (the shape of a run: rules that hold everywhere), LEARNINGS.md

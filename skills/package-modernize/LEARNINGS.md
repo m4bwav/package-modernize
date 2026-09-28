@@ -176,6 +176,22 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (references/nuget.md verification table already correct)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
+### L-107 · 2026-09-28 · The wiki comes after the release is verified, and it audits the shipped docs (`wiki-after-release`)
+- Trigger: Mark asked for GitHub wikis on the packages. Written by hand for RandomNameGeneratorLibrary 2.3.0 and JsonPrettyPrinter 3.0.1, then with the new wikiwright skill for get-title-at-url 3.0.0 (all 2026-09-28). Each found errors in the README or CHANGELOG that the modernization runs had shipped: a thread-safety sentence true on one runtime, a comment claim the printer breaks, a changelog escape System.Text.Json never writes, a NOT_HTML row that misses the no-Content-Type case, an exit-code line. Mark then asked that every run add a wiki when the repository has none.
+- Hypothesis: the wiki verifies every example against the published package, so it runs after Phase 6; writing the long form forces reading every claim against a run, which the release checks do not do for prose.
+- Rule: Phase 7 starts with the wiki (wikiwright new or update mode); its inaccuracies go to the kickoff prompt's corrections and HANDOFF.md for the next release.
+- Evidence: SKILL.md (phases table row 7; "Wiki (Phase 7, first)"), references/retrofit.md, prompts/kickoff-skeleton.md, C-20260928-5; get-title-at-url ai-docs/notes/2026-09-28-github-wiki.md; the two DotNet repositories' wiki notes
+- Scope: skill
+- Status: active · helpful 3 · harmful 0 · last_confirmed 2026-09-28
+
+### L-108 · 2026-09-28 · Old majors without a golden capture can be run for the upgrade story (`run-old-majors-for-docs`)
+- Trigger: get-title-at-url was modernized before golden captures existed; its wiki run installed 2.0.0 and 1.1.8 in scratch folders and found that 2.0.0 cannot be imported since cheerio 1.0.0 (August 2024), a fact in the plan but in no shipped doc, and that no old version is deprecated on npm although 2.0.0 still gets about 60 downloads a week (2026-09-28).
+- Hypothesis: a broken old major is a deprecation candidate the survey can miss when it reads the changelog instead of installing the version.
+- Rule: the Phase 0 survey (and a retrofit's gap audit) installs the latest version of each old major and imports it once; one that fails is a deprecation recommendation with its message.
+- Evidence: get-title-at-url ai-docs/notes/2026-09-28-github-wiki.md (facts, recommendation); wikiwright L-011 `run-the-old-majors`
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
