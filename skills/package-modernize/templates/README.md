@@ -1,6 +1,6 @@
 # Templates
 
-Files a run copies into the package repository and adapts; do not write them from memory. Placeholders are `{{NAME}}` tokens; a `TEMPLATE:` comment marks a block that needs the package's own content. After copying, grep the repository for `{{` and `TEMPLATE` before the first commit. Each template was taken from a finished run named below, with the package-specific parts replaced.
+Files a run copies into the package repository and adapts; do not write them from memory. Placeholders are `{{NAME}}` tokens; a `TEMPLATE:` comment marks a block that needs the package's own content. After copying, grep the repository for `{{[A-Z_]+}}` (a bare `{{` also matches GitHub Actions expressions) and `TEMPLATE` before the first commit. Each template was taken from a finished run named below, with the package-specific parts replaced.
 
 ## npm (from get-title-at-url 3.0.0 and seeded-random-utilities 2.0.0, 2026-09-24 and 25)
 

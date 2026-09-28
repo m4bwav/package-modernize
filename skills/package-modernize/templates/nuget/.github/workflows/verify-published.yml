@@ -1,4 +1,4 @@
-# TEMPLATE (package-modernize), from {{PACKAGE_ID}} 2.0.0 and IsImageUrlDotNet 2.0.0 (2026-09-27). Replace
+# TEMPLATE (package-modernize), from CachingServiceWithAOPSupport 2.0.0 and IsImageUrlDotNet 2.0.0 (2026-09-27). Replace
 # {{PACKAGE_ID}} and {{PACKAGE_ID_LOWER}} (the id in lower case, as the nuget.org APIs spell it).
 # Run by hand after a release is approved: proves the published package from nuget.org itself. On Linux, macOS and
 # Windows: waits until nuget.org lists the version in both indexes, checks the repository signature, then runs the fresh

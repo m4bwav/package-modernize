@@ -104,6 +104,62 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (references/plan-skeleton.md)
 - Status: promoted: C-20260928-2 · extends L-082 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
+### L-098 · 2026-09-28 · Record the process bitness; run the replay the same way (`record-process-bitness`)
+- Trigger: RandomNameGeneratorLibrary's net48 golden replay, pinned to win-x86 like the unit tests, differed from the 2.2.0 recording in 16 cases: "Exception of type 'System.OutOfMemoryException' was thrown." where the AnyCPU (64-bit) capture had "Array dimensions exceeded supported range." for a count of int.MaxValue (2026-09-28).
+- Hypothesis: the lock-file rule (pin a RuntimeIdentifier for a net48 test exe) chose x86 without regard to how the capture ran; allocation failures are worded by the process, not the library.
+- Rule: the capture header records the process bitness; the replay pins the matching RuntimeIdentifier (win-x64 for an AnyCPU capture).
+- Evidence: DotNetRandomNameGenerator 64ebdf3 (GoldenTests csproj)
+- Scope: skill (references/nuget.md Phase 0; references/retrofit.md)
+- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-099 · 2026-09-28 · A ruled change to golden answers goes in a guarded exception file beside the replay (`ruled-exception-file`)
+- Trigger: the maintainer ruled the place-list fix in place; 35 recorded cases per runtime had to change without touching tests/Golden or loosening the replay (2026-09-28).
+- Hypothesis: an inline exception table does not scale past a dozen cases, and a file under tests/Golden would make the untouched check (`git diff --exit-code <phase-0> -- tests/Golden`) meaningless.
+- Rule: replay green and canary first; then the fix; the replay writes the differing cases on request (an environment variable) into `Exceptions/<version>.<topic>.<runtime>.json` beside the replay project; the test pins the exact set of allowed keys (a topic regex also matched 26 cases that must never change, the review found) and refuses an exception equal to the old answer; an oracle independent of the library checks every exception, and in a mixed case every answer outside the topic must equal the old recording.
+- Evidence: DotNetRandomNameGenerator 8bebf10 (GoldenTests.cs, Exceptions/)
+- Scope: skill (references/retrofit.md)
+- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-100 · 2026-09-28 · Adapting templates: C-locale content list, placeholder regex, seven-day cooldown, eol=lf re-checkout (`template-adaptation-traps`)
+- Trigger: four template traps in one adaptation (2026-09-28): the ci.yml content list put the nuspec before README.md, but `LC_ALL=C sort` puts README.md first for an id starting with "Ra" (CI would fail); the instruction to grep for `{{` matched every GitHub expression; zizmor 1.30.1 flagged the template's three-day Dependabot cooldown and the dotnet-sdk ecosystem with none; switching an autocrlf clone to `eol=lf` left CRLF working files and 150 ENDOFLINE errors from dotnet format.
+- Hypothesis: the templates were proven on packages whose ids sort after README.md and in clones created with LF, and zizmor's cooldown audit is newer than the template.
+- Rule: the ci.yml template says to list files in C-locale order; templates/README says to grep `{{[A-Z_]+}}`; the Dependabot template uses seven days on every ecosystem; after adopting eol=lf, commit, then `git rm -r --cached . && git reset --hard`.
+- Evidence: DotNetRandomNameGenerator 3398d5c, 4457d01; C-20260928-3
+- Scope: skill (templates/nuget, templates/README.md, references/nuget.md Traps)
+- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-101 · 2026-09-28 · Run CI's exact test command locally before pushing (`ci-command-locally`)
+- Trigger: the first CI run of RandomNameGeneratorLibrary's pull request failed on both OSes with exit code 5 and "Zero tests ran": ci.yml passes `--coverage`, which Microsoft.Testing.Platform rejects in a test project without Microsoft.Testing.Extensions.CodeCoverage, and the new golden project had none. Locally the agent had run `dotnet test` without the flag (2026-09-28).
+- Hypothesis: "verified locally" meant the same tools, not the same command line; a flag applies to every test project, including the one just added.
+- Rule: before pushing, run each workflow's test and pack commands exactly as written in the workflow; a new test project gets every extension the workflow's flags need.
+- Evidence: CI run 36372933350 (failed), fix 35b7655
+- Scope: skill (SKILL.md Phase 2 verification)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-102 · 2026-09-28 · Three known traps repeated in one session (`known-traps-repeated`)
+- Trigger: in the RandomNameGeneratorLibrary retrofit the agent (a) wrote `--coverage` inside an MSBuild XML comment (MSB4025, a trap listed in nuget.md since 2026-09-25), (b) ran Python through Bash heredocs three times with backslashes in the text, which were halved (a regex `\|` and two replacement patterns; the SKILL.md Windows line says to write files with the editor tools), and (c) used `sed` with `\|`, which GNU sed reads as alternation (2026-09-28).
+- Hypothesis: the rules are phrased per tool ("heredocs", "XML comment in Directory.Build.props"); a Python heredoc or a csproj comment did not look like the case the rule names.
+- Rule: any script with a backslash in it goes to the scratchpad through the Write tool and runs from there; never `--` in any MSBuild comment (csproj, props, targets); edit with Python or the Edit tool, not sed, when the text has a backslash or a pipe.
+- Evidence: this session's log; DotNetRandomNameGenerator 35b7655
+- Scope: skill (SKILL.md Windows line)
+- Status: promoted: C-20260928-3 (SKILL.md Windows line) · recurrence of L-050 · recurred once more the same session, minutes after it was written (a Python heredoc halved a backslash in a replacement pattern; the assertion caught it before any write) · helpful 0 · harmful 0 · last_confirmed 2026-09-28
+
+### L-103 · 2026-09-28 · The package content check died silently on a package without dependencies (`empty-dependency-group`)
+- Trigger: RandomNameGeneratorLibrary's second CI run failed on Ubuntu in "The package holds exactly what it should" with exit 1 and no message: its nuspec writes each empty dependency group as a self-closing element, so the template's `grep -o "<group targetFramework=...>.*"` matched nothing, and under bash's -e and pipefail the command substitution ended the step (2026-09-28). The worked examples all had dependencies.
+- Hypothesis: a template proven only on packages with dependencies never ran the no-match path; a grep without a match is an error under pipefail.
+- Rule: every grep in a check that may legitimately match nothing is wrapped as `{ grep ... || true; }`; run a workflow step locally with `bash -e -o pipefail` on the real artifact, once with the right expectation and once with a wrong one (it must fail with its ::error line).
+- Evidence: CI run 36373102418 (failed), fix 1e4e416; templates/nuget/.github/workflows/ci.yml (C-20260928-3)
+- Scope: skill (templates/nuget ci.yml; references/retrofit.md)
+- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
+### L-104 · 2026-09-28 · A consumer of the packed package needs source mapping (`consumer-source-mapping`)
+- Trigger: the review of RandomNameGeneratorLibrary PR #13 found that tests/consumers/run.sh added the local folder beside nuget.org in a fresh nuget.config; once the same version is on nuget.org (after the beta), NuGet may restore that copy and the consumer cannot tell (2026-09-28).
+- Hypothesis: a separate packages folder stops the cache from standing in, but not a second source holding the same id and version.
+- Rule: with a local source, the consumer's nuget.config maps the package id to the local folder only (`packageSourceMapping`) and everything else to nuget.org; version lines are compared as whole lines (`grep -qxF`), so 2.3.0 cannot pass on 2.3.0-beta.1. The template does both.
+- Evidence: DotNetRandomNameGenerator 355af8b; templates/nuget/tests/consumers/run.sh (C-20260928-3)
+- Scope: skill (templates/nuget)
+- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

@@ -1,6 +1,7 @@
 # Weekly update pull requests. Merge when CI is green; read the release notes before merging a major.
 # The actions are pinned to commit SHAs with the version in a comment; Dependabot updates both.
-# The three-day cooldown keeps brand-new releases out until they have had time to be pulled if bad.
+# The seven-day cooldown keeps brand-new releases out until they have had time to be pulled if bad (zizmor 1.30.1 requires at
+# least seven days on every ecosystem, RandomNameGeneratorLibrary 2026-09-28).
 # TEMPLATE (package-modernize), from CachingServiceWithAOPSupport 2.0.0 (2026-09-27). A library's runtime dependencies
 # are its declared floors, not versions to chase: list them under `ignore` (FSharp.Core for an F# library). An advisory on
 # a floor version still shows as a Dependabot alert and fails ci.yml's audit step. Delete the ignore block if there is none.
@@ -12,7 +13,7 @@ updates:
       interval: weekly
       day: monday
     cooldown:
-      default-days: 3
+      default-days: 7
     ignore:
       - dependency-name: {{RUNTIME_DEPENDENCY}}
     groups:
@@ -26,10 +27,12 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
       day: monday
     cooldown:
-      default-days: 3
+      default-days: 7
