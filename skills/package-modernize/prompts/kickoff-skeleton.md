@@ -10,7 +10,7 @@ Modernize the <system> package <name> with the package-modernize skill: fix ever
 Repository: <URL> (<visibility>, default branch <name>; <system> package <name>, latest <version> from <date>, about <n> downloads a month, <n> dependents). Clone it to <local path>.
 
 Read first, in this order:
-1. The package-modernize skill (it loads by itself when you start; if not, read its SKILL.md), then <system>'s reference file in it.
+1. The package-modernize skill (it loads by itself when you start; if not, read its SKILL.md), then <system>'s reference file in it. Update it first with `git -C <skill repository> pull --ff-only`, never `cd`: the skill's shell rules are not loaded yet (L-090 `pull-without-cd`).
 2. <The reference run for this system: repo path, its AGENTS.md, ai-docs/HANDOFF.md and plan.>
 3. <The maintainer's inventory or overlay, if any: where this package sits among the others.>
 

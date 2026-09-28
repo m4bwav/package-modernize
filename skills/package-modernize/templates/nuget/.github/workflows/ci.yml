@@ -68,7 +68,8 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           nupkg=$(ls artifacts/{{PACKAGE_ID}}.[0-9]*.nupkg)
-          # TEMPLATE: every file the package must hold, sorted (add lib/net462/... when the project targets it).
+          # TEMPLATE: every file the package must hold, in C-locale order as `LC_ALL=C sort` gives it (uppercase first: README.md
+          # sorts before an id that starts with "Ra"), adding lib/net462/... when the project targets it.
           expected=$'{{PACKAGE_ID}}.nuspec\nREADME.md\nicon.png\nlib/net10.0/{{PROJECT}}.dll\nlib/net10.0/{{PROJECT}}.xml\nlib/netstandard2.0/{{PROJECT}}.dll\nlib/netstandard2.0/{{PROJECT}}.xml'
           actual=$(unzip -Z1 "$nupkg" | grep -Ev '^(_rels/|package/|\[Content_Types\])' | LC_ALL=C sort)
           if [ "$actual" != "$expected" ]; then
@@ -78,8 +79,9 @@ jobs:
           fi
           nuspec=$(unzip -p "$nupkg" {{PACKAGE_ID}}.nuspec | tr -d '\r\n')
           for tfm in .NETStandard2.0 net10.0; do
-            group=$(echo "$nuspec" | grep -o "<group targetFramework=\"$tfm\">.*" | sed 's:</group>.*::')
-            deps=$(echo "$group" | grep -o '<dependency id="[^"]*" version="[^"]*"' | LC_ALL=C sort | tr '\n' ' ')
+            # grep finds nothing in an empty (self-closing) group; under -e and pipefail that would end the step without a message.
+            group=$(echo "$nuspec" | { grep -o "<group targetFramework=\"$tfm\">.*" || true; } | sed 's:</group>.*::')
+            deps=$(echo "$group" | { grep -o '<dependency id="[^"]*" version="[^"]*"' || true; } | LC_ALL=C sort | tr '\n' ' ')
             # TEMPLATE: the declared dependencies of each group, sorted by id, each followed by one space ('' for none).
             want='<dependency id="{{DEPENDENCY_ID}}" version="{{DEPENDENCY_FLOOR}}" '
             if [ "$deps" != "$want" ]; then
