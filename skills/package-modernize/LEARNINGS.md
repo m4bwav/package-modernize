@@ -613,3 +613,43 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: IsImageUrlDotNet ai-docs/log.md "Phase 4 and the Phase 5 stop" (merge e9e1eb7 at 20:08:58Z, rulesets 24084842 and 24084845 after it)
 - Scope: skill (SKILL.md phases table, Phase 3 and 4)
 - Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-078 · 2026-09-27 · Read every version's nupkg, not only the latest (`survey-every-version-nupkg`)
+- Trigger: CachingServiceWithAOPSupport's survey listed only 1.0.1's files (fine: lib/net45); a hash comparison later showed 1.0.0 packed its DLL, the dependencies' DLLs, the source, PDBs and obj/ caches (one naming the 2015 user folder) under bin/Debug and obj/Debug, so 1.0.0 installed no reference at all (2026-09-27).
+- Hypothesis: old hand-packed versions differ from the latest in layout and contents, and a version that installs nothing or leaks build files is a deprecation and security item for the plan.
+- Rule: survey-nuget.sh lists the files of the newest ten versions and warns on assemblies outside lib/, runtimes/, tools/, build/, ref/ and analyzers/; the plan's deprecation row covers every broken version.
+- Evidence: CachingServiceWithAOPSupport ai-docs/log.md (Phase 0), survey-nuget.sh output on 2026-09-27
+- Scope: skill (scripts/survey-nuget.sh, references/nuget.md Phase 0)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-079 · 2026-09-27 · Run the old tests unchanged against the published package when the old projects cannot build (`old-tests-against-published`)
+- Trigger: CachingServiceWithAOPSupport's 2015 projects fail on the .NET 10 SDK (MSB3644, MSTest from Visual Studio QualityTools), so "run the old build and tests as they are" gave only a failure (2026-09-27).
+- Hypothesis: the old test files still compile against the published DLL with a current MSTest, which turns them into behaviour evidence for the baseline.
+- Rule: record the failing old build, then link the old test files unchanged (`Compile Include` with the clone's path) into a scratch SDK-style net48 project with MSTest 4.x, `GenerateAssemblyInfo false` and the published package; log the result. It passed 13 of 13.
+- Evidence: CachingServiceWithAOPSupport ai-docs/log.md (Phase 0)
+- Scope: skill (references/nuget.md Phase 0)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-080 · 2026-09-27 · A recording can be a record of failure; then net48 is the contract everywhere (`net10-record-of-failure`)
+- Trigger: CachingServiceWithAOPSupport 1.0.1 restores into net10.0 (NU1701) but every proxy fails there (Castle.Core 3.2.2 needs System.Security.Permissions); comparing v2 on .NET 10 with that recording would demand the failure back (2026-09-27).
+- Hypothesis: "one recording per runtime" (L-065 `golden-per-runtime`) fits a package whose answers differ by runtime, not one that does not work on a runtime at all.
+- Rule: still capture the net10.0 recording (it proves the failure and shows which plain classes answered), then name it a record of failure in the plan and compare every runtime with the net48 recording, with the ArgumentException suffix ` (Parameter 'x')` as a named exception.
+- Evidence: CachingServiceWithAOPSupport tests/Golden/1.0.1.net10.0-windows.json, plan E1 and E3
+- Scope: skill (references/nuget.md Phase 0)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-081 · 2026-09-27 · Check the cooldown with the registration index before every package reference (`nuget-latest-cooldown`)
+- Trigger: NUnit 5.0.0 was published on 2026-09-27, the day of CachingServiceWithAOPSupport's plan; the search API shows only the version, not its age (2026-09-27).
+- Hypothesis: a one-line check of listed stable version, publish date and age for every id a run adds removes the guesswork from the three-day cooldown.
+- Rule: run `scripts/nuget-latest.py ID ...` for every PackageReference a run adds or bumps; take the previous version it prints when the latest is inside the cooldown, and log the output.
+- Evidence: CachingServiceWithAOPSupport ai-docs/log.md (Phase 1)
+- Scope: skill (scripts/nuget-latest.py, references/nuget.md Traps)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-082 · 2026-09-27 · The everlast lint reads C# generics as placeholders (`lint-reads-csharp-generics`)
+- Trigger: `everlast.py lint` flagged "template placeholder text" on notes naming `EnableCacheInterception<TLimit, TActivatorData, TRegistrionStyle>` and a "privacy @handle" on `@AGENTS.md` in a plan (2026-09-27).
+- Hypothesis: the lint's placeholder pattern `<[A-Z][^>]{10,}>` matches any generic parameter list over ten characters that starts with a capital.
+- Rule: in ai-docs, name type parameters in words and write "the AGENTS.md import line"; the plan skeleton says so.
+- Evidence: CachingServiceWithAOPSupport ai-docs/log.md (Phases 0 and 1)
+- Scope: skill (references/plan-skeleton.md)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
