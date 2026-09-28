@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260927-14 · 2026-09-27 · NuGet workflow, consumer and golden-test templates from proven runs (`nuget-templates-current`)
+- because: L-083 `bcl-shape-differs-by-runtime`, L-084 `blame-hang-names-the-test`, L-085 `templates-marked-unverified`; the maintainer's request in the CachingServiceWithAOPSupport kickoff
+- files: templates/nuget/.github/workflows/ci.yml, release.yml, verify-published.yml (replaced), templates/nuget/.github/dependabot.yml, templates/nuget/Directory.Build.props (updated), templates/nuget/tests/consumers/run.sh, Program.cs and templates/nuget/tests/GoldenTests.cs.template (new), templates/README.md, references/nuget.md (Traps; what it still lacks), LEARNINGS.md (L-083 to L-085)
+- The NuGet templates were the unverified drafts of 2026-09-25; runs copied TrailerClipper's and IsImageUrlDotNet's workflows instead. They are now CachingServiceWithAOPSupport's CI-proven files (run 36363389674 green on Ubuntu and Windows) with placeholders.
+
 ### C-20260927-13 · 2026-09-27 · Every version's nupkg, old tests against the published package, the cooldown helper (`survey-every-version`)
 - because: L-078 `survey-every-version-nupkg`, L-079 `old-tests-against-published`, L-080 `net10-record-of-failure`, L-081 `nuget-latest-cooldown`, L-082 `lint-reads-csharp-generics` (CachingServiceWithAOPSupport Phases 0 and 1)
 - files: scripts/survey-nuget.sh (newest ten versions' files, warning for assemblies outside lib/), scripts/nuget-latest.py (new), scripts/README.md, references/nuget.md (Phase 0 bullets; Traps), references/plan-skeleton.md (lint note), LEARNINGS.md (L-078 to L-082)

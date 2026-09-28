@@ -1,8 +1,12 @@
-# TEMPLATE (package-modernize). Every push to master and every pull request: locked restore, format check, build with
-# analyzers, tests on Ubuntu (net10.0) and Windows (net10.0 and net48, which runs the netstandard2.0 build), a pack with
-# package validation on Linux, and the final `ci` job the ruleset on master requires. Publishing is release.yml.
-# Replace {{PROJECT}} (the library project folder and file name) and {{TESTS}} (the test project). Actions are pinned to
-# commit SHAs with the version in a comment (resolved 2026-09-25); Dependabot updates both.
+# TEMPLATE (package-modernize), from CachingServiceWithAOPSupport 2.0.0 (C#, 2026-09-27; the same shape as
+# IsImageUrlDotNet 2.0.0 and TrailerClipper 2.0.0, both released through it). Every push to master and every pull request:
+# locked restore, dotnet format, build with warnings as errors, the NuGet audit, the tests on Linux and Windows (net10.0 on
+# both; net48 on Windows, which runs the netstandard2.0 build; the golden replay in a test project of its own), a pack with
+# a content and dependency check, fresh consumers of the packed package (tests/consumers/run.sh), and the final `ci` job
+# the ruleset on master requires. Publishing is release.yml.
+# Replace {{PACKAGE_ID}} (the nuget.org id) and {{PROJECT}} (the folder, csproj and assembly name under src/), and fill
+# the two TEMPLATE blocks. An F# library: Fantomas instead of dotnet format (references/nuget.md, "F# packages").
+# Actions are pinned to commit SHAs with the version in a comment (checked 2026-09-27); Dependabot updates both.
 name: ci
 
 on:
@@ -18,6 +22,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     name: build and test (${{ matrix.os }})
@@ -26,7 +34,7 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -37,7 +45,6 @@ jobs:
           global-json-file: global.json
           cache: true
           cache-dependency-path: '**/packages.lock.json'
-      # The lock files must not depend on anything the SDK infers per OS (reference assemblies, runtime identifiers).
       - run: dotnet restore --locked-mode
       - run: dotnet format --no-restore --verify-no-changes
       - run: dotnet build --no-restore -c Release
@@ -55,18 +62,41 @@ jobs:
           name: test-results-${{ matrix.os }}
           path: TestResults
           retention-days: 30
-      - name: Pack with package validation against the baseline version
-        if: runner.os == 'Linux'
-        run: dotnet pack {{PROJECT}} --no-build -c Release -o artifacts -p:ContinuousIntegrationBuild=true
-      - name: The package holds exactly what it should
+      - name: Pack
+        run: dotnet pack src/{{PROJECT}} --no-build -c Release -o artifacts
+      - name: The package holds exactly what it should and declares its dependencies
         if: runner.os == 'Linux'
         run: |
-          unzip -l artifacts/*.nupkg
-          # TEMPLATE: assert the expected entries (lib per target, README.md, icon.png, the nuspec) and nothing else.
+          nupkg=$(ls artifacts/{{PACKAGE_ID}}.[0-9]*.nupkg)
+          # TEMPLATE: every file the package must hold, sorted (add lib/net462/... when the project targets it).
+          expected=$'{{PACKAGE_ID}}.nuspec\nREADME.md\nicon.png\nlib/net10.0/{{PROJECT}}.dll\nlib/net10.0/{{PROJECT}}.xml\nlib/netstandard2.0/{{PROJECT}}.dll\nlib/netstandard2.0/{{PROJECT}}.xml'
+          actual=$(unzip -Z1 "$nupkg" | grep -Ev '^(_rels/|package/|\[Content_Types\])' | LC_ALL=C sort)
+          if [ "$actual" != "$expected" ]; then
+            echo "::error::unexpected package contents"
+            diff <(echo "$expected") <(echo "$actual")
+            exit 1
+          fi
+          nuspec=$(unzip -p "$nupkg" {{PACKAGE_ID}}.nuspec | tr -d '\r\n')
+          for tfm in .NETStandard2.0 net10.0; do
+            group=$(echo "$nuspec" | grep -o "<group targetFramework=\"$tfm\">.*" | sed 's:</group>.*::')
+            deps=$(echo "$group" | grep -o '<dependency id="[^"]*" version="[^"]*"' | LC_ALL=C sort | tr '\n' ' ')
+            # TEMPLATE: the declared dependencies of each group, sorted by id, each followed by one space ('' for none).
+            want='<dependency id="{{DEPENDENCY_ID}}" version="{{DEPENDENCY_FLOOR}}" '
+            if [ "$deps" != "$want" ]; then
+              echo "::error::$tfm dependencies: $deps"
+              exit 1
+            fi
+          done
+      # Fresh consumers of the packed package (tests/consumers/run.sh and Program.cs): net10.0 everywhere, net48 on Windows,
+      # in each dependency set the script lists.
+      - name: Fresh consumers of the packed package
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/{{PROJECT}}/{{PROJECT}}.csproj)
+          tests/consumers/run.sh "$version" artifacts
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: runner.os == 'Linux'
         with:
-          name: package
+          name: packages
           path: artifacts/*nupkg
           retention-days: 30
 

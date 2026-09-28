@@ -1,20 +1,17 @@
-# TEMPLATE (package-modernize), unverified by a run as of 2026-09-25. After the maintainer approves the release job, run this
-# with the version: it waits for nuget.org to list the version, downloads the nupkg and verifies its repository signature and
-# contents, restores the exact version into fresh console projects on Ubuntu and Windows (net10.0, plus net48 on Windows for
-# the netstandard2.0 build) and runs a smoke check with a golden answer. Replace {{PACKAGE_ID}} and {{SMOKE_CS}} (one or two
-# C# statements that call the package and throw on a wrong answer). With the release run's id, it also verifies the attestation.
+# TEMPLATE (package-modernize), from {{PACKAGE_ID}} 2.0.0 and IsImageUrlDotNet 2.0.0 (2026-09-27). Replace
+# {{PACKAGE_ID}} and {{PACKAGE_ID_LOWER}} (the id in lower case, as the nuget.org APIs spell it).
+# Run by hand after a release is approved: proves the published package from nuget.org itself. On Linux, macOS and
+# Windows: waits until nuget.org lists the version in both indexes, checks the repository signature, then runs the fresh
+# consumers of tests/consumers/run.sh against nuget.org (each dependency set the script lists; net10.0 everywhere, net48
+# on Windows). The checkout is only for that script; the package itself comes from nuget.org.
 name: verify-published
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: The published version to verify, for example 2.0.0
+        description: The version to verify, such as 2.0.0
         required: true
-        type: string
-      run-id:
-        description: The release workflow run id whose nupkg was attested (optional)
-        required: false
         type: string
 
 permissions:
@@ -24,101 +21,40 @@ defaults:
   run:
     shell: bash
 
-env:
-  VERSION: ${{ inputs.version }}
-  PACKAGE_ID: "{{PACKAGE_ID}}"
-
 jobs:
-  registry:
-    name: wait for the version on nuget.org
-    runs-on: ubuntu-24.04
-    timeout-minutes: 40
-    steps:
-      - name: The version is valid, in the flat container, and listed
-        run: |
-          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-            echo "::error::$VERSION is not a version number"
-            exit 1
-          fi
-          lower=$(printf '%s' "$PACKAGE_ID" | tr '[:upper:]' '[:lower:]')
-          # Indexing usually takes under 15 minutes; the registration index lagged about 25 minutes once.
-          for attempt in $(seq 1 60); do
-            if curl -sf "https://api.nuget.org/v3-flatcontainer/$lower/index.json" | jq -e --arg v "$VERSION" '.versions | index($v)' > /dev/null; then
-              listed=$(curl -s --compressed "https://api.nuget.org/v3/registration5-gz-semver2/$lower/index.json" \
-                | jq -r --arg v "$VERSION" '[.items[].items[]? | select(.catalogEntry.version == $v) | .catalogEntry.listed // true] | first')
-              if [ "$listed" = true ]; then
-                echo "$PACKAGE_ID $VERSION is on nuget.org and listed"
-                exit 0
-              fi
-              echo "in the flat container, not yet listed in the registration index (attempt $attempt of 60)"
-            else
-              echo "not in the flat container yet (attempt $attempt of 60)"
-            fi
-            sleep 30
-          done
-          echo "::error::$PACKAGE_ID $VERSION is not listed after 30 minutes"
-          exit 1
-
-  package:
-    name: signature and contents of the published nupkg
-    needs: registry
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        with:
-          dotnet-version: 10.0.x
-      - name: Download the nupkg from the flat container
-        run: |
-          lower=$(printf '%s' "$PACKAGE_ID" | tr '[:upper:]' '[:lower:]')
-          curl -sfL -o "$lower.$VERSION.nupkg" "https://api.nuget.org/v3-flatcontainer/$lower/$VERSION/$lower.$VERSION.nupkg"
-          unzip -l "$lower.$VERSION.nupkg"
-          unzip -p "$lower.$VERSION.nupkg" '*.nuspec'
-      - name: Repository signature (and any author signature) verifies
-        run: dotnet nuget verify --all ./*.nupkg
-      # The attested file is the one the release run built; nuget.org's repository signature changes the downloaded file's hash.
-      - name: Provenance attestation of the release run's artifact
-        if: inputs.run-id != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RUN_ID: ${{ inputs.run-id }}
-        run: |
-          gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name release --dir release
-          gh attestation verify release/artifacts/*.nupkg --repo "$GITHUB_REPOSITORY"
-
-  consumer:
-    name: fresh consumer (${{ matrix.os }})
-    needs: registry
+  verify:
+    name: verify ${{ inputs.version }} (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, windows-latest]
+        os: [ubuntu-24.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    timeout-minutes: 45
+    env:
+      VERSION: ${{ inputs.version }}
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.x
-      - name: A net10.0 console project restores the exact version from nuget.org and gets the golden answer
-        working-directory: ${{ runner.temp }}
+      - name: nuget.org lists the version in both indexes (they can lag about 15 to 25 minutes)
         run: |
-          dotnet new console -n Consumer10 -f net10.0 --no-restore > /dev/null
-          cd Consumer10
-          dotnet add package "$PACKAGE_ID" --version "$VERSION" --source https://api.nuget.org/v3/index.json
-          cat > Program.cs <<'EOF'
-          {{SMOKE_CS}}
-          System.Console.WriteLine("consumer ok");
-          EOF
-          dotnet run -c Release
-      - name: A net48 console project on Windows exercises the netstandard2.0 build
-        if: runner.os == 'Windows'
-        working-directory: ${{ runner.temp }}
+          for attempt in $(seq 1 40); do
+            # The flat container (downloads) updates first; the registration index, which restores read, can lag.
+            if curl -fsS "https://api.nuget.org/v3-flatcontainer/{{PACKAGE_ID_LOWER}}/index.json" | grep -q "\"$VERSION\"" \
+              && curl -fsS --compressed "https://api.nuget.org/v3/registration5-gz-semver2/{{PACKAGE_ID_LOWER}}/index.json" | grep -q "\"version\":\"$VERSION\""; then
+              echo "{{PACKAGE_ID}} $VERSION listed"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::error::{{PACKAGE_ID}} $VERSION is not on nuget.org"
+          exit 1
+      - name: The downloaded package carries nuget.org's repository signature
         run: |
-          dotnet new console -n Consumer48 -f net48 --no-restore > /dev/null
-          cd Consumer48
-          dotnet add package "$PACKAGE_ID" --version "$VERSION" --source https://api.nuget.org/v3/index.json
-          cat > Program.cs <<'EOF'
-          {{SMOKE_CS}}
-          System.Console.WriteLine("consumer ok");
-          EOF
-          dotnet run -c Release
+          curl -fsSL -o "$RUNNER_TEMP/p.nupkg" "https://api.nuget.org/v3-flatcontainer/{{PACKAGE_ID_LOWER}}/$VERSION/{{PACKAGE_ID_LOWER}}.$VERSION.nupkg"
+          dotnet nuget verify "$RUNNER_TEMP/p.nupkg" --all
+      - name: Fresh consumers restore the published package and answer
+        run: tests/consumers/run.sh "$VERSION" nuget.org

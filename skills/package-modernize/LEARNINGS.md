@@ -653,3 +653,27 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: CachingServiceWithAOPSupport ai-docs/log.md (Phases 0 and 1)
 - Scope: skill (references/plan-skeleton.md)
 - Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-083 · 2026-09-27 · Public BCL shapes differ between .NET Framework and .NET (`bcl-shape-differs-by-runtime`)
+- Trigger: CachingServiceWithAOPSupport's golden replay passed on net48 and failed one case on net10.0: the cache key of a TimeSpan argument, written by reflection over public properties, had four more properties (.NET 7 added Microseconds and Nanoseconds totals) and TotalHours 0.025 instead of 0.024999999999999998 (2026-09-27).
+- Hypothesis: anything that serializes BCL types by reflection inherits every runtime's changes to their public surface and arithmetic; a net48 recording pins the Framework's.
+- Rule: when the contract is the net48 recording on every runtime, write such types in the Framework's shape explicitly, and say in the README which other types may differ between runtimes.
+- Evidence: CachingServiceWithAOPSupport ai-docs/log.md (Phase 2), src/CachingServiceWithAOP/CachingServices/ScriptJson.cs
+- Scope: skill (references/nuget.md Traps)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-084 · 2026-09-27 · Let the test host name a hanging test (`blame-hang-names-the-test`)
+- Trigger: CachingServiceWithAOPSupport's first unit-test run sat for minutes on both runtimes with no output; `--blame-hang-timeout 30s --blame-hang-dump-type none` named FixTests.A_task_that_faults_later_is_evicted within a minute: the key writer read Task.Result of a pending TaskCompletionSource argument (2026-09-27).
+- Hypothesis: a hang gives no output at all, and a piped `dotnet test | grep | sort` hides even the progress lines; the blame collector is the cheapest way to a name.
+- Rule: run a new test suite once with `--blame-hang-timeout 60s --blame-hang-dump-type none`; never pipe a first run through `sort`.
+- Evidence: CachingServiceWithAOPSupport ai-docs/log.md (Phase 2)
+- Scope: skill (references/nuget.md Traps)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27
+
+### L-085 · 2026-09-27 · Existing templates can be stale drafts; read their header before calling them missing (`templates-marked-unverified`)
+- Trigger: the CachingServiceWithAOPSupport kickoff said the skill lacked NuGet release and verify templates; templates/nuget held both, marked "unverified by a run as of 2026-09-25", older than the three NuGet runs that each wrote better ones (2026-09-27).
+- Hypothesis: a template that no run has used drifts behind the worked examples, and later runs copy the examples instead, so nobody updates the template.
+- Rule: when a run's workflows are proven by CI, replace the templates they came from in the same run, and keep the "from which run, which date" header on every template.
+- Evidence: package-modernize C-20260927-14
+- Scope: skill (templates/README.md)
+- Status: promoted (2026-09-27) · helpful 1 · harmful 0 · last_confirmed 2026-09-27

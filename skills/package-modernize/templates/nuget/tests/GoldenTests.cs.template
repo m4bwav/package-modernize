@@ -1,0 +1,151 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading;
+using GoldenCapture;
+using NUnit.Framework;
+
+namespace {{PROJECT}}.GoldenTests
+{
+    /// <summary>
+    /// TEMPLATE (package-modernize), from CachingServiceWithAOPSupport 2.0.0 (2026-09-27). Runs the Phase 0 capture's cases
+    /// (tests/Golden/Capture/Cases.cs, Fixtures.cs and Json.cs, compiled here by link, unchanged) against the new version and
+    /// compares every answer with the recording. The only allowed differences are the named exceptions below, each ruled on
+    /// in the plan. With one recording per runtime (skill L-065), pick the file by runtime and OS instead of {{RECORDING}}.
+    /// </summary>
+    [TestFixture]
+    [NonParallelizable]
+    public class GoldenTests
+    {
+        // .NET Core runtimes add " (Parameter 'name')" to ArgumentException messages.
+        private static readonly Regex ParameterSuffix = new(@" \(Parameter '[^']*'\)", RegexOptions.Compiled);
+
+        // TEMPLATE: cases where only "it throws" must hold (errors raised by a dependency whose major moved), or none.
+        private static readonly HashSet<string> ThrowsOnlyCases = new(StringComparer.Ordinal)
+        {
+        };
+
+        // TEMPLATE: the fixes the maintainer ruled on, each recorded case ("group | name") with the new answer as JSON.
+        private static readonly Dictionary<string, string> Fixed = new(StringComparer.Ordinal)
+        {
+        };
+
+        private static List<Case>? _actual;
+        private static Dictionary<string, JsonElement>? _recorded;
+
+        [OneTimeSetUp]
+        public static void RunCapture()
+        {
+            var saved = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            try
+            {
+                _actual = Cases.Run().ToList();
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = saved;
+            }
+
+            var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "Golden", "{{RECORDING}}");
+            using var doc = JsonDocument.Parse(File.ReadAllText(path));
+            _recorded = doc.RootElement.GetProperty("cases").EnumerateArray()
+                .ToDictionary(c => Key(c.GetProperty("group").GetString()!, c.GetProperty("name").GetString()!), c => c.GetProperty("result").Clone(), StringComparer.Ordinal);
+        }
+
+        private static string Key(string group, string name)
+        {
+            return group + " | " + name;
+        }
+
+        [Test]
+        public void Every_recorded_case_runs()
+        {
+            Assert.That(_actual!.Select(c => Key(c.Group, c.Name)), Is.EquivalentTo(_recorded!.Keys));
+        }
+
+        [Test]
+        public void Named_exceptions_name_recorded_cases()
+        {
+            Assert.That(Fixed.Keys.Concat(ThrowsOnlyCases), Is.SubsetOf(_recorded!.Keys));
+        }
+
+        [Test]
+        public void Every_answer_matches_the_recording_apart_from_the_named_exceptions()
+        {
+            var failures = new List<string>();
+            foreach (var c in _actual!)
+            {
+                var key = Key(c.Group, c.Name);
+                var actualText = ParameterSuffix.Replace(Json.Write(c.Result), string.Empty);
+                using var actual = JsonDocument.Parse(actualText);
+
+                if (ThrowsOnlyCases.Contains(key))
+                {
+                    if (!JsonEqual(_recorded![key], actual.RootElement, throwsOnly: true))
+                    {
+                        failures.Add(key + ": expected " + _recorded[key].GetRawText() + " with any throw, got " + actualText.Trim());
+                    }
+
+                    continue;
+                }
+
+                if (Fixed.TryGetValue(key, out var fixedText))
+                {
+                    using var expectedFixed = JsonDocument.Parse(fixedText);
+                    if (!JsonEqual(expectedFixed.RootElement, actual.RootElement))
+                    {
+                        failures.Add(key + " (fixed): expected " + fixedText + ", got " + actualText.Trim());
+                    }
+
+                    continue;
+                }
+
+                if (!JsonEqual(_recorded![key], actual.RootElement))
+                {
+                    failures.Add(key + ": expected " + _recorded[key].GetRawText() + ", got " + actualText.Trim());
+                }
+            }
+
+            Assert.That(failures, Is.Empty, string.Join(Environment.NewLine, failures));
+        }
+
+        private static bool IsThrow(JsonElement e)
+        {
+            return e.ValueKind == JsonValueKind.Object && e.TryGetProperty("$throws", out _);
+        }
+
+        private static bool JsonEqual(JsonElement a, JsonElement b, bool throwsOnly = false)
+        {
+            if (throwsOnly && IsThrow(a) && IsThrow(b))
+            {
+                return true;
+            }
+
+            if (a.ValueKind != b.ValueKind)
+            {
+                return false;
+            }
+
+            switch (a.ValueKind)
+            {
+                case JsonValueKind.Object:
+                    var ap = a.EnumerateObject().ToList();
+                    var bp = b.EnumerateObject().ToList();
+                    return ap.Count == bp.Count && ap.Zip(bp, (x, y) => x.Name == y.Name && JsonEqual(x.Value, y.Value, throwsOnly)).All(ok => ok);
+                case JsonValueKind.Array:
+                    var ai = a.EnumerateArray().ToList();
+                    var bi = b.EnumerateArray().ToList();
+                    return ai.Count == bi.Count && ai.Zip(bi, (x, y) => JsonEqual(x, y, throwsOnly)).All(ok => ok);
+                case JsonValueKind.String:
+                    return string.Equals(ParameterSuffix.Replace(a.GetString()!, string.Empty), b.GetString(), StringComparison.Ordinal);
+                default:
+                    return a.GetRawText() == b.GetRawText();
+            }
+        }
+    }
+}
