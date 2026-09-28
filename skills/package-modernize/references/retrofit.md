@@ -13,16 +13,18 @@ The latest published version already builds on the current SDK or runtime, has C
 | 0 | Replace the fresh survey with a gap audit (below). The golden capture is of the **latest** published version, one recording per runtime, before any change. Everything else of Phase 0 applies. |
 | 1 | The plan's first question is whether any library code changes at all (default: none). Decisions on everything the audit found. Recommend a release only for a reason (below). |
 | 2 | Templates adapted over the existing files, not a new layout: keep the project folders where they are (moving them breaks links for no caller benefit). Golden replay first, canary after the commit. |
-| 3 to 7 | As in SKILL.md. The review's differential compares the new build with the latest published version. |
+| 3 to 6 | As in SKILL.md. The review's differential compares the new build with the latest published version. |
+| 7 | As in SKILL.md, including the wiki: a retrofit without a release still gets one (wikiwright, verified against the latest published version); with a release, after it is verified. |
 
 ## The gap audit (Phase 0)
 
 1. Run the survey scripts and read every version's package files: old versions of a hand-modernized package can still be broken (RandomNameGeneratorLibrary 1.1.0 shipped sources and obj caches and no DLL; 1.1.1 to 1.2.1 had the DLL outside a framework folder). Each gets a deprecation recommendation for the maintainer.
-2. List every gap against the phases table and the system's reference: golden capture, API list with parameter and protected names, validation baseline, workflows and pins, consumers, release gate, verify-published, Dependabot, rulesets and security settings, README badges and images, icon, SECURITY.md, AGENTS.md with the import, everlast docs. A table of item, current state, standard is the note's core.
+2. List every gap against the phases table and the system's reference: golden capture, API list with parameter and protected names, validation baseline, workflows and pins, consumers, release gate, verify-published, Dependabot, rulesets and security settings, README badges and images, icon, SECURITY.md, AGENTS.md with the import, everlast docs, the GitHub wiki (none, a placeholder, or pages for an older version). A table of item, current state, standard is the note's core.
 3. Read the earlier pass's own notes and changelog for what it decided and what it changed without guarding it (RandomNameGeneratorLibrary 2.1.0 changed every seeded place name; its changelog said the list changed, not that seeded output did).
 4. **Data provenance** (L-093 `data-provenance-check`): rebuild every embedded data file from its source with the old tool's logic. Equal output proves where it came from; a corrected rebuild beside it lists the defects. Integrity tests (counts, blanks, encoding) and the golden capture cannot see a wrong tool. Record the sources' URLs and hashes next to the tool.
 5. **The popular version** (L-094 `diff-the-popular-version`): when most downloads are on an old version, run the capture's deterministic cases that its API allows against it and write every difference into the next changelog.
 6. Baseline: the current build and tests as they are, and the package list for outdated and vulnerable dependencies.
+7. **Old majors** (L-108 `run-old-majors-for-docs`): install the latest version of each old major in a scratch folder and import it once; one that no longer loads is a deprecation recommendation.
 
 ## A ruled data or behaviour fix in a retrofit
 

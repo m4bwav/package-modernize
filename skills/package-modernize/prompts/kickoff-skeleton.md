@@ -20,6 +20,7 @@ What the survey found on <date> (verify before relying on it):
 - Dependencies: <each runtime dependency, wanted range, latest, deprecated or not, and whether the package's observable behaviour depends on its internals>.
 - Community: <issues, pull requests by author and kind, forks>.
 - Security: <leaked tokens and where, webhooks with ids, security features off, alert counts, dead services with their badge, config file, webhook and OAuth app; README images and badges to keep, replace or remove>.
+- Wiki: <hasWikiEnabled; whether OWNER/REPO.wiki.git exists (git ls-remote), is GitHub's placeholder, or has pages for an older version>.
 
 Decisions the plan must settle (recommendation first; the maintainer rules in the plan review, and silence means the recommendation stands):
 - <The compatibility promise: what the golden capture must prove, and the rule for fixes that would change an old result.>
@@ -41,7 +42,9 @@ Rules:
 
 Remind the maintainer when one of their own tasks blocks you: <revoke tokens, remove OAuth apps, enable secret scanning, add the trusted publisher, approve staged versions>.
 
-At the end: <the deliverables: release verified or stopped cleanly at a stop, HANDOFF.md, the inventory row, lessons in the skill, the next package>.
+After the release is verified, the wiki (Phase 7): a new one with the wikiwright skill when the repository has none, its update mode when it has one. <If ls-remote fails, ask for the first-page click at https://github.com/OWNER/REPO/wiki/_new at the start of Phase 7.>
+
+At the end: <the deliverables: release verified or stopped cleanly at a stop, the wiki URL and its live check, HANDOFF.md, the inventory row with the wiki, lessons in the skill, the next package>.
 ```
 
 ## What the run found wrong in this prompt
