@@ -1,11 +1,11 @@
-# TEMPLATE (package-modernize), unverified by a run as of 2026-09-25 (the two NuGet runs published from a job inside ci.yml).
-# A tag v<version>, pushed only after master is green, builds, tests and packs the package, then a second job waits at the
-# `nuget` GitHub environment (required reviewer: the maintainer) before it attests the nupkg, trades the job's OIDC token
-# for a one-hour nuget.org key through Trusted Publishing and pushes. nuget.org has no staging, so the environment approval
-# is the gate: nothing is on the registry before the maintainer clicks Review deployments on the run, and nothing can be
-# deleted afterwards (only unlisted). The nuget.org policy names this file, release.yml, and the environment `nuget`;
-# renaming either breaks publishing. NUGET_USER is the nuget.org profile name (not the email), stored on the environment.
-# Replace {{PROJECT}} and {{PACKAGE_ID}}.
+# TEMPLATE (package-modernize), from IsImageUrlDotNet 2.0.0 and CachingServiceWithAOPSupport 2.0.0 (2026-09-27; releases
+# verified through it: IsImageUrlDotNet 2.0.0-beta.1 and 2.0.0). Replace {{PROJECT}} (the folder and csproj name under
+# src/; for F#, change the extension to .fsproj).
+# A tag v<version> on a master commit builds and tests the package (Linux, and Windows with net48), attests it, then
+# waits at the `nuget` environment for the maintainer's approval (Review deployments on the run); only then is it pushed
+# to nuget.org, and the GitHub Release is created. Tag only after ci is green on master. No API key is stored anywhere:
+# NuGet/login trades the publish job's OIDC token for a one-hour key, under the Trusted Publishing policy on nuget.org
+# that names this file, release.yml, and the environment `nuget`. Renaming either breaks publishing.
 name: release
 
 on:
@@ -25,9 +25,9 @@ defaults:
 
 jobs:
   build:
-    name: build, test and pack the release
+    name: build and test the release
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     outputs:
       version: ${{ steps.version.outputs.version }}
       prerelease: ${{ steps.version.outputs.prerelease }}
@@ -39,25 +39,25 @@ jobs:
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
-          cache: true
-          cache-dependency-path: '**/packages.lock.json'
-      # Before anything is built: the tag must equal <Version> in the csproj, the one place the version lives.
-      - name: The tag must equal the csproj version
+      - name: The tag must equal the project's version
         id: version
         env:
           TAG: ${{ github.ref_name }}
         run: |
-          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' {{PROJECT}}/{{PROJECT}}.csproj)
-          if [ "v$version" != "$TAG" ]; then
-            echo "::error::tag $TAG does not match <Version>$version</Version> in {{PROJECT}}/{{PROJECT}}.csproj"
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/{{PROJECT}}/{{PROJECT}}.csproj)
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::tag $TAG and project version $version must agree"
             exit 1
           fi
-          if [[ "$version" == *-* ]]; then
-            echo "prerelease=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "prerelease=false" >> "$GITHUB_OUTPUT"
-          fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$version" == *-* ]]; then echo "prerelease=true" >> "$GITHUB_OUTPUT"; else echo "prerelease=false" >> "$GITHUB_OUTPUT"; fi
+      - name: The tagged commit is on master
+        run: |
+          git fetch --no-tags origin master
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" FETCH_HEAD; then
+            echo "::error::$GITHUB_SHA is not on master; tag only commits on master, after ci is green"
+            exit 1
+          fi
       - name: Release notes from the changelog
         env:
           VERSION: ${{ steps.version.outputs.version }}
@@ -69,10 +69,6 @@ jobs:
             ' CHANGELOG.md
           }
           notes=$(section "$VERSION")
-          # A prerelease takes the section of the release it leads to: 2.0.0-beta.1 uses 2.0.0.
-          if [ -z "$notes" ] && [[ "$VERSION" == *-* ]]; then
-            notes=$(section "${VERSION%%-*}")
-          fi
           if [ -z "$notes" ]; then
             echo "::error::CHANGELOG.md has no section for $VERSION"
             exit 1
@@ -83,55 +79,90 @@ jobs:
           fi
           printf '%s\n' "$notes" > release-notes.md
       - run: dotnet restore --locked-mode
-      - run: dotnet format --no-restore --verify-no-changes
       - run: dotnet build --no-restore -c Release
       - run: dotnet test --no-build -c Release -f net10.0
-      - name: Pack with package validation
-        run: dotnet pack {{PROJECT}} --no-build -c Release -o artifacts -p:ContinuousIntegrationBuild=true
+      - run: dotnet pack src/{{PROJECT}} --no-build -c Release -o artifacts
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release
           path: |
-            artifacts/*.nupkg
-            artifacts/*.snupkg
+            artifacts/*nupkg
             release-notes.md
           if-no-files-found: error
 
-  publish:
-    name: push to nuget.org and create the GitHub Release
+  test-windows:
+    name: test on Windows (net48 and net10.0)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - run: dotnet restore --locked-mode
+      - run: dotnet build --no-restore -c Release
+      - run: dotnet test --no-build -c Release -f net48
+      - run: dotnet test --no-build -c Release -f net10.0
+
+  attest:
+    name: attest the package
     needs: build
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    # The gate: this environment has a required reviewer and a `v*` tag rule. The job waits here for the approval.
-    environment: nuget
-    # The only job with write permissions, and it runs no project code: it pushes the package the build job tested.
+    timeout-minutes: 5
     permissions:
-      contents: write
+      contents: read
       id-token: write
       attestations: write
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: release
-      # No checkout in this job, so global.json is not available; pin the SDK line instead.
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        with:
-          dotnet-version: 10.0.x
-      # The attestation covers the nupkg as built; nuget.org adds its repository signature after upload, so the file
-      # downloaded from the registry has a different hash. Verify with `gh attestation verify` on this run's artifact.
-      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: artifacts/*.nupkg
-      - name: NuGet login (OIDC to a one-hour API key)
+
+  publish:
+    name: push to nuget.org (after approval)
+    needs: [build, test-windows, attest]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    # The human gate: the run waits here until the maintainer approves the `nuget` environment.
+    environment: nuget
+    # The only job that can push. It checks nothing out, restores nothing and runs no dependency code.
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x # no checkout here, so global.json is not available
+      - name: NuGet login (OIDC to a one-hour key)
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         id: login
         with:
           user: ${{ secrets.NUGET_USER }}
-      - name: Push the package and its symbols
+      - name: Push the package (its snupkg symbols go with it)
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
-        run: dotnet nuget push "artifacts/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
-      - name: GitHub Release with the changelog section
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
+
+  github-release:
+    name: GitHub Release
+    needs: [build, publish]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release
+      - name: GitHub Release with the changelog section and the package
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
@@ -141,4 +172,4 @@ jobs:
           if [ "$PRERELEASE" = true ]; then
             flags+=(--prerelease)
           fi
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "$TAG" --notes-file release-notes.md "${flags[@]}" artifacts/*.nupkg artifacts/*.snupkg
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "$TAG" --notes-file release-notes.md "${flags[@]}" artifacts/*nupkg

@@ -111,6 +111,8 @@ Standing work specific to NuGet: set `PackageValidationBaselineVersion` to the r
 - The editor tools decode backslash-u escapes in the text they write, and Git Bash heredocs halve backslashes: a C# escape for "<" became a literal "<" and silently disabled the config escaping. Write such text through Python with chr(92) and grep the result.
 
 - `dotnet format --verify-no-changes` exits 0 on F# projects without checking anything (2026-09-27); an F# repository needs Fantomas in CI.
+- Reflection-based key or JSON writers see different public properties on .NET Framework and .NET: `TimeSpan` gained Microseconds, Nanoseconds, TotalMicroseconds and TotalNanoseconds in .NET 7, and .NET computes `TotalHours` exactly (0.025 where the Framework gave 0.024999999999999998). A golden case recorded on net48 then fails on net10.0 only; write such types in the Framework's shape (L-083 `bcl-shape-differs-by-runtime`, 2026-09-27).
+- A cache or serializer that reads every public getter of its arguments blocks on a pending `Task` argument (`Result`), as JavaScriptSerializer did; a test that passes a `TaskCompletionSource` hangs the whole test host. Run new test suites with `dotnet test --blame-hang-timeout 60s --blame-hang-dump-type none`, which names the hanging test (L-084 `blame-hang-names-the-test`, 2026-09-27).
 - The flat container lists unlisted versions (FSharp.Core 11.0.100 on 2026-09-27); read `listed` and `published` from the registration index before calling a version the latest.
 - NUnit 5.0.0 was published on 2026-09-27; runs that day kept 4.6.1 for the three-day cooldown. `scripts/nuget-latest.py` flags such versions (L-081 `nuget-latest-cooldown`).
 - `survey-github.sh` needs a logged-in gh; without one it now stops with exit 2 instead of printing "(none)" lines (fixed 2026-09-27 after a cloud session printed false negatives).
@@ -127,6 +129,6 @@ Standing work specific to NuGet: set `PackageValidationBaselineVersion` to the r
 
 ## What this reference still lacks
 
-Template copies of TrailerClipper's `release.yml` and `verify-published.yml` under `templates/nuget/` (the template `ci.yml` is still the older single-job one; copy from TrailerClipperLib for now), (F# is complete: IsImageUrlDotNet 2.0.0, 2026-09-27; its workflows in m4bwav/IsImageUrlDotNet are the F# worked example, with C# and F# consumers on net48). The two earlier packages still owe the list in the maintainer's inventory.
+The workflow templates are current since 2026-09-27 (C-20260927-14: ci.yml, release.yml, verify-published.yml, the consumers script and the golden test, from CachingServiceWithAOPSupport and IsImageUrlDotNet; F# worked example m4bwav/IsImageUrlDotNet). Still missing: a C# version of the split golden capture as a script template (`scripts/golden-capture-nuget.template.cs` is the older single-file shape; copy CachingServiceWithAOPSupport's tests/Golden/Capture instead). The two earlier packages still owe the list in the maintainer's inventory.
 
 Related: builds on [../SKILL.md](../SKILL.md); see also [npm.md](npm.md), [plan-skeleton.md](plan-skeleton.md), [../templates/README.md](../templates/README.md).
