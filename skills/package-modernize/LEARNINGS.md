@@ -312,6 +312,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (scripts/golden-capture-npm.template.cjs, references/npm.md)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
+### L-124 · 2026-09-29 · A socket guard that reads `args[0].host` lets plain http through (`guard-normalised-args`)
+- Trigger: the markdown-plain-link-replacer wiki's verification script used the capture's guard (wrap `net.Socket.prototype.connect`, throw unless the host is 127.0.0.1). On Node 20.20.2, where `NODE_USE_ENV_PROXY` does nothing, a probe `fetch('http://example.com/')` behind the guard answered 200 from the real site; the same held on Node 24.18.0, while `https.get('https://example.com/')` was refused (2026-09-29).
+- Hypothesis: `net.connect()` and `net.createConnection()` call `socket.connect(normalized)` with the arguments already normalised into one array, `[options, callback]`; `tls.connect()` passes an options object. The guard read `args[0].host` from the array, found nothing, and allowed the connection.
+- Rule: read the options from `Array.isArray(args[0]) ? args[0][0] : args[0]`; test a guard with a host that cannot resolve (`http://guard-test.invalid/`), which must fail with the guard's message. markdown-plain-link-replacer's `test/golden/capture-1.1.16.cjs` (the only capture with this guard) sent every request through its proxy, so the hole did not change its recording, but its guard would not have caught a stray plain http request.
+- Evidence: the fixed guard refused `fetch('http://example.com/')` on Node 20.20.2 and 24.18.0 (`wiki-verify guard: refused a connection to example.com:80`); markdown-plain-link-replacer ai-docs/notes/2026-09-29-wiki-verify.mjs (guard.cjs)
+- Scope: skill (references/npm.md, Phase 0 network captures)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
