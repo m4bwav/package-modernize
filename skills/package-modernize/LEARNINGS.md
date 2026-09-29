@@ -288,6 +288,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (templates/nuget)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
+### L-121 · 2026-09-28 · A wait loop must stop on an empty id or a gh error (`wait-loop-exits`)
+- Trigger: after JsonPrettyPrinter's merge, `gh run list -b master -L 1` returned a Dependabot run without the fields asked for, the loop `until [ "$(gh run view $id ...)" = completed ]` polled run id "null" for ten minutes and was stopped by hand (2026-09-28).
+- Hypothesis: `until` on a command substitution never ends when the command fails, and a list query can return a run of another workflow.
+- Rule: filter the run by workflow and head (`-w release`, headBranch equal to the tag), exit when the id is empty, bound the loop (`for i in $(seq 1 N)`), and exit on a gh error; scripts/watch-run.sh is the tested form.
+- Evidence: DotNetJsonPrettyPrinter ai-docs/log.md (2026-09-28, pull request #8 merged)
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
