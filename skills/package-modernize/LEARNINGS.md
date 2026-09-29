@@ -4,7 +4,7 @@ Procedural lessons for [SKILL.md](SKILL.md). Research findings live in [RESEARCH
 
 Write an entry the moment a real signal happens: a user correction, the same error twice, a discovered workaround, an environment fact, a stated preference, a failed test or a failure in use. Check existing entries first, by meaning (`evergreen.py search "<the lesson>" --kinds learnings` finds near-duplicates in every registered unit): add / update / retire / none. Trigger and Hypothesis are required. Promote after three confirmations; retire when harmful > helpful.
 
-The first twelve entries were seeded on 2026-09-25 from the three runs that preceded the skill (get-title-at-url, seeded-random-utilities, the two NuGet libraries); their evidence is those repositories' `ai-docs/` and the playbook the skill was built from. They are promoted into SKILL.md or a reference already, so their status says so. The consolidation pass C-20260928-1 (2026-09-28) merged 13 near-duplicates into their lowest ID, moved every promoted and merged entry to the archive, and left one index line per ID below, so every ID cited elsewhere still resolves.
+The first twelve entries were seeded on 2026-09-25 from the three runs that preceded the skill (get-title-at-url, seeded-random-utilities, the two NuGet libraries); their evidence is those repositories' `ai-docs/` and the playbook the skill was built from. They are promoted into SKILL.md or a reference already, so their status says so. The consolidation pass C-20260928-1 (2026-09-28) merged 13 near-duplicates into their lowest ID, moved every promoted and merged entry to the archive, and left one index line per ID below, so every ID cited elsewhere still resolves. The second pass C-20260929-3 (2026-09-29) moved 29 more promoted entries (L-090 to L-124) to the archive, 16 of them marked promoted there because a later change had already written their rule into SKILL.md, a reference or a template.
 
 ## Active
 
@@ -40,134 +40,6 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-26
 
-### L-090 · 2026-09-28 · Pull the skill with git -C; its shell rules are not loaded yet (`pull-without-cd`)
-- Trigger: the RandomNameGeneratorLibrary kickoff said "pull master first"; the first shell call was `cd <skill> && git pull`, which moved the session's working directory into the skill repository before SKILL.md (and its rule L-089 `cd-only-in-a-subshell`) had been read. A second `cd /` followed a few calls later (2026-09-28).
-- Hypothesis: a rule inside the skill cannot govern the commands a kickoff asks for before the skill is read; the promoted rule held in the previous run only once it was loaded.
-- Rule: the kickoff skeleton names the pull as `git -C <skill repository> pull --ff-only`; runs use `git -C` for every repository they do not work in.
-- Evidence: RandomNameGeneratorLibrary retrofit session, 2026-09-28 (the harness reported the working directory change)
-- Scope: skill (prompts/kickoff-skeleton.md)
-- Status: promoted: C-20260928-2 (kickoff skeleton) · recurrence of L-089 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
-
-### L-091 · 2026-09-28 · Backslash-u in prose is decoded too; name code points as U+XXXX (`prose-escapes-decode-too`)
-- Trigger: a Phase 0 note written with the Write tool quoted the recorded string "Mu", then a backslash-u escape for U+FFFD, then "oz"; the file held the replacement character itself, although the rule (L-050, which absorbed L-058) was known and followed in the code written the same hour (2026-09-28).
-- Hypothesis: the rule reads as a code rule; markdown that quotes an escape is text like any other to the tool layer.
-- Rule: in documents, write code points as U+FFFD and never quote a backslash-u escape; in code, build it from (char)92. Check a written file with Python for chr(0xFFFD) and for chr(92)+"u" when the text mentions encodings.
-- Evidence: DotNetRandomNameGenerator ai-docs/notes/2026-09-28-phase-0-gap-audit.md (fixed before commit bdb53b3)
-- Scope: skill (references/nuget.md Traps)
-- Status: promoted: C-20260928-2 (nuget.md Traps) · recurrence of L-050 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
-
-### L-092 · 2026-09-28 · The public API list includes protected members and class kinds (`api-list-protected-members`)
-- Trigger: the ApiList program copied from CachingServiceWithAOPSupport listed public members only; RandomNameGeneratorLibrary's public abstract BaseNameGenerator has protected constructors and a protected readonly field that callers' subclasses use, and the list did not say "abstract" (2026-09-28).
-- Hypothesis: the first package that needed the lister had no public unsealed base class, so the gap never showed.
-- Rule: the lister takes constructors and fields with IsPublic, IsFamily or IsFamilyOrAssembly, marks them "protected", and writes the kind as static, abstract, sealed or plain class; templates/nuget/tests/Golden/ApiList is the corrected program.
-- Evidence: DotNetRandomNameGenerator 84dbc6b (tests/Golden/ApiList; PublicApi-2.2.0.txt 101 lines, 98 before the fix)
-- Scope: skill (templates/nuget/tests/Golden/ApiList)
-- Status: promoted: C-20260928-2 (template) · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-093 · 2026-09-28 · Rebuild embedded data from its source with the old tool's logic (`data-provenance-check`)
-- Trigger: RandomNameGeneratorLibrary embeds a place list that 2.1.0 hand-fixed; running the 2014 stripper's logic on the Census 2000 file reproduced the list exactly, and a correct strip showed 150 entries that are not names ("Feli" from Felicity, "Hagers" from Hagerstown) and 246 missing names. Neither the golden capture (it records what is there) nor 146 unit tests (counts, blanks, U+FFFD, duplicates, Title case) could see it (2026-09-28).
-- Hypothesis: a data file is the output of a program; integrity tests check its shape, not whether the program that made it was right.
-- Rule: in Phase 0, for every embedded data file, find its source and rebuild it with the old tool's logic; equal output proves provenance, and a corrected rebuild beside it lists the defects. A data fix changes seeded or indexed output, so it is a plan decision (fix under a new name or at the next major), never a chore.
-- Evidence: DotNetRandomNameGenerator ai-docs/notes/2026-09-28-phase-0-gap-audit.md
-- Scope: skill (SKILL.md survey; the retrofit path)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-094 · 2026-09-28 · Compare the most-downloaded old version with the contract, not only the latest (`diff-the-popular-version`)
-- Trigger: RandomNameGeneratorLibrary's contract is 2.2.0, but 1.2.2 has 3.79 million of its 3.89 million downloads; a scratch program on 1.2.2 showed seeded person names unchanged and every seeded place name different since 2.1.0, which the changelog never said (2026-09-28).
-- Hypothesis: the retrofit's contract protects the next upgrade; the callers who matter most upgrade from the popular version, whose drift nobody recorded.
-- Rule: in a retrofit, run the capture's seeded or deterministic cases (as far as the old API allows) against the version with the most downloads and state every difference in the changelog of the next release.
-- Evidence: DotNetRandomNameGenerator ai-docs/log.md (Phase 0)
-- Scope: skill (the retrofit path)
-- Status: active · helpful 2 · harmful 0 · last_confirmed 2026-09-28 (JsonPrettyPrinter: 2.0.0 swapped the serializer and rewrote its expectation file; the CHANGELOG named two of about fifteen changes)
-
-### L-095 · 2026-09-28 · A path token in a recording also needs forward slashes (`portable-path-token`)
-- Trigger: the first RandomNameGeneratorLibrary recordings held `{WORK}` followed by a Windows separator and a file name in FileNotFoundException messages; the replay on Ubuntu would have failed on every path case (2026-09-28, caught before the Phase 0 commit).
-- Hypothesis: the work-folder token hides the machine, not the OS's separator.
-- Rule: when a recorded text contains the work folder, replace it with the token and replace the directory separator in the same text with "/", inside the case, so the replay normalises the same way.
-- Evidence: DotNetRandomNameGenerator tests/Golden/Capture/Cases.cs (Normalize)
-- Scope: skill (references/nuget.md Phase 0)
-- Status: promoted: C-20260928-2 (nuget.md Phase 0) · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-096 · 2026-09-28 · Two survey helpers printed errors as findings (`helpers-say-none-plainly`)
-- Trigger: `nuget-latest.py --help` looked up a package called "--help" and died with an HTTPError traceback; `survey-github.sh` printed GitHub's 404 JSON before "(no classic branch protection)" and nothing at all for an empty ruleset list (2026-09-28).
-- Hypothesis: both were written against packages that had the thing asked about.
-- Rule: helpers print a usage on no argument or -h, a one-line "not on nuget.org" with exit 1 for an unknown id, and "(no rulesets)" or "(no classic branch protection)" instead of an API error body.
-- Evidence: scripts/nuget-latest.py, scripts/survey-github.sh (C-20260928-2)
-- Scope: skill (scripts)
-- Status: promoted: C-20260928-2 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-097 · 2026-09-28 · The everlast lint also reads the C# lazy type as an opinion about people (`lint-reads-lazy`)
-- Trigger: `everlast.py lint` flagged "privacy: opinion about people or politics" on two notes that named the lazily initialised name lists by their C# type (2026-09-28).
-- Hypothesis: the privacy pattern matches the word as an adjective about a person.
-- Rule: in ai-docs, describe such fields as "lazily initialised"; the plan skeleton's lint note lists it with the other false positives.
-- Evidence: DotNetRandomNameGenerator bdb53b3 (lint clean after rewording)
-- Scope: skill (references/plan-skeleton.md)
-- Status: promoted: C-20260928-2 · extends L-082 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-098 · 2026-09-28 · Record the process bitness; run the replay the same way (`record-process-bitness`)
-- Trigger: RandomNameGeneratorLibrary's net48 golden replay, pinned to win-x86 like the unit tests, differed from the 2.2.0 recording in 16 cases: "Exception of type 'System.OutOfMemoryException' was thrown." where the AnyCPU (64-bit) capture had "Array dimensions exceeded supported range." for a count of int.MaxValue (2026-09-28).
-- Hypothesis: the lock-file rule (pin a RuntimeIdentifier for a net48 test exe) chose x86 without regard to how the capture ran; allocation failures are worded by the process, not the library.
-- Rule: the capture header records the process bitness; the replay pins the matching RuntimeIdentifier (win-x64 for an AnyCPU capture).
-- Evidence: DotNetRandomNameGenerator 64ebdf3 (GoldenTests csproj)
-- Scope: skill (references/nuget.md Phase 0; references/retrofit.md)
-- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-099 · 2026-09-28 · A ruled change to golden answers goes in a guarded exception file beside the replay (`ruled-exception-file`)
-- Trigger: the maintainer ruled the place-list fix in place; 35 recorded cases per runtime had to change without touching tests/Golden or loosening the replay (2026-09-28).
-- Hypothesis: an inline exception table does not scale past a dozen cases, and a file under tests/Golden would make the untouched check (`git diff --exit-code <phase-0> -- tests/Golden`) meaningless.
-- Rule: replay green and canary first; then the fix; the replay writes the differing cases on request (an environment variable) into `Exceptions/<version>.<topic>.<runtime>.json` beside the replay project; the test pins the exact set of allowed keys (a topic regex also matched 26 cases that must never change, the review found) and refuses an exception equal to the old answer; an oracle independent of the library checks every exception, and in a mixed case every answer outside the topic must equal the old recording.
-- Evidence: DotNetRandomNameGenerator 8bebf10 (GoldenTests.cs, Exceptions/)
-- Scope: skill (references/retrofit.md)
-- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-100 · 2026-09-28 · Adapting templates: C-locale content list, placeholder regex, seven-day cooldown, eol=lf re-checkout (`template-adaptation-traps`)
-- Trigger: four template traps in one adaptation (2026-09-28): the ci.yml content list put the nuspec before README.md, but `LC_ALL=C sort` puts README.md first for an id starting with "Ra" (CI would fail); the instruction to grep for `{{` matched every GitHub expression; zizmor 1.30.1 flagged the template's three-day Dependabot cooldown and the dotnet-sdk ecosystem with none; switching an autocrlf clone to `eol=lf` left CRLF working files and 150 ENDOFLINE errors from dotnet format.
-- Hypothesis: the templates were proven on packages whose ids sort after README.md and in clones created with LF, and zizmor's cooldown audit is newer than the template.
-- Rule: the ci.yml template says to list files in C-locale order; templates/README says to grep `{{[A-Z_]+}}`; the Dependabot template uses seven days on every ecosystem; after adopting eol=lf, commit, then `git rm -r --cached . && git reset --hard`.
-- Evidence: DotNetRandomNameGenerator 3398d5c, 4457d01; C-20260928-3
-- Scope: skill (templates/nuget, templates/README.md, references/nuget.md Traps)
-- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-101 · 2026-09-28 · Run CI's exact test command locally before pushing (`ci-command-locally`)
-- Trigger: the first CI run of RandomNameGeneratorLibrary's pull request failed on both OSes with exit code 5 and "Zero tests ran": ci.yml passes `--coverage`, which Microsoft.Testing.Platform rejects in a test project without Microsoft.Testing.Extensions.CodeCoverage, and the new golden project had none. Locally the agent had run `dotnet test` without the flag (2026-09-28).
-- Hypothesis: "verified locally" meant the same tools, not the same command line; a flag applies to every test project, including the one just added.
-- Rule: before pushing, run each workflow's test and pack commands exactly as written in the workflow; a new test project gets every extension the workflow's flags need.
-- Evidence: CI run 36372933350 (failed), fix 35b7655
-- Scope: skill (SKILL.md Phase 2 verification)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-102 · 2026-09-28 · Three known traps repeated in one session (`known-traps-repeated`)
-- Trigger: in the RandomNameGeneratorLibrary retrofit the agent (a) wrote `--coverage` inside an MSBuild XML comment (MSB4025, a trap listed in nuget.md since 2026-09-25), (b) ran Python through Bash heredocs three times with backslashes in the text, which were halved (a regex `\|` and two replacement patterns; the SKILL.md Windows line says to write files with the editor tools), and (c) used `sed` with `\|`, which GNU sed reads as alternation (2026-09-28).
-- Hypothesis: the rules are phrased per tool ("heredocs", "XML comment in Directory.Build.props"); a Python heredoc or a csproj comment did not look like the case the rule names.
-- Rule: any script with a backslash in it goes to the scratchpad through the Write tool and runs from there; never `--` in any MSBuild comment (csproj, props, targets); edit with Python or the Edit tool, not sed, when the text has a backslash or a pipe.
-- Evidence: this session's log; DotNetRandomNameGenerator 35b7655
-- Scope: skill (SKILL.md Windows line)
-- Status: promoted: C-20260928-3 (SKILL.md Windows line) · recurrence of L-050 · recurred once more the same session, minutes after it was written (a Python heredoc halved a backslash in a replacement pattern; the assertion caught it before any write) · helpful 0 · harmful 0 · last_confirmed 2026-09-28
-
-### L-103 · 2026-09-28 · The package content check died silently on a package without dependencies (`empty-dependency-group`)
-- Trigger: RandomNameGeneratorLibrary's second CI run failed on Ubuntu in "The package holds exactly what it should" with exit 1 and no message: its nuspec writes each empty dependency group as a self-closing element, so the template's `grep -o "<group targetFramework=...>.*"` matched nothing, and under bash's -e and pipefail the command substitution ended the step (2026-09-28). The worked examples all had dependencies.
-- Hypothesis: a template proven only on packages with dependencies never ran the no-match path; a grep without a match is an error under pipefail.
-- Rule: every grep in a check that may legitimately match nothing is wrapped as `{ grep ... || true; }`; run a workflow step locally with `bash -e -o pipefail` on the real artifact, once with the right expectation and once with a wrong one (it must fail with its ::error line).
-- Evidence: CI run 36373102418 (failed), fix 1e4e416; templates/nuget/.github/workflows/ci.yml (C-20260928-3)
-- Scope: skill (templates/nuget ci.yml; references/retrofit.md)
-- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-104 · 2026-09-28 · A consumer of the packed package needs source mapping (`consumer-source-mapping`)
-- Trigger: the review of RandomNameGeneratorLibrary PR #13 found that tests/consumers/run.sh added the local folder beside nuget.org in a fresh nuget.config; once the same version is on nuget.org (after the beta), NuGet may restore that copy and the consumer cannot tell (2026-09-28).
-- Hypothesis: a separate packages folder stops the cache from standing in, but not a second source holding the same id and version.
-- Rule: with a local source, the consumer's nuget.config maps the package id to the local folder only (`packageSourceMapping`) and everything else to nuget.org; version lines are compared as whole lines (`grep -qxF`), so 2.3.0 cannot pass on 2.3.0-beta.1. The template does both.
-- Evidence: DotNetRandomNameGenerator 355af8b; templates/nuget/tests/consumers/run.sh (C-20260928-3)
-- Scope: skill (templates/nuget)
-- Status: promoted: C-20260928-3 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-105 · 2026-09-28 · Log only what the maintainer said, quoted (`log-maintainer-quotes`)
-- Trigger: after Mark said "I merged everything", the RandomNameGeneratorLibrary log recorded that he had also edited the nuget.org Trusted Publishing policy, which he had not said; a later entry corrected it (2026-09-28). The beta's push job was the real evidence.
-- Hypothesis: a stop lists several maintainer actions, and a short "done" reads as covering all of them.
-- Rule: log the maintainer's words as a quote; any action they did not name stays unconfirmed in the log, with the step that will prove it (here: the push job's NuGet login).
-- Evidence: DotNetRandomNameGenerator ai-docs/log.md, 881ddec
-- Scope: skill (SKILL.md, the rules that hold everywhere)
-- Status: promoted: C-20260928-4 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
-
 ### L-106 · 2026-09-28 · check-readme-images.mjs defaults to npm (`readme-images-registry-flag`)
 - Trigger: the 2.3.0 README check ran first without `--registry nuget` and printed "checked for npm"; references/nuget.md has the flag, the agent typed the command from memory (2026-09-28). The rerun with the flag also passed.
 - Hypothesis: the script is shared by both registries and the default hides which allow-list was applied.
@@ -176,36 +48,12 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (references/nuget.md verification table already correct)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
-### L-107 · 2026-09-28 · The wiki comes after the release is verified, and it audits the shipped docs (`wiki-after-release`)
-- Trigger: Mark asked for GitHub wikis on the packages. Written by hand for RandomNameGeneratorLibrary 2.3.0 and JsonPrettyPrinter 3.0.1, then with the new wikiwright skill for get-title-at-url 3.0.0 (all 2026-09-28). Each found errors in the README or CHANGELOG that the modernization runs had shipped: a thread-safety sentence true on one runtime, a comment claim the printer breaks, a changelog escape System.Text.Json never writes, a NOT_HTML row that misses the no-Content-Type case, an exit-code line. Mark then asked that every run add a wiki when the repository has none.
-- Hypothesis: the wiki verifies every example against the published package, so it runs after Phase 6; writing the long form forces reading every claim against a run, which the release checks do not do for prose.
-- Rule: Phase 7 starts with the wiki (wikiwright new or update mode); its inaccuracies go to the kickoff prompt's corrections and HANDOFF.md for the next release.
-- Evidence: SKILL.md (phases table row 7; "Wiki (Phase 7, first)"), references/retrofit.md, prompts/kickoff-skeleton.md, C-20260928-5; get-title-at-url ai-docs/notes/2026-09-28-github-wiki.md; the two DotNet repositories' wiki notes
-- Scope: skill
-- Status: active · helpful 3 · harmful 0 · last_confirmed 2026-09-28
-
 ### L-108 · 2026-09-28 · Old majors without a golden capture can be run for the upgrade story (`run-old-majors-for-docs`)
 - Trigger: get-title-at-url was modernized before golden captures existed; its wiki run installed 2.0.0 and 1.1.8 in scratch folders and found that 2.0.0 cannot be imported since cheerio 1.0.0 (August 2024), a fact in the plan but in no shipped doc, and that no old version is deprecated on npm although 2.0.0 still gets about 60 downloads a week (2026-09-28).
 - Hypothesis: a broken old major is a deprecation candidate the survey can miss when it reads the changelog instead of installing the version.
 - Rule: the Phase 0 survey (and a retrofit's gap audit) installs the latest version of each old major and imports it once; one that fails is a deprecation recommendation with its message.
 - Evidence: get-title-at-url ai-docs/notes/2026-09-28-github-wiki.md (facts, recommendation); wikiwright L-011 `run-the-old-majors`
 - Scope: skill
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-109 · 2026-09-28 · The golden capture feeds the wiki, and cleanup must not switch the wiki off (`golden-capture-feeds-the-wiki`)
-- Trigger: the seeded-random-utilities wiki (wikiwright's second run) replayed `test/golden/capture-1.1.4.cjs` against 1.1.4 from npm (322 of 322 cases identical to the recording) and against 2.0.0 (316 of 322; the six are the documented emoji exception), and `capture-2.0.0.cjs` against the published build (150 of 150): the Versions and upgrading page's evidence. The same repository's Phase 6 cleanup had switched the wiki off, following references/npm.md ("wiki and projects off"), so Phase 7 had to switch it back on (2026-09-28).
-- Hypothesis: a capture recorded for the rewrite's tests is also the most exact upgrade documentation the package has; the cleanup line predates the wiki step (C-20260928-5).
-- Rule: Phase 6 leaves the wiki on (or switches it on); capture scripts stay runnable from a scratch folder (the build path as an argument, no import from the repository), so the wiki run can replay them.
-- Evidence: seeded-random-utilities ai-docs/notes/2026-09-28-github-wiki.md and its log (Stage 2 settings); wikiwright L-020 `replay-the-golden-capture`
-- Scope: skill
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-110 · 2026-09-28 · One capture program records every published version (`one-capture-many-versions`)
-- Trigger: JsonPrettyPrinter's retrofit needed 3.0.1 (the contract), 2.1.1 and the popular 1.0.1.1 recorded with the same cases (L-094). An `OldVersion` MSBuild property (`Version="[$(OldVersion)]"`) and a define for the oldest API (`JPP_V1` when the version starts with "1.") let one Cases.cs compile against all three; same case names, so a 90-line compare script diffs versions case by case. 1.0.0 and 1.0.1 then took two seconds each and answered all 446 cases as 1.0.1.1 did, so one deprecation message covers all three. A hidden 2.x constructor overload made `new JsonPrettyPrinter(null)` ambiguous against 2.1.1 only (2026-09-28).
-- Hypothesis: the popular-version check was written as a separate scratch program; putting it in the capture makes it exact, repeatable and reusable by the wiki (L-109).
-- Rule: write the capture with a version property and `#if` blocks for older APIs; record the popular and the latest old major on every runtime into an `upgrade/` folder beside the contract, never replayed; cast every null argument to its parameter type; run every version of the popular major once before writing a deprecation message.
-- Evidence: DotNetJsonPrettyPrinter 08b777a (tests/Golden/Capture, tests/Golden/upgrade)
-- Scope: skill (references/retrofit.md, references/nuget.md Phase 0, scripts/golden-capture-nuget.template.cs)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
 ### L-111 · 2026-09-28 · Record the parameter name, the dependency that worded a message, and the time zone (`record-param-and-source`)
@@ -224,68 +72,12 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (capture template)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
-### L-113 · 2026-09-28 · The API lister shows init accessors as set (`api-list-init-accessors`)
-- Trigger: JsonPrettyPrintOptions has init-only properties; the template ApiList wrote `{ get; set; }`, which would let a later change from init to set pass the API test unnoticed (2026-09-28).
-- Hypothesis: RandomNameGeneratorLibrary had no init accessors.
-- Rule: the lister writes `init;` when the setter's return parameter has the IsExternalInit required modifier, marks static properties and const fields, and loads the assembly by name so an `OldVersion` property lists any published version.
-- Evidence: DotNetJsonPrettyPrinter tests/Golden/ApiList/Program.cs
-- Scope: skill (templates/nuget/tests/Golden/ApiList)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-114 · 2026-09-28 · The everlast lint reads an MSBuild element in prose as a placeholder (`lint-reads-msbuild-elements`)
-- Trigger: the converted wiki note named the baseline property as an XML element with its value; `everlast.py lint` reported "template placeholder text still present" (its pattern is a capital letter and ten characters inside angle brackets) (2026-09-28).
-- Hypothesis: same family as L-082 (C# generics) and L-097 (the lazy type).
-- Rule: in ai-docs, write "the PackageValidationBaselineVersion property set to X", never the element.
-- Evidence: DotNetJsonPrettyPrinter 366b93a
-- Scope: skill (references/plan-skeleton.md lint note)
-- Status: active · extends L-082 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-115 · 2026-09-28 · Three known traps again in the first hour (`known-traps-first-hour`)
-- Trigger: in the JsonPrettyPrinter retrofit, after reading SKILL.md and LEARNINGS.md: (a) a one-off lookup `cd <records repo>; grep ...` moved the session's working directory (L-089, L-090); (b) the first csproj written had a usage line with the double dash before the program arguments inside an XML comment, MSB4025 (L-102); (c) a Phase 0 note quoted the CHANGELOG's escape for a quote, and the Write tool decoded it into a bare quote (L-091) (2026-09-28).
-- Hypothesis: each rule is read as a rule about a kind of task (a pull, a props file, a code string), and the first hour's small writes do not look like that task.
-- Rule: never start a shell command with `cd`; never write a usage line in an MSBuild comment (say "then the arguments"); never type an escape sequence in any text a tool writes, code or prose: name it (U+0022) or build it with chr(92). After writing a doc that mentions escapes, grep it for the intended text, not only for chr(92)+"u".
-- Evidence: this session; DotNetJsonPrettyPrinter tests/Golden/ApiList/ApiList.csproj (fixed before commit); ai-docs/notes/2026-09-28-phase-0-gap-audit.md (fixed before commit)
-- Scope: skill (SKILL.md Windows line)
-- Status: active · recurrence of L-089, L-102, L-091 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
-
 ### L-116 · 2026-09-28 · Python output redirected on Windows is CRLF (`python-redirect-crlf`)
 - Trigger: `python compare.py a b > report.txt` from Git Bash wrote CRLF reports into a repository with `eol=lf` (2026-09-28).
 - Hypothesis: Python's stdout is in text mode and translates newlines on Windows.
 - Rule: a report meant for the repository is written by the script with `newline="\n"`, or normalised by byte before `git add`.
 - Evidence: DotNetJsonPrettyPrinter tests/Golden/upgrade/diff-*.txt (normalised before 08b777a)
 - Scope: env:windows
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-117 · 2026-09-28 · The template replay's string comparison throws on a recorded lone surrogate (`raw-text-for-lone-surrogates`)
-- Trigger: JsonPrettyPrinter's golden replay, adapted from templates/nuget/tests/GoldenTests.cs.template, failed on net48 with InvalidOperationException "Cannot read incomplete UTF-16 JSON text as string with missing low surrogate": JsonElement.GetString() refuses the lone surrogates the capture recorded (2026-09-28).
-- Hypothesis: earlier packages recorded no invalid UTF-16; the template compares strings through GetString() so it can strip the .NET parameter suffix.
-- Rule: with one recording per runtime, compare strings by raw JSON text (both sides come from the capture's writer, which escapes every character outside ASCII); keep GetString() only where the suffix must be stripped, and never for a package whose inputs include lone surrogates.
-- Evidence: DotNetJsonPrettyPrinter 7cbc419 (GoldenTests.cs); template comment added (C-20260928-7)
-- Scope: skill (templates/nuget/tests/GoldenTests.cs.template)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-118 · 2026-09-28 · actionlint found nothing in shell because shellcheck was missing; with it, a template bug (`actionlint-needs-shellcheck`)
-- Trigger: actionlint and shellcheck are not installed here; with both release zips in the scratchpad (actionlint 1.7.12, shellcheck 0.11.0, passed by absolute path with `-shellcheck`; a PATH entry written as C:/... does not work in Git Bash) actionlint reported SC2034 in templates/nuget verify-published.yml (an unused loop variable), which the earlier NuGet runs had linted without shellcheck (2026-09-28).
-- Hypothesis: L-030 said so for npm; the NuGet template never met shellcheck.
-- Rule: download both zips (`gh release download -R rhysd/actionlint -p '*windows_amd64.zip'`, `gh release download -R koalaman/shellcheck -p '*.zip'`), run `actionlint.exe -shellcheck <abs path>/shellcheck.exe` from the repository root, and log both versions. The template loop now uses `_`.
-- Evidence: DotNetJsonPrettyPrinter 613cc69; templates/nuget/.github/workflows/verify-published.yml (C-20260928-7)
-- Scope: skill (references/nuget.md Phase 4; the template)
-- Status: active · recurrence of L-030 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-119 · 2026-09-28 · A dependency's default can write the OS newline into a recording (`os-newline-through-a-dependency`)
-- Trigger: the first Ubuntu CI run of JsonPrettyPrinter's replay failed one case of 1174: `ToJson` with `JsonSerializerOptions { WriteIndented = true }`, whose System.Text.Json output uses Environment.NewLine; the recording made on Windows holds CRLF. The capture had avoided Environment.NewLine in its own option cases but not inside a dependency (2026-09-28).
-- Hypothesis: a Windows capture replays on Linux only when no answer holds the OS newline, and a dependency's defaults are easy to miss.
-- Rule: before the Phase 0 commit, grep the recordings for CRLF (the ASCII writer shows it as an escape pair) and ask of each case whether the OS chose it; either record it with a token (as RandomNameGeneratorLibrary's {NL}) or, once frozen, add one exactly keyed exception (compare with CRLF read as LF off Windows) with a test that the key exists and holds a CRLF. Run the replay on Linux before calling it green (CI does, so push early).
-- Evidence: CI run 36489418546 (failed), fix on pull request m4bwav/DotNetJsonPrettyPrinter#8
-- Scope: skill (references/nuget.md Phase 0; the capture template)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-120 · 2026-09-28 · The release workflow pushed a package no check had run on (`release-checks-what-it-pushes`)
-- Trigger: the independent review of JsonPrettyPrinter's retrofit (pull request #8) found that the template release.yml packs in its Linux job and pushes that nupkg after approval, while nothing checked its contents or ran the consumers on it (test-windows tested its own build), the "on master" check was ancestry only, and ci.yml cancelled master runs, so a tag on a commit whose ci was cancelled would publish unchecked. It also found that no workflow enforced the untouched golden files (2026-09-28). Its differential: 525,778 comparisons per runtime, 0 differences.
-- Hypothesis: the template was proven by releases that happened to follow a green master; the gate checks who approves, not what is approved.
-- Rule: release.yml requires a successful `ci` check run on the tagged SHA (check-runs API, checks read), runs the content check and the consumers on the artifact it will push (Linux, and Windows with net48 after downloading it); ci.yml cancels in-progress runs only for pull requests and runs `git diff --exit-code <phase-0> -- tests/Golden`. The templates carry all of it.
-- Evidence: DotNetJsonPrettyPrinter 637c6c3 (CI run 36490775529 green); templates/nuget ci.yml and release.yml (C-20260928-7)
-- Scope: skill (templates/nuget)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
 ### L-121 · 2026-09-28 · A wait loop must stop on an empty id or a gh error (`wait-loop-exits`)
@@ -295,30 +87,6 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: DotNetJsonPrettyPrinter ai-docs/log.md (2026-09-28, pull request #8 merged)
 - Scope: skill
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-122 · 2026-09-29 · nuget.org's registration index can lag past the 20-minute wait (`registration-lag-past-20-minutes`)
-- Trigger: JsonPrettyPrinter 3.0.2 was pushed at 03:21Z; the flat container listed it within minutes, but the registration index listed it only at 03:44Z (about 23 minutes), so verify-published (40 tries 30 seconds apart, about 20 minutes) failed on all three OSes a minute before it would have passed, and a package validation baseline of 3.0.2 and a file-based app restoring it both failed with NU1102 (2026-09-29). 3.0.2-beta.1 had indexed within the old limit an hour earlier.
-- Hypothesis: the registration index is updated by a separate catalog pipeline whose delay varies; 25 minutes (L-012) was one observation, not a bound. The agent first reported the lag as over 40 minutes without reading the time; the background job's log showed 03:44Z (a claim corrected the same hour).
-- Rule: verify-published waits up to 60 minutes (120 tries, job timeout 90 minutes; the template carries it); a baseline bump and any restore of the new version wait for the registration index (check it with curl --compressed first); a timed-out verify is rerun, not read as a failed release.
-- Evidence: verify-published run 36516856747 (failed on the index wait), run 36518499591 (green on three OSes after the index listed it); templates/nuget verify-published.yml
-- Scope: skill (templates/nuget, references/nuget.md)
-- Status: active · extends L-012 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
-
-### L-123 · 2026-09-29 · A golden capture must replay against the next major without hand patches (`replayable-capture`)
-- Trigger: wikiwright replays each repository's golden capture against the old version installed today and against the new major for the wiki's Versions and upgrading page (wikiwright L-113 `replay-requesting-capture`). Every replay so far needed hand patches to the copied capture: is-an-image-url 2.0.0 two lines (the bin path `cli.js` hard-coded, a dependency list naming packages 2.0.0 dropped); markdown-plain-link-replacer 2.0.0 the same two plus a proxy agent and a fixture-server change, because 2.0.0's `fetch` reads `HTTP_PROXY` only when Node started with `NODE_USE_ENV_PROXY=1` and the variables set, and tunnels `http:` links with `CONNECT host:80`, which the fixture handed to its TLS server (2026-09-29). With the patches, 1.1.16 today gave 154 of 154 calls and 18 of 18 CLI runs identical, and 2.0.0 replayed all 154.
-- Hypothesis: a capture is written once, for the old version only, so it reaches into that version's layout; the replay against the next major comes later, from another skill, and meets each assumption as a failure.
-- Rule: the template reads the bin from package.json (`binPath()`), looks dependencies up with `dependency()` (answering `none`), and finds package.json from the entry point when an exports map hides it; a network capture routes CONNECT by port and keeps its proxy setup in one place. references/npm.md, "Replaying a capture against the next major", records the patches a fetch-based major needs.
-- Evidence: markdown-plain-link-replacer ai-docs/notes/2026-09-29-wiki-verify.mjs (the golden section) and its output; is-an-image-url ai-docs/notes/2026-09-28-wiki-verify.mjs; the template run against 1.1.16, 2.0.0 and rand-seed 3 on 2026-09-29 (bin `cli.js`, `dist/cli.mjs`, none; missing dependencies `none`)
-- Scope: skill (scripts/golden-capture-npm.template.cjs, references/npm.md)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
-
-### L-124 · 2026-09-29 · A socket guard that reads `args[0].host` lets plain http through (`guard-normalised-args`)
-- Trigger: the markdown-plain-link-replacer wiki's verification script used the capture's guard (wrap `net.Socket.prototype.connect`, throw unless the host is 127.0.0.1). On Node 20.20.2, where `NODE_USE_ENV_PROXY` does nothing, a probe `fetch('http://example.com/')` behind the guard answered 200 from the real site; the same held on Node 24.18.0, while `https.get('https://example.com/')` was refused (2026-09-29).
-- Hypothesis: `net.connect()` and `net.createConnection()` call `socket.connect(normalized)` with the arguments already normalised into one array, `[options, callback]`; `tls.connect()` passes an options object. The guard read `args[0].host` from the array, found nothing, and allowed the connection.
-- Rule: read the options from `Array.isArray(args[0]) ? args[0][0] : args[0]`; test a guard with a host that cannot resolve (`http://guard-test.invalid/`), which must fail with the guard's message. markdown-plain-link-replacer's `test/golden/capture-1.1.16.cjs` (the only capture with this guard) sent every request through its proxy, so the hole did not change its recording, but its guard would not have caught a stray plain http request.
-- Evidence: the fixed guard refused `fetch('http://example.com/')` on Node 20.20.2 and 24.18.0 (`wiki-verify guard: refused a connection to example.com:80`); markdown-plain-link-replacer ai-docs/notes/2026-09-29-wiki-verify.mjs (guard.cjs)
-- Scope: skill (references/npm.md, Phase 0 network captures)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
 ## Archived entries
 
@@ -409,3 +177,32 @@ One line per promoted or merged ID, in order; the full entry (trigger, hypothesi
 - L-087 · "Cannot create ref due to creations being restricted" on a tag push is the admin bypass, not a failure (`tag-bypass-message`) → promoted: C-20260927-16
 - L-088 · `gh attestation verify` prints nothing on success outside a terminal (`attestation-verify-silent`) → promoted: C-20260927-16
 - L-089 · Put a needed working directory in a subshell (`cd-only-in-a-subshell`) → promoted: C-20260927-16
+- L-090 · Pull the skill with git -C; its shell rules are not loaded yet (`pull-without-cd`) → promoted: C-20260928-2
+- L-091 · Backslash-u in prose is decoded too; name code points as U+XXXX (`prose-escapes-decode-too`) → promoted: C-20260928-2
+- L-092 · The public API list includes protected members and class kinds (`api-list-protected-members`) → promoted: C-20260928-2
+- L-093 · Rebuild embedded data from its source with the old tool's logic (`data-provenance-check`) → promoted: C-20260928-3
+- L-094 · Compare the most-downloaded old version with the contract, not only the latest (`diff-the-popular-version`) → promoted: C-20260928-3
+- L-095 · A path token in a recording also needs forward slashes (`portable-path-token`) → promoted: C-20260928-2
+- L-096 · Two survey helpers printed errors as findings (`helpers-say-none-plainly`) → promoted: C-20260928-2
+- L-097 · The everlast lint also reads the C# lazy type as an opinion about people (`lint-reads-lazy`) → promoted: C-20260928-2
+- L-098 · Record the process bitness; run the replay the same way (`record-process-bitness`) → promoted: C-20260928-3
+- L-099 · A ruled change to golden answers goes in a guarded exception file beside the replay (`ruled-exception-file`) → promoted: C-20260928-3
+- L-100 · Adapting templates: C-locale content list, placeholder regex, seven-day cooldown, eol=lf re-checkout (`template-adaptation-traps`) → promoted: C-20260928-3
+- L-101 · Run CI's exact test command locally before pushing (`ci-command-locally`) → promoted: C-20260928-3
+- L-102 · Three known traps repeated in one session (`known-traps-repeated`) → promoted: C-20260928-3
+- L-103 · The package content check died silently on a package without dependencies (`empty-dependency-group`) → promoted: C-20260928-3
+- L-104 · A consumer of the packed package needs source mapping (`consumer-source-mapping`) → promoted: C-20260928-3
+- L-105 · Log only what the maintainer said, quoted (`log-maintainer-quotes`) → promoted: C-20260928-4
+- L-107 · The wiki comes after the release is verified, and it audits the shipped docs (`wiki-after-release`) → promoted: C-20260928-5
+- L-109 · The golden capture feeds the wiki, and cleanup must not switch the wiki off (`golden-capture-feeds-the-wiki`) → promoted: C-20260928-6
+- L-110 · One capture program records every published version (`one-capture-many-versions`) → promoted: C-20260928-7
+- L-113 · The API lister shows init accessors as set (`api-list-init-accessors`) → promoted: C-20260928-7
+- L-114 · The everlast lint reads an MSBuild element in prose as a placeholder (`lint-reads-msbuild-elements`) → promoted: C-20260929-3
+- L-115 · Three known traps again in the first hour (`known-traps-first-hour`) → promoted: C-20260929-3
+- L-117 · The template replay's string comparison throws on a recorded lone surrogate (`raw-text-for-lone-surrogates`) → promoted: C-20260928-7
+- L-118 · actionlint found nothing in shell because shellcheck was missing; with it, a template bug (`actionlint-needs-shellcheck`) → promoted: C-20260928-7
+- L-119 · A dependency's default can write the OS newline into a recording (`os-newline-through-a-dependency`) → promoted: C-20260928-7
+- L-120 · The release workflow pushed a package no check had run on (`release-checks-what-it-pushes`) → promoted: C-20260928-7
+- L-122 · nuget.org's registration index can lag past the 20-minute wait (`registration-lag-past-20-minutes`) → promoted: C-20260929-3
+- L-123 · A golden capture must replay against the next major without hand patches (`replayable-capture`) → promoted: C-20260929-1
+- L-124 · A socket guard that reads `args[0].host` lets plain http through (`guard-normalised-args`) → promoted: C-20260929-2

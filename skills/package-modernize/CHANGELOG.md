@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260929-3 · 2026-09-29 · Second learnings consolidation, L-090 to L-124 (`consolidate-learnings-2`)
+- because: consolidation pass (the session-start audit flagged 26 active entries against consolidate_every 25; LEARNINGS.md was 411 lines against a 200-line budget)
+- files: LEARNINGS.md (Active: 10 entries; index lines for L-090 to L-124), LEARNINGS-ARCHIVE.md (Promoted: full text of the 29 moved entries), SKILL.md (Windows line: escapes in any written text, `--` in any MSBuild comment), references/plan-skeleton.md (the lint note: MSBuild elements in prose), evergreen.json (last_consolidated)
+- 13 entries already marked promoted moved to the archive. 16 still marked active had their rule written into SKILL.md, a reference or a template by a later change and are now marked promoted with that change and place: L-093, L-094, L-101 (C-20260928-3), L-107 (C-20260928-5), L-109 (C-20260928-6), L-110, L-113, L-117, L-118, L-119, L-120 (C-20260928-7), L-123 (C-20260929-1), L-124 (C-20260929-2), and L-122, whose 60-minute wait landed in e4f2be7 without a C- entry (recorded here). Two proven recurrences were finished: L-115 (the fifth slip of the escape and MSBuild-comment traps) now sits in the Windows line, which had carried only the heredoc and cd halves since L-102; L-114 joins L-082 and L-097 in the plan skeleton's lint note. Active: L-013, L-014, L-018, L-034, L-106, L-108, L-111, L-112, L-116, L-121. No merges (no two active entries say the same thing), no renumbering, and no rule's meaning changed.
+
 ### C-20260929-2 · 2026-09-29 · The capture's socket guard reads normalised arguments (`guard-normalised-args`)
 - because: L-124 (found by the markdown-plain-link-replacer wiki run)
 - files: references/npm.md (Phase 0, "A package that looks up links found in its input"), LEARNINGS.md (L-124), evergreen.json (counts)
