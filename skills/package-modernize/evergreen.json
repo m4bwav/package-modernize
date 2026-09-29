@@ -17,7 +17,18 @@
   "last_checked": "2026-09-26",
   "next_due": "2026-10-05",
   "verify_at_use": false,
-  "volatile_claims": [],
+  "volatile_claims": [
+    {
+      "claim": "GitHub bills private repositories' hosted minutes and storage (Free 2,000 min and 500 MB, Pro 3,000 and 1 GB), self-hosted runner minutes are free, and the $0.002-a-minute self-hosted fee announced for 2026-03-01 is still postponed (references/private-repo-ci.md)",
+      "checked": "2026-09-29",
+      "recheck_days": 30.0
+    },
+    {
+      "claim": "npm trusted publishing and provenance accept only GitHub-hosted runners (references/private-repo-ci.md)",
+      "checked": "2026-09-29",
+      "recheck_days": 30.0
+    }
+  ],
   "contradiction": null,
   "events": [
     {
