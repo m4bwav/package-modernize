@@ -124,9 +124,21 @@ async function main() {
     quirks,
   };
 
-  // One case per line keeps the file diffable.
+  // One case per line keeps the file diffable. The file is ASCII: every character outside printable ASCII becomes a JSON escape,
+  // so a lone surrogate or an invisible character cannot change on its way to disk (L-112; seeded-random-utilities'
+  // capture-2.0.0-npm.cjs). The characters are built with String.fromCharCode, so no escape sequence passes through an editor.
+  const tab = String.fromCharCode(9);
+  const newline = String.fromCharCode(10);
+  const backslash = String.fromCharCode(92);
+  const headerText = JSON.stringify(header, undefined, tab).slice(0, -2);
   const lines = cases.map(entry => JSON.stringify(entry));
-  const output = `${JSON.stringify(header, null, '\t').slice(0, -2)},\n\t"cases": [\n\t\t${lines.join(',\n\t\t')}\n\t]\n}\n`;
+  const text = `${headerText},${newline}${tab}"cases": [${newline}${tab}${tab}${lines.join(`,${newline}${tab}${tab}`)}${newline}${tab}]${newline}}${newline}`;
+  let output = '';
+  for (let index = 0; index < text.length; index++) {
+    const code = text.charCodeAt(index);
+    output += code === 9 || code === 10 || (code >= 32 && code <= 126) ? text[index] : `${backslash}u${code.toString(16).padStart(4, '0')}`;
+  }
+
   process.stdout.write(output);
 
   if (proxy) {

@@ -1,6 +1,6 @@
 /*
 TEMPLATE (package-modernize): the package-shape suite. Copy to test/package/shape.test.js, replace {{PACKAGE}} and {{OWNER}}, then edit
-PUBLISHED_FILES, TARBALL_BUDGET and the bare-engine smoke call for the package. Every assertion here guards a promise the plan made:
+scripts/published-files.js (PUBLISHED_FILES, TARBALL_BUDGET) and the bare-engine smoke call for the package. Every assertion here guards a promise the plan made:
 what ships, that the builds are portable, that require() and import see the same API.
 */
 import assert from 'node:assert/strict';
@@ -9,27 +9,13 @@ import {access, readFile} from 'node:fs/promises';
 import {test} from 'node:test';
 import {fileURLToPath} from 'node:url';
 import vm from 'node:vm';
+import {PUBLISHED_FILES, TARBALL_BUDGET} from '../../scripts/published-files.js';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const read = file => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 const packageJson = JSON.parse(await read('package.json'));
 
-// Exactly what `npm pack` may contain. Add dist/cli.mjs for a package with a bin (and keep its map out through `files`).
-const PUBLISHED_FILES = [
-  'CHANGELOG.md',
-  'LICENSE',
-  'README.md',
-  'dist/index.cjs',
-  'dist/index.cjs.map',
-  'dist/index.d.cts',
-  'dist/index.d.mts',
-  'dist/index.mjs',
-  'dist/index.mjs.map',
-  'package.json',
-];
-
-// Set from the first build and written in the plan; the two source maps are usually most of it.
-const TARBALL_BUDGET = 50_000;
+// What `npm pack` may contain, and the size budget: scripts/published-files.js, shared with scripts/check-tarball.mjs.
 
 test('the tarball holds exactly the built files and the docs, and stays under the size budget', async () => {
   // --ignore-scripts: prepack would rebuild dist/ while the other test files are reading it.

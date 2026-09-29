@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copied from the package-modernize skill (scripts/check-golden-untouched.sh, 2026-09-29) so ci.yml can run it; keep the two alike.
 # Prove the golden recording was never edited after it was committed (package-modernize, Phase 2 exit and before every tag).
 # Usage: check-golden-untouched.sh [REPO_DIR] [GOLDEN_DIR]     (defaults: . and test/golden)
 # For every recording file in GOLDEN_DIR at HEAD (*.json, capture*, codec*, fixture-server*), finds the commit that added it and diffs the
