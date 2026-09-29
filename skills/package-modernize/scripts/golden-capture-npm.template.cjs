@@ -25,12 +25,23 @@
 // package.json with binPath() (a rewrite moves it, `cli.js` to `dist/cli.mjs`), look dependencies up with dependency()
 // (the new major drops some), and never reach into the package's files by path. A network capture has more to keep
 // replayable; references/npm.md, "Replaying a capture against the next major".
+//
+// A capture that records the package's requests through its own proxy with TLS takes the whole proxy setup from ONE
+// call, startCaptureProxy() in capture-proxy.cjs (copy it beside this file; L-125 `replayable-proxy-setup`): the socket
+// guard, a stand-in proxy that routes CONNECT by port (443 to the TLS fixture, any other to the plain one), and the proxy
+// variables set before the package loads and before any child starts. That is why main() requires the package only
+// after it. Fill `fixtures` below and the same script records the old version and replays the new major unchanged; on
+// Node 20 a fetch-based major also needs `npm install undici@7` in the scratch project (the report on stderr says so).
 
 const path = require('node:path');
 const fs = require('node:fs');
 const {encode, decode, capture} = require('./codec.cjs');
 
-const library = require('{{PACKAGE}}');
+// TEMPLATE (network captures only): the fixture servers the proxy hands requests to; they need not listen.
+//   fixtures = {plain: http.createServer(handler), secure: https.createServer({key, cert}, handler), ca: 'tls/cert.pem'}
+// The handler sees `http://host/path` for requests sent to the proxy directly and `/path` through CONNECT, so route by
+// new URL(request.url, `http://${request.headers.host}`). Leave it undefined for a package that makes no requests.
+const fixtures = undefined;
 
 // The package's own package.json, found from its entry point when an `exports` map hides `{{PACKAGE}}/package.json`.
 function manifestPath() {
@@ -71,8 +82,8 @@ const dependency = name => {
   }
 };
 
-// The callable under test: the module itself for `module.exports = function`, or a named export.
-const target = typeof library === 'function' ? {[library.name || 'default']: library} : library;
+// The callable under test: the module itself for `module.exports = function`, or a named export (set in main()).
+let target;
 
 function runCase(method, args, calls = 1) {
   const encoded = encode(args);
@@ -92,34 +103,57 @@ const methodCases = [
   // ['methodName', [arg1, arg2], calls],
 ];
 
-const cases = methodCases.map(([method, args, calls]) => runCase(method, args, calls));
-
 // TEMPLATE: quirks worth recording as evidence but not asserting as golden values (behaviour the new major changes on purpose).
 const quirks = {};
 
-const header = {
-  package: `{{PACKAGE}}@${packageVersion}`,
-  // TEMPLATE: the runtime dependencies of the old version; dependency() records 'none' for any the replayed version lacks.
-  dependencies: Object.fromEntries([].map(name => [name, dependency(name)])),
-  node: process.version,
-  captured: new Date().toISOString().slice(0, 10),
-  note: 'Golden outputs of the published {{OLD_VERSION}}; see test/golden/capture-{{OLD_VERSION}}.cjs and codec.cjs for the format.',
-  quirks,
-};
+async function main() {
+  // The proxy first, then the package: nothing may read the proxy variables before they are set.
+  const proxy = fixtures ? await require('./capture-proxy.cjs').startCaptureProxy(fixtures) : undefined;
+  const library = require('{{PACKAGE}}');
+  target = typeof library === 'function' ? {[library.name || 'default']: library} : library;
 
-// One case per line keeps the file diffable. The file is ASCII: every character outside printable ASCII becomes a JSON escape,
-// so a lone surrogate or an invisible character cannot change on its way to disk (L-112; seeded-random-utilities'
-// capture-2.0.0-npm.cjs). The characters are built with String.fromCharCode, so no escape sequence passes through an editor.
-const tab = String.fromCharCode(9);
-const newline = String.fromCharCode(10);
-const backslash = String.fromCharCode(92);
-const headerText = JSON.stringify(header, undefined, tab).slice(0, -2);
-const lines = cases.map(entry => JSON.stringify(entry));
-const text = `${headerText},${newline}${tab}"cases": [${newline}${tab}${tab}${lines.join(`,${newline}${tab}${tab}`)}${newline}${tab}]${newline}}${newline}`;
-let ascii = '';
-for (let index = 0; index < text.length; index++) {
-  const code = text.charCodeAt(index);
-  ascii += code === 9 || code === 10 || (code >= 32 && code <= 126) ? text[index] : `${backslash}u${code.toString(16).padStart(4, '0')}`;
+  const cases = methodCases.map(([method, args, calls]) => runCase(method, args, calls));
+
+  const header = {
+    package: `{{PACKAGE}}@${packageVersion}`,
+    // TEMPLATE: the runtime dependencies of the old version; dependency() records 'none' for any the replayed version lacks.
+    dependencies: Object.fromEntries([].map(name => [name, dependency(name)])),
+    node: process.version,
+    captured: new Date().toISOString().slice(0, 10),
+    note: 'Golden outputs of the published {{OLD_VERSION}}; see test/golden/capture-{{OLD_VERSION}}.cjs and codec.cjs for the format.',
+    quirks,
+  };
+
+  // One case per line keeps the file diffable. The file is ASCII: every character outside printable ASCII becomes a JSON escape,
+  // so a lone surrogate or an invisible character cannot change on its way to disk (L-112; seeded-random-utilities'
+  // capture-2.0.0-npm.cjs). The characters are built with String.fromCharCode, so no escape sequence passes through an editor.
+  const tab = String.fromCharCode(9);
+  const newline = String.fromCharCode(10);
+  const backslash = String.fromCharCode(92);
+  const headerText = JSON.stringify(header, undefined, tab).slice(0, -2);
+  const lines = cases.map(entry => JSON.stringify(entry));
+  const text = `${headerText},${newline}${tab}"cases": [${newline}${tab}${tab}${lines.join(`,${newline}${tab}${tab}`)}${newline}${tab}]${newline}}${newline}`;
+  let output = '';
+  for (let index = 0; index < text.length; index++) {
+    const code = text.charCodeAt(index);
+    output += code === 9 || code === 10 || (code >= 32 && code <= 126) ? text[index] : `${backslash}u${code.toString(16).padStart(4, '0')}`;
+  }
+
+  process.stdout.write(output);
+
+  if (proxy) {
+    // The routes and the guard check belong in the log, not in the golden file.
+    process.stderr.write(proxy.report());
+    if (output.includes(proxy.guardMessage)) {
+      process.stderr.write(`a case hit the socket guard ("${proxy.guardMessage}"): a request went around the proxy\n`);
+      process.exitCode = 1;
+    }
+
+    await proxy.close();
+  }
 }
 
-process.stdout.write(ascii);
+main().catch(error => {
+  process.stderr.write(`${error.stack}\n`);
+  process.exitCode = 1;
+});
