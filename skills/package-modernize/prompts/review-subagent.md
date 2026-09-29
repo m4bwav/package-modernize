@@ -16,7 +16,7 @@ Review for, in this order of importance:
 4. Public type declarations (build with `npm run build` if dist/ is missing; it writes only dist/, which is gitignored) that are wrong or break common old usage beyond what CHANGELOG.md lists: default-import and require() patterns, optional flags forwarded to overloads, interface augmentation, Records and exhaustive switches over unions.
 5. Test gaps that matter: a behaviour the tests would not catch if it changed.
 
-Verify each finding before reporting it (run a small script against the built output if needed; put any scratch file in the scratchpad path above, never in the repo). Report at most 12 findings, most severe first, each as: severity (bug / risk / nit), file:line, one-sentence problem, the concrete input and the wrong result, and a suggested fix. Say explicitly if you found nothing in a category. Keep the whole report under 60 lines.
+Start any long harness with a timeout; stop only processes you started, by PID, never by image name (`taskkill /IM node.exe` also ends other sessions' work). Verify each finding before reporting it (run a small script against the built output if needed; put any scratch file in the scratchpad path above, never in the repo). Report at most 12 findings, most severe first, each as: severity (bug / risk / nit), file:line, one-sentence problem, the concrete input and the wrong result, and a suggested fix. Say explicitly if you found nothing in a category. Keep the whole report under 60 lines.
 ```
 
 Related: builds on [../SKILL.md](../SKILL.md) (Phase 3); see also [kickoff-skeleton.md](kickoff-skeleton.md).

@@ -104,6 +104,30 @@ Standing work specific to NuGet: set `PackageValidationBaselineVersion` to the r
 | Repo tidy | `gh pr list`, hooks, alerts, `security_and_analysis` | No open pull requests, 0 webhooks, 0 alerts, scanning on |
 | Badges and images work | `node scripts/check-readme-images.mjs README.md --registry nuget` on the `PackageReadmeFile` | Exit 0; nuget.org shows every image |
 
+## Retrofit
+
+The NuGet side of [retrofit.md](retrofit.md), from RandomNameGeneratorLibrary 2.2.0 to 2.3.0 and JsonPrettyPrinter 3.0.1 to 3.0.2 (2026-09-28; moved here from retrofit.md on 2026-09-29).
+
+- Gap table items of its own: the public API list with parameter, protected and init-only names (templates/nuget/tests/Golden/ApiList), the package validation baseline, one golden recording per runtime (net48 and net10.0), and the `nuget` environment with its required reviewer.
+- Old versions through the capture (retrofit.md gap audit steps 1 and 7): when most downloads are on an old version, run the capture's deterministic cases that its API allows against it and write every difference into the next changelog. Do it with the capture itself (L-110 `one-capture-many-versions`): a version property on the package reference and `#if` blocks for the oldest API, recordings in `tests/Golden/upgrade/`, a compare script that reports CRLF-only differences apart. JsonPrettyPrinter's showed that its 2.0.0 serializer switch changed about fifteen things the changelog did not name, and that every 1.x version answered alike.
+- Old majors: install the latest version of each old major in a scratch folder and import it once; one that no longer loads is a deprecation recommendation. Load it on every runtime a caller can have: JsonPrettyPrinter 1.x loads on .NET 10, but half its API throws there.
+- A ruled fix: the changed answers go in a separate file beside the replay project (`Exceptions/<new version>.<topic>.<runtime>.json`), not under `tests/Golden`, so `git diff --exit-code <phase-0> -- tests/Golden` stays meaningful. The replay can write the differences on request (an environment variable, never set in CI); the file is then reviewed like code. Check `git diff --exit-code <phase-0> -- tests/Golden` after the fix. For a seeded list, the oracle is the new list indexed by the same `Random` draws; for a data file, the file against the rebuilt hash.
+- A root `Directory.Build.props` from the template sets `IsPackable` false and repeats settings the csproj files already carry; when they do, add only the audit switches (JsonPrettyPrinter) rather than move settings and risk an unpackable library.
+
+### Retrofit traps
+
+- The published old version was recorded in a 64-bit .NET Framework process; the replay ran 32-bit and one OutOfMemoryException message differed. Record the process bitness in the capture's header and run the replay the same way.
+- Adopting `* text=auto eol=lf` in a clone checked out with autocrlf leaves CRLF working files, and `dotnet format` then reports ENDOFLINE everywhere; after committing, `git rm -r --cached . && git reset --hard` rewrites them.
+- The package content check lists files in C-locale order, which depends on the package id (README.md sorts before an id starting with Ra); build the expected list with the same sort.
+- `{{` also matches GitHub Actions expressions; grep for `{{[A-Z_]+}}` and `TEMPLATE` after adapting templates.
+- zizmor 1.30.1 requires a Dependabot cooldown of at least seven days, for every ecosystem.
+- The package content check in ci.yml died without a message on a package with no dependencies: the nuspec's empty groups are self-closing, and a grep with no match ends a step under `-e` and pipefail. Run each new check locally with `bash -e -o pipefail` on the real nupkg, with a right and a wrong expectation (L-103 `empty-dependency-group`).
+- A new test project must carry every extension the workflow's test flags need (`--coverage` needs Microsoft.Testing.Extensions.CodeCoverage), or Microsoft.Testing.Platform exits 5 with "Zero tests ran" (L-101 `ci-command-locally`).
+- xunit.v3 4.x made `CollectionBehavior(DisableTestParallelization = true)` an error (CS0619); a replay in one test class needs no attribute.
+- JsonElement.GetString() throws on .NET Framework for a recorded lone surrogate; with one recording per runtime, compare strings by raw JSON text (L-117).
+- A hidden overload in an older major (JsonPrettyPrinter 2.x kept a constructor taking its old context) makes `new X(null)` ambiguous when the capture compiles against it: cast every null (L-110).
+- The Linux leg is where an OS-dependent answer shows; push early so CI runs the replay on Ubuntu before the review (L-119).
+
 ## Traps (from the runs of 2026-09-25 and TrailerClipper, 2026-09-27)
 
 - A capture project inside the repository inherits `Directory.Build.props`; an IDE restore then writes a `packages.lock.json` into `tests/Golden/Capture/`, and `git add -A` commits it. Gitignore it; the untouched-golden check (`git diff --exit-code <phase-0> -- tests/Golden`) caught it.

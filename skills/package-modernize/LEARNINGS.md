@@ -40,21 +40,13 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-26
 
-### L-106 · 2026-09-28 · check-readme-images.mjs defaults to npm (`readme-images-registry-flag`)
-- Trigger: the 2.3.0 README check ran first without `--registry nuget` and printed "checked for npm"; references/nuget.md has the flag, the agent typed the command from memory (2026-09-28). The rerun with the flag also passed.
-- Hypothesis: the script is shared by both registries and the default hides which allow-list was applied.
-- Rule: copy the command from the registry's reference; for NuGet it is `node scripts/check-readme-images.mjs README.md --registry nuget`, and the output line must say "checked for nuget".
-- Evidence: this run's DotNetRandomNameGenerator log, 2.3.0 entry
-- Scope: skill (references/nuget.md verification table already correct)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
 ### L-108 · 2026-09-28 · Old majors without a golden capture can be run for the upgrade story (`run-old-majors-for-docs`)
 - Trigger: get-title-at-url was modernized before golden captures existed; its wiki run installed 2.0.0 and 1.1.8 in scratch folders and found that 2.0.0 cannot be imported since cheerio 1.0.0 (August 2024), a fact in the plan but in no shipped doc, and that no old version is deprecated on npm although 2.0.0 still gets about 60 downloads a week (2026-09-28).
 - Hypothesis: a broken old major is a deprecation candidate the survey can miss when it reads the changelog instead of installing the version.
 - Rule: the Phase 0 survey (and a retrofit's gap audit) installs the latest version of each old major and imports it once; one that fails is a deprecation recommendation with its message.
 - Evidence: get-title-at-url ai-docs/notes/2026-09-28-github-wiki.md (facts, recommendation); wikiwright L-011 `run-the-old-majors`
 - Scope: skill
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+- Status: active · helpful 2 · harmful 0 · last_confirmed 2026-09-29
 
 ### L-111 · 2026-09-28 · Record the parameter name, the dependency that worded a message, and the time zone (`record-param-and-source`)
 - Trigger: on net48 the first line of an ArgumentNullException message is "Value cannot be null." without the parameter, so a renamed parameter would pass the replay; System.Text.Json's messages on net10.0 come from the runner's runtime, not the package, and can move with a patch; 1.x's JavaScriptSerializer read ISO dates as local time, so its recording held "-06:00 Local" (2026-09-28).
@@ -62,15 +54,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Rule: exception records carry `$param` (ParamName) and `$from` when the throwing method's assembly is a dependency (System.Text.Json, System.Web.Extensions); the header records the time zone and the dependency's version; the plan names "dependency-worded message, compared by type when the dependency's version differs" as the one exception class.
 - Evidence: DotNetJsonPrettyPrinter tests/Golden/Capture/Cases.cs (AddException), Program.cs (header)
 - Scope: skill (references/nuget.md Phase 0, the capture template)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
-
-### L-112 · 2026-09-28 · A recording is ASCII and its inputs use placeholders (`lossless-capture-text`)
-- Trigger: a JSON printer's capture needs lone surrogates, NUL, BOM and backslash escapes as inputs and outputs. The template writer copies non-ASCII characters raw, and a UTF-8 file turns a lone surrogate into U+FFFD without a word; typing the inputs as C# escapes puts backslashes through the editor tools (L-050) (2026-09-28).
-- Hypothesis: the earlier packages had no such text.
-- Rule: the capture's JSON writer escapes every character outside printable ASCII; inputs are verbatim strings with a backtick for a backslash and `{U+XXXX}` for a code unit, expanded by a helper; long outputs are recorded as length, SHA-256 of the UTF-16LE bytes, head and tail.
-- Evidence: DotNetJsonPrettyPrinter tests/Golden/Capture/Json.cs and Cases.cs (J, Text)
-- Scope: skill (capture template)
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+- Status: active · helpful 2 · harmful 0 · last_confirmed 2026-09-29
 
 ### L-116 · 2026-09-28 · Python output redirected on Windows is CRLF (`python-redirect-crlf`)
 - Trigger: `python compare.py a b > report.txt` from Git Bash wrote CRLF reports into a repository with `eol=lf` (2026-09-28).
@@ -86,7 +70,15 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Rule: filter the run by workflow and head (`-w release`, headBranch equal to the tag), exit when the id is empty, bound the loop (`for i in $(seq 1 N)`), and exit on a gh error; scripts/watch-run.sh is the tested form.
 - Evidence: DotNetJsonPrettyPrinter ai-docs/log.md (2026-09-28, pull request #8 merged)
 - Scope: skill
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+- Status: active · helpful 2 · harmful 0 · last_confirmed 2026-09-29
+
+### L-126 · 2026-09-29 · With `npm version`, the tag's release run starts before ci on the same commit ends (`npm-version-tags-before-ci`)
+- Trigger: bringing L-120 to the npm templates: `npm version` makes the version commit and the tag together and `git push --follow-tags` pushes both, so ci.yml and release.yml start on the same commit in the same second, and a plain "ci passed on the tagged commit" check always fails. The NuGet flow tags after a green pull request merge and never meets it (2026-09-29).
+- Hypothesis: the npm ritual predates the check; the fix is either a bounded wait for the check run in release.yml or tagging after green.
+- Rule: npm's release.yml waits for the `ci` check run on the tagged commit (bounded, fails on a missing, red or timed-out check, L-121) before it builds; the alternative is `npm version --no-git-tag-version`, push, wait for green, then tag. To be confirmed by the 2.0.1-beta.1 rehearsal.
+- Evidence: m4bwav/seeded-random-utilities ai-docs/plans/2026-09-29-retrofit-and-2.0.1-release.md (R3)
+- Scope: skill (templates/npm/.github/workflows/release.yml, references/npm.md Phases 5 and 6)
+- Status: active · extends L-120 · helpful 0 · harmful 0 · last_confirmed 2026-09-29
 
 ## Archived entries
 
@@ -206,3 +198,10 @@ One line per promoted or merged ID, in order; the full entry (trigger, hypothesi
 - L-122 · nuget.org's registration index can lag past the 20-minute wait (`registration-lag-past-20-minutes`) → promoted: C-20260929-3
 - L-123 · A golden capture must replay against the next major without hand patches (`replayable-capture`) → promoted: C-20260929-1
 - L-124 · A socket guard that reads `args[0].host` lets plain http through (`guard-normalised-args`) → promoted: C-20260929-2
+- L-106 · check-readme-images.mjs defaults to npm (`readme-images-registry-flag`) → promoted: C-20260929-4
+- L-112 · A recording is ASCII and its inputs use placeholders (`lossless-capture-text`) → promoted: C-20260929-4
+- L-125 · Replay the capture against every old version; a CHANGELOG can hide a change (`every-old-version-replayed`) → promoted: C-20260929-4
+- L-127 · A gate that compares a command's output with `!=` passes when the command is missing (`gate-fails-closed`) → promoted: C-20260929-4
+- L-128 · `npm run lint | tail -2 && git commit` committed six lint errors (`pipe-hides-status`) → promoted: C-20260929-4
+- L-130 · A reviewer stopped its runaway script with `taskkill //F //IM node.exe` (`kill-by-pid-only`) → promoted: C-20260929-4
+- L-129 · Correct an old changelog from the whole package diff, declarations included (`diff-the-whole-package`) → promoted: C-20260929-4
