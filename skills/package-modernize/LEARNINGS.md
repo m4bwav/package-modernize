@@ -120,6 +120,54 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (SKILL.md rule, references/private-repo-ci.md, scripts/add-self-hosted-runner.ps1) and the maintainer's overlay (standing decision)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
+### L-136 · 2026-09-29 · A piped watcher hid its own failure, and swapped arguments cost a minute (`pipe-hid-the-watcher`)
+- Trigger: FizzBuzzPlus Phase 0 ran `bash watch-run.sh 36645300631 m4bwav/FizzBuzzPlus 2>&1 | tail -15`, with the run id first. It printed "failed to determine base repo" twelve times, then "no run of m4bwav/FizzBuzzPlus started since", and the background task reported exit 0, which was tail's (2026-09-29).
+- Hypothesis: L-129 `pipe-hides-status` again, this time in a background call. The script took any first argument as OWNER/REPO and treated a gh error as "no run yet".
+- Rule: never pipe a script whose exit status is the verdict; read the status. watch-run.sh now exits 2 at once unless the first argument has a slash and the second ends in .yml or .yaml.
+- Evidence: m4bwav/FizzBuzzPlus ai-docs/log.md (2026-09-29). The fixed script exits 2 with a usage line for swapped arguments and for a missing workflow file, and exits 0 on run 36645600812.
+- Scope: skill (scripts/watch-run.sh), env:any
+- Status: active · extends L-129 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-137 · 2026-09-29 · Where an arithmetic exception comes from depends on the CPU (`exception-source-depends-on-cpu`)
+- Trigger: FizzBuzzPlus's golden capture records where each exception was thrown (the namespace or assembly of `TargetSite`). On Windows and ubuntu-latest (x64), DivideByZeroException and OverflowException from `long %` came from the library. On macos-latest they came from System.Private.CoreLib, in the same four cases. The header recorded the bitness but not the architecture, so the difference looked like an OS difference (2026-09-29).
+- Hypothesis: macos-latest runs on arm64, where the runtime checks 64-bit division in a CoreLib helper instead of relying on a hardware trap.
+- Rule: the capture header records `RuntimeInformation.ProcessArchitecture`. When exceptions' sources are recorded, the recordings are per runtime, OS and CPU, and a replay on another architecture compares that field only through a named rule.
+- Evidence: m4bwav/FizzBuzzPlus golden-capture runs 36645300631 and 36645600812; tests/Golden/1.0.0.net10.0-macos.json (architecture arm64) against 1.0.0.net10.0-linux.json (x64), commit 2835ec0
+- Scope: skill (references/nuget.md Phase 0, the capture templates)
+- Status: active · extends L-098 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-138 · 2026-09-29 · On .NET, ICU writes a negative number differently in five cultures (`icu-minus-sign`)
+- Trigger: the same 2014 FizzBuzzPlus source, compiled for net48 and for net10.0, wrote different lines for negative numbers under five cultures. `"Current Number: " + n` formats with the current culture. .NET 10 writes U+2212 (sv-SE, nb-NO), U+200E then "-" (he-IL), U+200E U+2212 (fa-IR), or U+061C then "-" (ar-SA); .NET Framework wrote "-" in all five. Linux gave the same answers as Windows (2026-09-29).
+- Hypothesis: .NET 5 moved number formatting to ICU (CLDR) data on every OS. A Framework-era package that formats with the current culture changes its output in the port without any code change, and a capture under invariant and en-US alone never sees it.
+- Rule: golden captures of .NET code include negative numbers under sv-SE, nb-NO, he-IL, fa-IR and ar-SA, beside invariant and en-US, on both runtimes. The plan then chooses, per method, invariant formatting (the Framework's answer) or the current culture.
+- Evidence: m4bwav/FizzBuzzPlus tests/Golden/1.0.0.net48-windows.json against 1.0.0.net10.0-windows.json and -linux.json, group culture; ai-docs/notes/2026-09-29-phase-0-findings.md
+- Scope: skill (references/nuget.md Phase 0)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-139 · 2026-09-29 · A repository that was never published: the frozen source is the reference (`frozen-source-reference`)
+- Trigger: FizzBuzzPlus, the first repository run (never published; a 2014 .NET Framework kata), needed a golden reference where the skill says "install the published old version" (2026-09-29).
+- Hypothesis: for such a repository the last old commit's source is the only contract, and a capture that compiles files the rewrite will change would end up recording the new code.
+- Rule: copy the files the capture needs byte for byte (`git show COMMIT:PATH > tests/Golden/Original/FILE`), let the capture script check `git hash-object` against `git rev-parse COMMIT:PATH` before every run, and mark the folder `-text`. Compile the files unchanged in the capture; rebuild an app from its frozen source in a project of its own and run it as a process. The maintainer's machine gives the Windows recordings; Linux and macOS come from a throwaway workflow on a scratch branch (capture twice, `cmp`, upload, check the artifact's hash against the log). The whole variant is drafted during the run and becomes references/repository.md when the run has proved it.
+- Evidence: m4bwav/FizzBuzzPlus branch v2 (tests/Golden with capture.sh; commits 7c455b9 to 2835ec0), ai-docs/notes/2026-09-29-repository-variant.md
+- Scope: skill (the repository variant)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-140 · 2026-09-29 · With Dependabot alerts off, gh's scope hint makes the survey look broken (`alerts-off-scope-hint`)
+- Trigger: survey-github.sh on FizzBuzzPlus printed "Dependabot alerts are disabled for this repository (HTTP 403)" in the alert sections, with gh's hint "This API operation needs the admin:repo_hook scope". That reads as if the webhooks section had failed, but the hooks call returned `[]` with exit 0 (2026-09-29).
+- Hypothesis: gh adds a scope hint to any 403, whether or not a scope would help.
+- Rule: the survey first probes `repos/OWNER/REPO/vulnerability-alerts` (success when on, 404 when off) and prints OFF plainly; the hint under the alert sections is to be ignored.
+- Evidence: m4bwav/FizzBuzzPlus ai-docs/notes/2026-09-29-survey.txt; the fixed script prints OFF for FizzBuzzPlus, and the probe answers on for TrailerClipperLib, IsImageUrlDotNet and DotNetJsonPrettyPrinter
+- Scope: skill (scripts/survey-github.sh)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-141 · 2026-09-29 · A workflow written outside the templates got its action pins from memory (`pins-from-the-templates`)
+- Trigger: FizzBuzzPlus's throwaway golden-capture workflow was first written with checkout v6.0.2, setup-dotnet v4.3.1 and upload-artifact v4.6.2 and their SHAs typed from memory. setup-dotnet v4 is a node20 action, which stopped running on 2026-09-23. The pins were replaced from the templates before the first commit (2026-09-29).
+- Hypothesis: the templates cover the release workflows, so a one-off workflow gets no template, and recall fills the gap.
+- Rule: every workflow a run writes, one-off or not, copies its `uses:` lines from `templates/*/.github/workflows/` (`grep -h "uses:" templates/nuget/.github/workflows/*.yml | sort -u`); an action the templates lack is looked up and pinned to the SHA of its latest release.
+- Evidence: m4bwav/FizzBuzzPlus ai-docs/log.md (2026-09-29, Phase 0); the golden-capture workflow on the scratch branch golden-capture
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

@@ -9,6 +9,15 @@
 set -u
 REPO="${1:?usage: watch-run.sh OWNER/REPO WORKFLOW_FILE [RUN_ID] [--dispatch KEY=VALUE ...]}"
 WF="${2:?workflow file, for example release.yml}"
+# Swapped or missing arguments used to cost twelve identical gh errors and a minute before "no run" (L-136).
+case "$REPO" in
+  */*) ;;
+  *) echo "watch-run.sh: the first argument must be OWNER/REPO, got '$REPO' (usage: watch-run.sh OWNER/REPO WORKFLOW_FILE [RUN_ID])" >&2; exit 2 ;;
+esac
+case "$WF" in
+  *.yml|*.yaml) ;;
+  *) echo "watch-run.sh: the second argument must be a workflow file such as release.yml, got '$WF'" >&2; exit 2 ;;
+esac
 shift 2
 RUN_ID=""
 DISPATCH=()

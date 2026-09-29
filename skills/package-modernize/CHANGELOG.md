@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260929-8 · 2026-09-29 · FizzBuzzPlus Phase 0: CPU and ICU capture traps, two script fixes, the repository variant's first lessons (`fizzbuzzplus-phase-0`)
+- because: L-136, L-137, L-138, L-139, L-140, L-141
+- files: references/nuget.md (Phase 0: architecture and ICU culture lines), scripts/watch-run.sh (argument checks), scripts/survey-github.sh (Dependabot alerts probe), LEARNINGS.md (L-136 to L-141), evergreen.json (counts)
+- The first run on a repository that was never published (FizzBuzzPlus) reached its plan review. Its Phase 0 found three things worth a reference line: the capture header needs the CPU architecture (arm64 raises arithmetic exceptions from CoreLib); .NET's ICU data changes how five cultures write negative numbers; and gh's scope hint makes a disabled Dependabot look like a failed webhook query. watch-run.sh now refuses swapped arguments instead of retrying gh errors for a minute. The repository variant itself (frozen source as the reference, per-OS recordings from a scratch workflow) is recorded as L-139 and is proposed as references/repository.md when the run ends.
+
 ### C-20260929-7 · 2026-09-29 · Private repositories run their CI on the maintainer's own runner (`private-repo-ci`)
 - because: L-135; user request ("make that part of the modernization skill sets", 2026-09-29)
 - files: SKILL.md (Rules, the private repositories line), references/private-repo-ci.md (new), references/README.md, scripts/add-self-hosted-runner.ps1 (new), scripts/README.md, LEARNINGS.md (L-135)
