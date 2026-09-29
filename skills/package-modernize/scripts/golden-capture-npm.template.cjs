@@ -18,11 +18,58 @@
 // Write the cases as JavaScript values: NaN, -0, Infinity, undefined, new String('x'), new Set([1]) and holes are all fine.
 // codec.cjs stores them in a JSON form that keeps them (a plain JSON round trip turns NaN into null and -0 into 0) and
 // decodes them fresh for every call; results and thrown errors are stored the same way.
+//
+// Replaying it against the next major (the wiki's Versions page, wikiwright L-113): the script loads the package by name,
+// so copy it, codec.cjs and any helper it requires into a scratch project with the NEW version installed and run it
+// there unchanged; the header's `package` line says which version answered. Keep it replayable: take the bin's path from
+// package.json with binPath() (a rewrite moves it, `cli.js` to `dist/cli.mjs`), look dependencies up with dependency()
+// (the new major drops some), and never reach into the package's files by path. A network capture has more to keep
+// replayable; references/npm.md, "Replaying a capture against the next major".
 
+const path = require('node:path');
+const fs = require('node:fs');
 const {encode, decode, capture} = require('./codec.cjs');
 
 const library = require('{{PACKAGE}}');
-const packageVersion = require('{{PACKAGE}}/package.json').version;
+
+// The package's own package.json, found from its entry point when an `exports` map hides `{{PACKAGE}}/package.json`.
+function manifestPath() {
+  try {
+    return require.resolve('{{PACKAGE}}/package.json');
+  } catch {
+    let dir = path.dirname(require.resolve('{{PACKAGE}}'));
+    while (!fs.existsSync(path.join(dir, 'package.json')) || JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8')).name !== '{{PACKAGE}}') {
+      dir = path.dirname(dir);
+    }
+
+    return path.join(dir, 'package.json');
+  }
+}
+
+const manifest = JSON.parse(fs.readFileSync(manifestPath(), 'utf8'));
+const packageVersion = manifest.version;
+
+// The bin as package.json names it (a string, or an object keyed by command), or undefined without one. Spawn it with
+// process.execPath and record stdout, the exit status and the first error line of stderr per case.
+// eslint-disable-next-line no-unused-vars
+function binPath(command) {
+  const {bin} = manifest;
+  if (!bin) {
+    return undefined;
+  }
+
+  const file = typeof bin === 'string' ? bin : bin[command] ?? Object.values(bin)[0];
+  return path.join(path.dirname(manifestPath()), file);
+}
+
+// A runtime dependency's installed version, or 'none' when the installed version of the package does not have it.
+const dependency = name => {
+  try {
+    return require(`${name}/package.json`).version;
+  } catch {
+    return 'none';
+  }
+};
 
 // The callable under test: the module itself for `module.exports = function`, or a named export.
 const target = typeof library === 'function' ? {[library.name || 'default']: library} : library;
@@ -52,8 +99,8 @@ const quirks = {};
 
 const header = {
   package: `{{PACKAGE}}@${packageVersion}`,
-  // TEMPLATE: the versions of the runtime dependencies a fresh install resolved, from their package.json files.
-  dependencies: {},
+  // TEMPLATE: the runtime dependencies of the old version; dependency() records 'none' for any the replayed version lacks.
+  dependencies: Object.fromEntries([].map(name => [name, dependency(name)])),
   node: process.version,
   captured: new Date().toISOString().slice(0, 10),
   note: 'Golden outputs of the published {{OLD_VERSION}}; see test/golden/capture-{{OLD_VERSION}}.cjs and codec.cjs for the format.',

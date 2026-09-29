@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260929-1 · 2026-09-29 · Golden captures replay against the next major without hand patches (`replayable-capture`)
+- because: L-123 (from wikiwright L-113 and the markdown-plain-link-replacer wiki run); user request (wikiwright 0.4.0 kickoff)
+- files: scripts/golden-capture-npm.template.cjs (header note, `manifestPath()`, `binPath()`, `dependency()`, the dependencies line), references/npm.md (new bullet "Replaying a capture against the next major" in Phase 0), scripts/README.md, LEARNINGS.md (L-123), evergreen.json (counts)
+- The template now reads the bin's path from package.json, records `none` for a dependency the replayed version lacks, and finds package.json behind an exports map, so the wiki's replay runs the capture unchanged in a project with the new version installed. The reference records what a proxy-routed network capture needed against a fetch-based major (an undici proxy agent after the variables are set, CONNECT to port 80 served in plain HTTP) and how to compare the replay.
+
 ### C-20260928-7 · 2026-09-28 · The retrofit path's second run: old versions through the capture, a release path that checks what it pushes, the wiki hand-over (`jpp-retrofit`)
 - because: the JsonPrettyPrinter retrofit (3.0.1 to 3.0.2, m4bwav/DotNetJsonPrettyPrinter pull requests #8 and #10; its independent review: 525,778 comparisons per runtime, 0 differences, 9 findings); L-110 to L-121; user request (kickoff: correct references/retrofit.md, make Phase 7 and wikiwright say the same thing)
 - files: SKILL.md (the hand-over paragraph after "Wiki (Phase 7, first)"), references/retrofit.md (gap audit steps 2, 5, 7 to 9, "Templates over an existing layout", traps), references/nuget.md (Traps, dated), templates/nuget (.github/workflows/ci.yml and release.yml, verify-published.yml, tests/GoldenTests.cs.template, tests/Golden/ApiList/Program.cs), templates/README.md, LEARNINGS.md (L-110 to L-121; L-094 confirmed)
