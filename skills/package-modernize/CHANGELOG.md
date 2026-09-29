@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260929-7 · 2026-09-29 · Private repositories run their CI on the maintainer's own runner (`private-repo-ci`)
+- because: L-135; user request ("make that part of the modernization skill sets", 2026-09-29)
+- files: SKILL.md (Rules, the private repositories line), references/private-repo-ci.md (new), references/README.md, scripts/add-self-hosted-runner.ps1 (new), scripts/README.md, LEARNINGS.md (L-135)
+- A repository that is or will be private gets a self-hosted runner on the maintainer's Windows machine from one script, with workflow rules for it, because GitHub bills private repositories' hosted minutes and storage and blocks jobs at the allowance. The script was run against markdavidrogers-web's runner (already registered: it kept the registration, rewrote start.cmd, replaced the logon task and brought the runner back online). The reference records the volatile billing claims and npm's hosted-runner-only trusted publishing.
+
 ### C-20260929-6 · 2026-09-29 · The npm release job builds before publint; watch-run.sh judges a run by its conclusion (`sru-release-fixes`)
 - because: L-132, L-133, L-134; L-127 confirmed (seeded-random-utilities 2.0.1-beta.2 and 2.0.1 released through the new gate, 2026-09-29)
 - files: templates/npm/.github/workflows/release.yml (build job: `npm run build` before `npm run check`), scripts/watch-run.sh (watch until completed, verdict from the conclusion, quoted status), references/npm.md (Phases 5 and 6: rehearse a changed release job in a fresh clone; the EOTP line: the maintainer logs in and runs the 2FA commands), LEARNINGS.md (L-127 confirmed; L-132 to L-134)

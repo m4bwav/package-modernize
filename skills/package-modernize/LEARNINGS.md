@@ -112,6 +112,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (references/npm.md, the line on EOTP) and the maintainer's overlay
 - Status: active · extends L-037 · helpful 0 · harmful 0 · last_confirmed 2026-09-29
 
+### L-135 · 2026-09-29 · A private repository's CI runs on the maintainer's own runner (`private-repo-ci-on-own-runner`)
+- Trigger: on 2026-09-29 GitHub stopped starting hosted jobs in the private m4bwav/markdavidrogers-web ("recent account payments have failed or your spending limit needs to be increased"). About 650 minutes had been used that month, and about 1 GB of artifacts was held against a 500 MB allowance. The maintainer: "I'm not going to start paying github more", and "if a repo is going to be private then builds need to be run locally to avoid payment". A self-hosted runner on his PC ran CI and the preview green the same hour, while hosted jobs stayed blocked.
+- Hypothesis: GitHub bills a private repository's hosted minutes and its artifact and package storage, and blocks at the allowance with no budget; self-hosted minutes are free (checked 2026-09-29; a postponed fee may return). Setting up the runner on Windows had three traps: WSL's bash.exe ahead of Git Bash on the normal PATH; azure/login writing into the user's own az profile; and setup-dotnet installing into Program Files.
+- Rule: in Phase 0, record the repository's visibility. For a private one, run `scripts/add-self-hosted-runner.ps1` and follow references/private-repo-ci.md: `RUNS_ON` with a self-hosted default, setup actions only on hosted runners, `--ignore-scripts`, short-lived artifacts, containers built by the SDK. Keep an npm publish job on a hosted runner, or make the repository public before the release.
+- Evidence: m4bwav/markdavidrogers-web PR #24 (CI run 83 and Preview run 14 green on the runner DESKTOP-7KS2S6E-mdr) and its decisions/2026-09-29-self-hosted-runner.md; GitHub's billing docs and the npm trusted-publishing docs, read 2026-09-29
+- Scope: skill (SKILL.md rule, references/private-repo-ci.md, scripts/add-self-hosted-runner.ps1) and the maintainer's overlay (standing decision)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
