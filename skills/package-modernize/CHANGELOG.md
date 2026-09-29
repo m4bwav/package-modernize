@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260929-3 · 2026-09-29 · A network capture takes its proxy setup from one function (`replayable-proxy-setup`)
+- because: L-125; wikiwright L-116 `by-host-name-proxy` and L-117 `guard-normalised-args`; user request (wikiwright 0.5.0 follow-up)
+- files: scripts/capture-proxy.cjs (new: `startCaptureProxy()` and `--selftest`), scripts/golden-capture-npm.template.cjs (header note, `fixtures`, `main()` calls the setup before requiring the package, guard-message check), references/npm.md (Phase 0: new bullet "One proxy setup for the recording and the replay", last sentences of "Replaying a capture against the next major"), scripts/README.md, templates/README.md, LEARNINGS.md (L-125), evergreen.json (counts)
+- The guard, the stand-in proxy that routes CONNECT by port, the proxy variables and the `fetch` routes for this process and its children now come from one call made before the package loads, so the recording against the old version and the replay against a fetch-based major run the same file. `NO_PROXY` lists the loopback names instead of being empty, because Node 24's own proxy support otherwise rewrote request 2.88's http request line.
+
 ### C-20260929-2 · 2026-09-29 · The capture's socket guard reads normalised arguments (`guard-normalised-args`)
 - because: L-124 (found by the markdown-plain-link-replacer wiki run)
 - files: references/npm.md (Phase 0, "A package that looks up links found in its input"), LEARNINGS.md (L-124), evergreen.json (counts)
