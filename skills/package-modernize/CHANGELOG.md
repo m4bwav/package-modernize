@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260929-2 · 2026-09-29 · The capture's socket guard reads normalised arguments (`guard-normalised-args`)
+- because: L-124 (found by the markdown-plain-link-replacer wiki run)
+- files: references/npm.md (Phase 0, "A package that looks up links found in its input"), LEARNINGS.md (L-124), evergreen.json (counts)
+- The recommended guard read `args[0].host`, which `net.connect()` hands over inside an array, so plain http connections passed it on Node 20 and 24. The reference now reads the options from the array and says how to test a guard safely.
+
 ### C-20260929-1 · 2026-09-29 · Golden captures replay against the next major without hand patches (`replayable-capture`)
 - because: L-123 (from wikiwright L-113 and the markdown-plain-link-replacer wiki run); user request (wikiwright 0.4.0 kickoff)
 - files: scripts/golden-capture-npm.template.cjs (header note, `manifestPath()`, `binPath()`, `dependency()`, the dependencies line), references/npm.md (new bullet "Replaying a capture against the next major" in Phase 0), scripts/README.md, LEARNINGS.md (L-123), evergreen.json (counts)
