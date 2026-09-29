@@ -304,6 +304,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (templates/nuget, references/nuget.md)
 - Status: active · extends L-012 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
+### L-123 · 2026-09-29 · A golden capture must replay against the next major without hand patches (`replayable-capture`)
+- Trigger: wikiwright replays each repository's golden capture against the old version installed today and against the new major for the wiki's Versions and upgrading page (wikiwright L-113 `replay-requesting-capture`). Every replay so far needed hand patches to the copied capture: is-an-image-url 2.0.0 two lines (the bin path `cli.js` hard-coded, a dependency list naming packages 2.0.0 dropped); markdown-plain-link-replacer 2.0.0 the same two plus a proxy agent and a fixture-server change, because 2.0.0's `fetch` reads `HTTP_PROXY` only when Node started with `NODE_USE_ENV_PROXY=1` and the variables set, and tunnels `http:` links with `CONNECT host:80`, which the fixture handed to its TLS server (2026-09-29). With the patches, 1.1.16 today gave 154 of 154 calls and 18 of 18 CLI runs identical, and 2.0.0 replayed all 154.
+- Hypothesis: a capture is written once, for the old version only, so it reaches into that version's layout; the replay against the next major comes later, from another skill, and meets each assumption as a failure.
+- Rule: the template reads the bin from package.json (`binPath()`), looks dependencies up with `dependency()` (answering `none`), and finds package.json from the entry point when an exports map hides it; a network capture routes CONNECT by port and keeps its proxy setup in one place. references/npm.md, "Replaying a capture against the next major", records the patches a fetch-based major needs.
+- Evidence: markdown-plain-link-replacer ai-docs/notes/2026-09-29-wiki-verify.mjs (the golden section) and its output; is-an-image-url ai-docs/notes/2026-09-28-wiki-verify.mjs; the template run against 1.1.16, 2.0.0 and rand-seed 3 on 2026-09-29 (bin `cli.js`, `dist/cli.mjs`, none; missing dependencies `none`)
+- Scope: skill (scripts/golden-capture-npm.template.cjs, references/npm.md)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
