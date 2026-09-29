@@ -37,7 +37,15 @@ fi
 
 echo "run $RUN_ID https://github.com/$REPO/actions/runs/$RUN_ID"
 gh run watch "$RUN_ID" -R "$REPO" --exit-status >/dev/null 2>&1
-status=$?
+# gh run watch has exited non-zero while the run was still in progress (a dispatched verify-published run, 2026-09-29,
+# L-133), so the verdict is the run's conclusion once it is completed; watch again until then, and stop on a gh error.
+for _ in 1 2 3 4 5 6; do
+  state=$(gh run view "$RUN_ID" -R "$REPO" --json status --jq .status 2>/dev/null)
+  [ "$state" = completed ] || [ -z "$state" ] && break
+  gh run watch "$RUN_ID" -R "$REPO" >/dev/null 2>&1 || sleep 20
+done
+conclusion=$(gh run view "$RUN_ID" -R "$REPO" --json conclusion --jq .conclusion 2>/dev/null)
+[ "$conclusion" = success ] && status=0 || status=1
 gh run view "$RUN_ID" -R "$REPO" --json conclusion,jobs \
   --jq '"conclusion: \(.conclusion)", (.jobs[] | "  \(.conclusion // .status)  \(.name)")'
 
@@ -49,11 +57,11 @@ strip() {
     | sed -E 's/\x1b\[[0-9;]*m//g; s/\^\[\[[0-9;]*m//g' \
     | grep -v -E '^\s*$|^##\[(group|endgroup)\]'
 }
-if [ $status -ne 0 ]; then
+if [ "$status" -ne 0 ]; then
   echo "--- failed steps (last 40 lines) ---"
   gh run view "$RUN_ID" -R "$REPO" --log-failed 2>/dev/null | strip | tail -40
 else
   gh run view "$RUN_ID" -R "$REPO" --log 2>/dev/null | strip \
     | grep -E 'staged with id|Staging to|Provenance statement published|Published|/releases/tag/|\+ [@a-z0-9._/-]+@[0-9]' | sort -u
 fi
-exit $status
+exit "$status"
