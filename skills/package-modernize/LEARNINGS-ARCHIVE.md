@@ -845,7 +845,7 @@ Promoted and retired entries from [LEARNINGS.md](LEARNINGS.md), each with the re
 - Rule: in ai-docs, write "the PackageValidationBaselineVersion property set to X", never the element.
 - Evidence: DotNetJsonPrettyPrinter 366b93a
 - Scope: skill (references/plan-skeleton.md lint note)
-- Status: promoted: C-20260929-3 (references/plan-skeleton.md, the lint note; references/retrofit.md gap audit step 8) · extends L-082 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+- Status: promoted: C-20260929-4 (references/plan-skeleton.md, the lint note; references/retrofit.md gap audit step 8) · extends L-082 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
 ### L-115 · 2026-09-28 · Three known traps again in the first hour (`known-traps-first-hour`)
 - Trigger: in the JsonPrettyPrinter retrofit, after reading SKILL.md and LEARNINGS.md: (a) a one-off lookup `cd <records repo>; grep ...` moved the session's working directory (L-089, L-090); (b) the first csproj written had a usage line with the double dash before the program arguments inside an XML comment, MSB4025 (L-102); (c) a Phase 0 note quoted the CHANGELOG's escape for a quote, and the Write tool decoded it into a bare quote (L-091) (2026-09-28).
@@ -853,7 +853,7 @@ Promoted and retired entries from [LEARNINGS.md](LEARNINGS.md), each with the re
 - Rule: never start a shell command with `cd`; never write a usage line in an MSBuild comment (say "then the arguments"); never type an escape sequence in any text a tool writes, code or prose: name it (U+0022) or build it with chr(92). After writing a doc that mentions escapes, grep it for the intended text, not only for chr(92)+"u".
 - Evidence: this session; DotNetJsonPrettyPrinter tests/Golden/ApiList/ApiList.csproj (fixed before commit); ai-docs/notes/2026-09-28-phase-0-gap-audit.md (fixed before commit)
 - Scope: skill (SKILL.md Windows line)
-- Status: promoted: C-20260929-3 (SKILL.md Windows line) · recurrence of L-089, L-102, L-091 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
+- Status: promoted: C-20260929-4 (SKILL.md Windows line) · recurrence of L-089, L-102, L-091 · helpful 0 · harmful 0 · last_confirmed 2026-09-28
 
 ### L-117 · 2026-09-28 · The template replay's string comparison throws on a recorded lone surrogate (`raw-text-for-lone-surrogates`)
 - Trigger: JsonPrettyPrinter's golden replay, adapted from templates/nuget/tests/GoldenTests.cs.template, failed on net48 with InvalidOperationException "Cannot read incomplete UTF-16 JSON text as string with missing low surrogate": JsonElement.GetString() refuses the lone surrogates the capture recorded (2026-09-28).
@@ -893,7 +893,7 @@ Promoted and retired entries from [LEARNINGS.md](LEARNINGS.md), each with the re
 - Rule: verify-published waits up to 60 minutes (120 tries, job timeout 90 minutes; the template carries it); a baseline bump and any restore of the new version wait for the registration index (check it with curl --compressed first); a timed-out verify is rerun, not read as a failed release.
 - Evidence: verify-published run 36516856747 (failed on the index wait), run 36518499591 (green on three OSes after the index listed it); templates/nuget verify-published.yml
 - Scope: skill (templates/nuget, references/nuget.md)
-- Status: promoted: C-20260929-3 (references/nuget.md Traps; templates/nuget verify-published.yml; landed in e4f2be7, status recorded here) · extends L-012 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+- Status: promoted: C-20260929-4 (references/nuget.md Traps; templates/nuget verify-published.yml; landed in e4f2be7, status recorded here) · extends L-012 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
 ### L-123 · 2026-09-29 · A golden capture must replay against the next major without hand patches (`replayable-capture`)
 - Trigger: wikiwright replays each repository's golden capture against the old version installed today and against the new major for the wiki's Versions and upgrading page (wikiwright L-113 `replay-requesting-capture`). Every replay so far needed hand patches to the copied capture: is-an-image-url 2.0.0 two lines (the bin path `cli.js` hard-coded, a dependency list naming packages 2.0.0 dropped); markdown-plain-link-replacer 2.0.0 the same two plus a proxy agent and a fixture-server change, because 2.0.0's `fetch` reads `HTTP_PROXY` only when Node started with `NODE_USE_ENV_PROXY=1` and the variables set, and tunnels `http:` links with `CONNECT host:80`, which the fixture handed to its TLS server (2026-09-29). With the patches, 1.1.16 today gave 154 of 154 calls and 18 of 18 CLI runs identical, and 2.0.0 replayed all 154.
@@ -917,7 +917,7 @@ Promoted and retired entries from [LEARNINGS.md](LEARNINGS.md), each with the re
 - Rule: copy the command from the registry's reference; for NuGet it is `node scripts/check-readme-images.mjs README.md --registry nuget`, and the output line must say "checked for nuget".
 - Evidence: this run's DotNetRandomNameGenerator log, 2.3.0 entry
 - Scope: skill (references/nuget.md verification table already correct)
-- Status: promoted: C-20260929-4 (SKILL.md Badges and images) · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+- Status: promoted: C-20260929-5 (SKILL.md Badges and images) · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
 ### L-112 · 2026-09-28 · A recording is ASCII and its inputs use placeholders (`lossless-capture-text`)
 - Trigger: a JSON printer's capture needs lone surrogates, NUL, BOM and backslash escapes as inputs and outputs. The template writer copies non-ASCII characters raw, and a UTF-8 file turns a lone surrogate into U+FFFD without a word; typing the inputs as C# escapes puts backslashes through the editor tools (L-050) (2026-09-28).
@@ -925,44 +925,44 @@ Promoted and retired entries from [LEARNINGS.md](LEARNINGS.md), each with the re
 - Rule: the capture's JSON writer escapes every character outside printable ASCII; inputs are verbatim strings with a backtick for a backslash and `{U+XXXX}` for a code unit, expanded by a helper; long outputs are recorded as length, SHA-256 of the UTF-16LE bytes, head and tail.
 - Evidence: DotNetJsonPrettyPrinter tests/Golden/Capture/Json.cs and Cases.cs (J, Text)
 - Scope: skill (capture template)
-- Status: promoted: C-20260929-4 (scripts/golden-capture-npm.template.cjs (the ASCII writer)) · helpful 1 · harmful 0 · last_confirmed 2026-09-28
+- Status: promoted: C-20260929-5 (scripts/golden-capture-npm.template.cjs (the ASCII writer)) · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
-### L-125 · 2026-09-29 · Replay the capture against every old version; a CHANGELOG can hide a change (`every-old-version-replayed`)
+### L-126 · 2026-09-29 · Replay the capture against every old version; a CHANGELOG can hide a change (`every-old-version-replayed`)
 - Trigger: seeded-random-utilities' retrofit ran `capture-1.1.4.cjs` against 1.0.0, 1.1.0, 1.1.1, 1.1.2 and 1.1.3 (a loop of five scratch installs, under a minute). All five answered alike and differed from 1.1.4 in 48 of 322 cases: their JavaScript computes the shuffle index with `Math.random()`, so `shuffle` and `generateRandomArrayOfUniqueIntegers` ignore the seed. The CHANGELOG says 1.1.4 is "the same code as 1.1.3, published again", and the wiki repeated it. The popular version was 2.0.0 and the contract 1.1.4, so L-094 and L-110 did not point at these versions (2026-09-29).
 - Hypothesis: the popular-version rule looks where the users are; old patch versions with a handful of downloads can still carry the story the docs got wrong, and a deprecation message needs it.
 - Rule: in Phase 0, run the contract's capture against every published version (npm: one scratch project per version; it takes seconds), group the versions that answer alike, and diff the built code of the groups; every difference goes to the changelog corrections, the wiki's Versions page and the deprecation recommendation.
 - Evidence: m4bwav/seeded-random-utilities ai-docs/notes/2026-09-29-phase-0-gap-audit.md ("Every version, measured with the 1.1.4 capture"); log 2026-09-29
 - Scope: skill (references/retrofit.md gap audit step 5)
-- Status: promoted: C-20260929-4 (references/retrofit.md gap audit step 1) · extends L-094, L-110 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+- Status: promoted: C-20260929-5 (references/retrofit.md gap audit step 1) · extends L-094, L-110 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
-### L-127 · 2026-09-29 · A gate that compares a command's output with `!=` passes when the command is missing (`gate-fails-closed`)
+### L-128 · 2026-09-29 · A gate that compares a command's output with `!=` passes when the command is missing (`gate-fails-closed`)
 - Trigger: the first draft of the npm release.yml ci wait read the check runs with gh, then counted them with `jq` in `[ "$(jq ... <<< "$runs")" != 0 ]`. Run locally with `bash -e -o pipefail` on a commit that had no ci run at all, it printed "ci succeeded": Git Bash has no jq, the substitution printed nothing, and `[ "" != 0 ]` is true. `-e` does not stop on a failed substitution inside a test (2026-09-29).
 - Hypothesis: every runner has jq, so the draft looked safe; the local run with a wrong expectation (L-103) is what exposed that the gate fails open whenever its tool or the API does not answer.
 - Rule: a release gate computes one verdict word with a single command (gh's own `--jq`: success, failed or waiting), treats a failed command as its own state, and switches on exact words with a default branch that stops the job. Test it with a passing commit, a commit with no run, a failed run (another repository's is fine) and a bad repository name.
 - Evidence: m4bwav/seeded-random-utilities .github/workflows/release.yml (the ci wait step); the four local runs logged in its ai-docs/log.md on 2026-09-29
 - Scope: skill (templates/npm release.yml, references/npm.md traps)
-- Status: promoted: C-20260929-4 (templates/npm release.yml (the ci wait); references/npm.md Traps and Retrofit) · extends L-103 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+- Status: promoted: C-20260929-5 (templates/npm release.yml (the ci wait); references/npm.md Traps and Retrofit) · extends L-103 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
-### L-128 · 2026-09-29 · `npm run lint | tail -2 && git commit` committed six lint errors (`pipe-hides-status`)
+### L-129 · 2026-09-29 · `npm run lint | tail -2 && git commit` committed six lint errors (`pipe-hides-status`)
 - Trigger: in the seeded-random-utilities retrofit a chain `(npm run lint | tail -2 && npm test | grep ...) && git add -A && git commit` went through with six xo errors on screen: `tail` succeeded, so the chain went on. L-050 had recorded the same trap with grep on 2026-09-27; the agent had read it an hour before (2026-09-29).
 - Hypothesis: shortening output is a habit applied to every command, and the status it hides is only visible when read.
 - Rule: never commit in the same shell call as a check whose output is piped; run the check with its output to a file, echo its exit status, read it, then commit in a separate call (as the agent did for the rest of the run).
 - Evidence: m4bwav/seeded-random-utilities 2c7d52d (with the errors), 1e12cd5 (the fix), ai-docs/log.md 2026-09-29
 - Scope: skill (SKILL.md Windows and shell line)
-- Status: promoted: C-20260929-4 (SKILL.md Windows line) · recurrence of L-050 · helpful 0 · harmful 1 · last_confirmed 2026-09-29
+- Status: promoted: C-20260929-5 (SKILL.md Windows line) · recurrence of L-050 · helpful 0 · harmful 1 · last_confirmed 2026-09-29
 
-### L-130 · 2026-09-29 · A reviewer stopped its runaway script with `taskkill //F //IM node.exe` (`kill-by-pid-only`)
+### L-131 · 2026-09-29 · A reviewer stopped its runaway script with `taskkill //F //IM node.exe` (`kill-by-pid-only`)
 - Trigger: the seeded-random-utilities review subagent ran `taskkill //F //IM node.exe` once to stop its own harness; that ends every Node process on the machine, and another Claude session was working at the same time (2026-09-29).
 - Hypothesis: the review prompt says read-only for the repository but nothing about processes; a subagent under time pressure reached for the broadest stop.
 - Rule: the review prompt says: start long harnesses with a timeout, and stop only processes you started, by PID; never kill by image name. Tell the maintainer when it happened.
 - Evidence: the review's report, 2026-09-29; prompts/review-subagent.md
 - Scope: skill (prompts/review-subagent.md)
-- Status: promoted: C-20260929-4 (prompts/review-subagent.md) · helpful 0 · harmful 1 · last_confirmed 2026-09-29
+- Status: promoted: C-20260929-5 (prompts/review-subagent.md) · helpful 0 · harmful 1 · last_confirmed 2026-09-29
 
-### L-129 · 2026-09-29 · Correct an old changelog from the whole package diff, declarations included (`diff-the-whole-package`)
+### L-130 · 2026-09-29 · Correct an old changelog from the whole package diff, declarations included (`diff-the-whole-package`)
 - Trigger: the seeded-random-utilities audit diffed only the CommonJS JavaScript of 1.1.3 and 1.1.4, found one changed expression and wrote "the published packages differ in that one expression"; it also kept the old CHANGELOG line that put the `RandomUtilities` interface rename in 1.1.0. The independent review showed 1.1.4 also renamed `ISeededRandomUtilities` (a TypeScript break) and that 1.0.0 to 1.1.3 have byte-identical `dist/`. A second claim, that draws after a shuffle shifted in 1.1.3, was also wrong: its shuffle drew nothing from the seeded generator (2026-09-29).
 - Hypothesis: a finding that explains the behaviour difference feels complete; the declaration files and the unchanged versions were never compared, and a claim about later draws was reasoned, not run.
 - Rule: before correcting a changelog entry, `diff -r` the whole unpacked package between each pair of adjacent versions (JavaScript, declarations, package.json), state every difference, and run any claim about sequences instead of reasoning it.
 - Evidence: m4bwav/seeded-random-utilities pull request #18 review comment (findings 1 and 2), commit 1896ce2
 - Scope: skill (references/retrofit.md gap audit step 1)
-- Status: promoted: C-20260929-4 (references/retrofit.md gap audit step 1) · helpful 0 · harmful 1 · last_confirmed 2026-09-29
+- Status: promoted: C-20260929-5 (references/retrofit.md gap audit step 1) · helpful 0 · harmful 1 · last_confirmed 2026-09-29

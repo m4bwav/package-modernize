@@ -4,7 +4,7 @@ Procedural lessons for [SKILL.md](SKILL.md). Research findings live in [RESEARCH
 
 Write an entry the moment a real signal happens: a user correction, the same error twice, a discovered workaround, an environment fact, a stated preference, a failed test or a failure in use. Check existing entries first, by meaning (`evergreen.py search "<the lesson>" --kinds learnings` finds near-duplicates in every registered unit): add / update / retire / none. Trigger and Hypothesis are required. Promote after three confirmations; retire when harmful > helpful.
 
-The first twelve entries were seeded on 2026-09-25 from the three runs that preceded the skill (get-title-at-url, seeded-random-utilities, the two NuGet libraries); their evidence is those repositories' `ai-docs/` and the playbook the skill was built from. They are promoted into SKILL.md or a reference already, so their status says so. The consolidation pass C-20260928-1 (2026-09-28) merged 13 near-duplicates into their lowest ID, moved every promoted and merged entry to the archive, and left one index line per ID below, so every ID cited elsewhere still resolves. The second pass C-20260929-3 (2026-09-29) moved 29 more promoted entries (L-090 to L-124) to the archive, 16 of them marked promoted there because a later change had already written their rule into SKILL.md, a reference or a template.
+The first twelve entries were seeded on 2026-09-25 from the three runs that preceded the skill (get-title-at-url, seeded-random-utilities, the two NuGet libraries); their evidence is those repositories' `ai-docs/` and the playbook the skill was built from. They are promoted into SKILL.md or a reference already, so their status says so. The consolidation pass C-20260928-1 (2026-09-28) merged 13 near-duplicates into their lowest ID, moved every promoted and merged entry to the archive, and left one index line per ID below, so every ID cited elsewhere still resolves. The second pass C-20260929-4 (2026-09-29) moved 29 more promoted entries (L-090 to L-124) to the archive, 16 of them marked promoted there because a later change had already written their rule into SKILL.md, a reference or a template.
 
 ## Active
 
@@ -72,7 +72,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill
 - Status: active · helpful 2 · harmful 0 · last_confirmed 2026-09-29
 
-### L-126 · 2026-09-29 · With `npm version`, the tag's release run starts before ci on the same commit ends (`npm-version-tags-before-ci`)
+### L-127 · 2026-09-29 · With `npm version`, the tag's release run starts before ci on the same commit ends (`npm-version-tags-before-ci`)
 - Trigger: bringing L-120 to the npm templates: `npm version` makes the version commit and the tag together and `git push --follow-tags` pushes both, so ci.yml and release.yml start on the same commit in the same second, and a plain "ci passed on the tagged commit" check always fails. The NuGet flow tags after a green pull request merge and never meets it (2026-09-29).
 - Hypothesis: the npm ritual predates the check; the fix is either a bounded wait for the check run in release.yml or tagging after green.
 - Rule: npm's release.yml waits for the `ci` check run on the tagged commit (bounded, fails on a missing, red or timed-out check, L-121) before it builds; the alternative is `npm version --no-git-tag-version`, push, wait for green, then tag. To be confirmed by the 2.0.1-beta.1 rehearsal.
@@ -189,19 +189,19 @@ One line per promoted or merged ID, in order; the full entry (trigger, hypothesi
 - L-109 · The golden capture feeds the wiki, and cleanup must not switch the wiki off (`golden-capture-feeds-the-wiki`) → promoted: C-20260928-6
 - L-110 · One capture program records every published version (`one-capture-many-versions`) → promoted: C-20260928-7
 - L-113 · The API lister shows init accessors as set (`api-list-init-accessors`) → promoted: C-20260928-7
-- L-114 · The everlast lint reads an MSBuild element in prose as a placeholder (`lint-reads-msbuild-elements`) → promoted: C-20260929-3
-- L-115 · Three known traps again in the first hour (`known-traps-first-hour`) → promoted: C-20260929-3
+- L-114 · The everlast lint reads an MSBuild element in prose as a placeholder (`lint-reads-msbuild-elements`) → promoted: C-20260929-4
+- L-115 · Three known traps again in the first hour (`known-traps-first-hour`) → promoted: C-20260929-4
 - L-117 · The template replay's string comparison throws on a recorded lone surrogate (`raw-text-for-lone-surrogates`) → promoted: C-20260928-7
 - L-118 · actionlint found nothing in shell because shellcheck was missing; with it, a template bug (`actionlint-needs-shellcheck`) → promoted: C-20260928-7
 - L-119 · A dependency's default can write the OS newline into a recording (`os-newline-through-a-dependency`) → promoted: C-20260928-7
 - L-120 · The release workflow pushed a package no check had run on (`release-checks-what-it-pushes`) → promoted: C-20260928-7
-- L-122 · nuget.org's registration index can lag past the 20-minute wait (`registration-lag-past-20-minutes`) → promoted: C-20260929-3
+- L-122 · nuget.org's registration index can lag past the 20-minute wait (`registration-lag-past-20-minutes`) → promoted: C-20260929-4
 - L-123 · A golden capture must replay against the next major without hand patches (`replayable-capture`) → promoted: C-20260929-1
 - L-124 · A socket guard that reads `args[0].host` lets plain http through (`guard-normalised-args`) → promoted: C-20260929-2
-- L-106 · check-readme-images.mjs defaults to npm (`readme-images-registry-flag`) → promoted: C-20260929-4
-- L-112 · A recording is ASCII and its inputs use placeholders (`lossless-capture-text`) → promoted: C-20260929-4
-- L-125 · Replay the capture against every old version; a CHANGELOG can hide a change (`every-old-version-replayed`) → promoted: C-20260929-4
-- L-127 · A gate that compares a command's output with `!=` passes when the command is missing (`gate-fails-closed`) → promoted: C-20260929-4
-- L-128 · `npm run lint | tail -2 && git commit` committed six lint errors (`pipe-hides-status`) → promoted: C-20260929-4
-- L-130 · A reviewer stopped its runaway script with `taskkill //F //IM node.exe` (`kill-by-pid-only`) → promoted: C-20260929-4
-- L-129 · Correct an old changelog from the whole package diff, declarations included (`diff-the-whole-package`) → promoted: C-20260929-4
+- L-106 · check-readme-images.mjs defaults to npm (`readme-images-registry-flag`) → promoted: C-20260929-5
+- L-112 · A recording is ASCII and its inputs use placeholders (`lossless-capture-text`) → promoted: C-20260929-5
+- L-126 · Replay the capture against every old version; a CHANGELOG can hide a change (`every-old-version-replayed`) → promoted: C-20260929-5
+- L-128 · A gate that compares a command's output with `!=` passes when the command is missing (`gate-fails-closed`) → promoted: C-20260929-5
+- L-129 · `npm run lint | tail -2 && git commit` committed six lint errors (`pipe-hides-status`) → promoted: C-20260929-5
+- L-131 · A reviewer stopped its runaway script with `taskkill //F //IM node.exe` (`kill-by-pid-only`) → promoted: C-20260929-5
+- L-130 · Correct an old changelog from the whole package diff, declarations included (`diff-the-whole-package`) → promoted: C-20260929-5
