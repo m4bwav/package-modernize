@@ -296,11 +296,11 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
-### L-122 · 2026-09-29 · nuget.org's registration index can lag over 40 minutes (`registration-lag-40-minutes`)
-- Trigger: JsonPrettyPrinter 3.0.2 was pushed at 03:21Z; the flat container listed it within minutes, but the registration index still did not list it at 04:05Z, so verify-published (40 tries 30 seconds apart) failed on all three OSes, and a package validation baseline of 3.0.2 and a file-based app restoring it both failed with NU1102 (2026-09-29). 3.0.2-beta.1 had indexed within the old limit an hour earlier.
-- Hypothesis: the registration index is updated by a separate catalog pipeline whose delay varies; 25 minutes (L-012) was one observation, not a bound.
+### L-122 · 2026-09-29 · nuget.org's registration index can lag past the 20-minute wait (`registration-lag-past-20-minutes`)
+- Trigger: JsonPrettyPrinter 3.0.2 was pushed at 03:21Z; the flat container listed it within minutes, but the registration index listed it only at 03:44Z (about 23 minutes), so verify-published (40 tries 30 seconds apart, about 20 minutes) failed on all three OSes a minute before it would have passed, and a package validation baseline of 3.0.2 and a file-based app restoring it both failed with NU1102 (2026-09-29). 3.0.2-beta.1 had indexed within the old limit an hour earlier.
+- Hypothesis: the registration index is updated by a separate catalog pipeline whose delay varies; 25 minutes (L-012) was one observation, not a bound. The agent first reported the lag as over 40 minutes without reading the time; the background job's log showed 03:44Z (a claim corrected the same hour).
 - Rule: verify-published waits up to 60 minutes (120 tries, job timeout 90 minutes; the template carries it); a baseline bump and any restore of the new version wait for the registration index (check it with curl --compressed first); a timed-out verify is rerun, not read as a failed release.
-- Evidence: verify-published run 36516856747 (failed on the index wait), the rerun after the index listed it; templates/nuget verify-published.yml
+- Evidence: verify-published run 36516856747 (failed on the index wait), run 36518499591 (green on three OSes after the index listed it); templates/nuget verify-published.yml
 - Scope: skill (templates/nuget, references/nuget.md)
 - Status: active · extends L-012 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
