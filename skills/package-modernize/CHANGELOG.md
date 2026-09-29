@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260928-7 · 2026-09-28 · The retrofit path's second run: old versions through the capture, a release path that checks what it pushes, the wiki hand-over (`jpp-retrofit`)
+- because: the JsonPrettyPrinter retrofit (3.0.1 to 3.0.2, m4bwav/DotNetJsonPrettyPrinter pull requests #8 and #10; its independent review: 525,778 comparisons per runtime, 0 differences, 9 findings); L-110 to L-121; user request (kickoff: correct references/retrofit.md, make Phase 7 and wikiwright say the same thing)
+- files: SKILL.md (the hand-over paragraph after "Wiki (Phase 7, first)"), references/retrofit.md (gap audit steps 2, 5, 7 to 9, "Templates over an existing layout", traps), references/nuget.md (Traps, dated), templates/nuget (.github/workflows/ci.yml and release.yml, verify-published.yml, tests/GoldenTests.cs.template, tests/Golden/ApiList/Program.cs), templates/README.md, LEARNINGS.md (L-110 to L-121; L-094 confirmed)
+- release.yml now requires ci on the tagged commit and runs the content check and consumers on the package it pushes; ci.yml keeps master runs and checks the golden files; the capture records old versions for the upgrade story; the lister marks init accessors; the replay notes lone surrogates; retrofit.md says what its second run found missing; SKILL.md and wikiwright's SKILL.md carry the same hand-over paragraph.
+
 ### C-20260928-6 · 2026-09-28 · Phase 6 leaves the wiki on; the golden capture feeds the wiki (`golden-capture-wiki`)
 - because: L-109 `golden-capture-feeds-the-wiki`; wikiwright 0.2.0's second run (seeded-random-utilities)
 - files: references/npm.md (Phase 6 cleanup, `gh repo edit`), SKILL.md ("Wiki (Phase 7, first)"), references/retrofit.md (phases table row 7), LEARNINGS.md (L-109)

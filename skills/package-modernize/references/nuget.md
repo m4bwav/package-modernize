@@ -135,6 +135,11 @@ Standing work specific to NuGet: set `PackageValidationBaselineVersion` to the r
 - A Latin-1 data file decoded as UTF-8 put U+FFFD into 49 names; resource-integrity tests catch that class of problem.
 - xunit.v3 4.x runs only on Microsoft.Testing.Platform.
 - The Visual Studio `.gitignore` template ignores `ai-docs/log/`; add `!ai-docs/log/` or use everlast's `log.md`.
+- System.Text.Json with `WriteIndented` writes Environment.NewLine, so a Windows recording of it fails on Linux; look for CRLF in the recordings before the Phase 0 commit (L-119 `os-newline-through-a-dependency`, 2026-09-28).
+- On .NET Framework, System.Text.Json (netstandard2.0) writes 0.1 as 0.10000000000000001 and -0.0 as 0, and throws for 1e400 where .NET 10 returns Infinity: a serializer helper's answers differ by runtime, so record both (JsonPrettyPrinter, 2026-09-28).
+- JsonElement.GetString() throws on .NET Framework for a lone surrogate; replays compare raw JSON text (L-117, 2026-09-28).
+- net48 exception messages drop the parameter name from the first line; record ParamName separately (L-111, 2026-09-28).
+- actionlint and shellcheck are not on this machine and not on npm: download both release zips and pass shellcheck by absolute path (L-118, 2026-09-28).
 
 ## What this reference still lacks
 

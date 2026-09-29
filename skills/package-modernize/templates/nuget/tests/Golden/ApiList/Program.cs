@@ -50,13 +50,17 @@ public static class Program
 
             foreach (var p in t.GetProperties(Declared))
             {
-                var acc = (p.GetGetMethod() != null ? "get; " : "") + (p.GetSetMethod() != null ? "set; " : "");
-                lines.Add(Name(t) + " property " + Name(p.PropertyType) + " " + p.Name + " { " + acc + "}");
+                // An init-only setter is not a set (L-113 `api-list-init-accessors`): the modreq tells them apart.
+                var setter = p.GetSetMethod();
+                var init = setter != null && setter.ReturnParameter.GetRequiredCustomModifiers().Any(x => x.FullName == "System.Runtime.CompilerServices.IsExternalInit");
+                var acc = (p.GetGetMethod() != null ? "get; " : "") + (setter == null ? "" : init ? "init; " : "set; ");
+                var isStatic = (p.GetGetMethod() ?? setter)!.IsStatic;
+                lines.Add(Name(t) + " property " + (isStatic ? "static " : "") + Name(p.PropertyType) + " " + p.Name + " { " + acc + "}");
             }
 
             foreach (var f in t.GetFields(Declared | BindingFlags.NonPublic).Where(f => f.IsPublic || f.IsFamily || f.IsFamilyOrAssembly))
             {
-                lines.Add(Name(t) + " field " + (f.IsPublic ? "" : "protected ") + (f.IsStatic ? "static " : "") + (f.IsInitOnly ? "readonly " : "") + Name(f.FieldType) + " " + f.Name);
+                lines.Add(Name(t) + " field " + (f.IsPublic ? "" : "protected ") + (f.IsStatic ? "static " : "") + (f.IsInitOnly ? "readonly " : "") + (f.IsLiteral ? "const " : "") + Name(f.FieldType) + " " + f.Name);
             }
         }
 
