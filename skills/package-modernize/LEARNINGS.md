@@ -75,10 +75,10 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 ### L-127 · 2026-09-29 · With `npm version`, the tag's release run starts before ci on the same commit ends (`npm-version-tags-before-ci`)
 - Trigger: bringing L-120 to the npm templates: `npm version` makes the version commit and the tag together and `git push --follow-tags` pushes both, so ci.yml and release.yml start on the same commit in the same second, and a plain "ci passed on the tagged commit" check always fails. The NuGet flow tags after a green pull request merge and never meets it (2026-09-29).
 - Hypothesis: the npm ritual predates the check; the fix is either a bounded wait for the check run in release.yml or tagging after green.
-- Rule: npm's release.yml waits for the `ci` check run on the tagged commit (bounded, fails on a missing, red or timed-out check, L-121) before it builds; the alternative is `npm version --no-git-tag-version`, push, wait for green, then tag. To be confirmed by the 2.0.1-beta.1 rehearsal.
-- Evidence: m4bwav/seeded-random-utilities ai-docs/plans/2026-09-29-retrofit-and-2.0.1-release.md (R3)
+- Rule: npm's release.yml waits for the `ci` check run on the tagged commit (bounded, fails on a missing, red or timed-out check, L-121) before it builds; the alternative is `npm version --no-git-tag-version`, push, wait for green, then tag. Confirmed by the 2.0.1-beta.2 and 2.0.1 release runs (the beta.1 run failed later, for L-132); ready to promote at the next consolidation.
+- Evidence: m4bwav/seeded-random-utilities ai-docs/plans/2026-09-29-retrofit-and-2.0.1-release.md (R3); release runs 36615374214 (2.0.1-beta.2) and 36619659747 (2.0.1), each waiting for ci's push run on its tagged commit and then green (2026-09-29)
 - Scope: skill (templates/npm/.github/workflows/release.yml, references/npm.md Phases 5 and 6)
-- Status: active · extends L-120 · helpful 0 · harmful 0 · last_confirmed 2026-09-29
+- Status: active · extends L-120 · helpful 2 · harmful 0 · last_confirmed 2026-09-29
 
 ### L-125 · 2026-09-29 · A capture's proxy setup is one function that the recording and the replay both call (`replayable-proxy-setup`)
 - Trigger: markdown-plain-link-replacer's 2026-09-29 replay of the 1.1.16 capture against 2.0.0 needed four patched copies; two of them were proxy setup spread through the capture: undici's agent installed after the capture set the variables (it set them only once its server listened, too late for `NODE_USE_ENV_PROXY`, which Node reads at startup), and a fixture `connect` handler that sent port 80 to the plain server. wikiwright met the same pattern twice the same day: L-116 `by-host-name-proxy` (a proxy that routes by port, variables set before each child starts) and L-117 `guard-normalised-args` (the guard that let plain http out). Writing the setup as one function and running it with request 2.88 and a real TLS fixture found one more thing: with `NO_PROXY` empty and `NODE_USE_ENV_PROXY=1` (children on Node 24) or `http.setGlobalProxyFromEnv` (this process), Node 24.18.0 also proxied request 2.88's own connection to the proxy, and its http request line arrived as `http://host:<proxy port>/path` instead of `http://host/path`.
@@ -87,6 +87,30 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Evidence: wikiwright L-116 and L-117 and its templates/npm/host-fixture.mjs; markdown-plain-link-replacer's 2026-09-29 replay (wikiwright references/npm.md, "Golden captures that record through a proxy with TLS"); `node capture-proxy.cjs --selftest` 23 of 23 on Node 24.18.0 (undici 7 and none) and 20.20.2 with undici, 21 of 21 plus two skips on 20.20.2 without undici; the same self-test with `NO_PROXY` empty failed its two absolute-form checks on Node 24.18.0 (`plain GET http://selftest.invalid:49188/abs-self`); request 2.88.2 and `fetch` through the function with a real TLS fixture (2026-09-29)
 - Scope: skill (scripts/capture-proxy.cjs, scripts/golden-capture-npm.template.cjs, references/npm.md)
 - Status: active · extends L-123 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-132 · 2026-09-29 · publint reads dist/ from disk, so a job that checks before it builds fails, and a local preflight cannot see it (`build-before-publint`)
+- Trigger: seeded-random-utilities' 2.0.1-beta.1 release run (36614300884) failed in `npm run check`: publint reported that `dist/index.mjs`, `index.cjs` and `index.d.cts` do not exist. C-20260929-5 had moved check ahead of `npm test` (so the tested dist/ is the one packed), and `npm test` was the job's only build. `preflight-tag-npm.sh` had printed READY, because the clone's dist/ was already on disk. Nothing was staged; the tag v2.0.1-beta.1 stays with no npm version, and the rehearsal went out as 2.0.1-beta.2 after the fix (pull request #19). The template had the same order (2026-09-29).
+- Hypothesis: every step of a release job is checked locally in the working tree, never in the job's own order from a fresh checkout, so a reorder that only breaks on a clean tree passes every local check. ci.yml builds before check, which is why the pull request was green.
+- Rule: the npm release.yml's build job runs `npm run build` before `npm run check` (template fixed). After any change to a release job's steps, rehearse them before the tag: `git clone` the branch into scratch, `npm ci --ignore-scripts`, then the job's `run:` lines in order. One failing command there costs a minute; a failing release run costs a prerelease number.
+- Evidence: m4bwav/seeded-random-utilities release runs 36614300884 (failure) and 36615374214 (success), pull request #19 (3f0a841); in a clean clone `npm run check` failed without the build and passed with it, and `npm test` passed 2255 of 2255 (2026-09-29)
+- Scope: skill (templates/npm/.github/workflows/release.yml, references/npm.md Phases 5 and 6)
+- Status: active · extends L-120 · helpful 0 · harmful 0 · last_confirmed 2026-09-29
+
+### L-133 · 2026-09-29 · `gh run watch --exit-status` can exit non-zero before the run ends (`watch-exits-early`)
+- Trigger: `verify-registry-npm.sh seeded-random-utilities 2.0.1-beta.2 m4bwav/seeded-random-utilities` dispatched verify-published and printed `conclusion:` empty, every job with no result, and NOT VERIFIED; the same run (36618478939) finished green in all 15 jobs a few minutes later (2026-09-29).
+- Hypothesis: watch-run.sh took `gh run watch`'s exit status as the verdict; watching a run dispatched seconds earlier, gh returned non-zero while jobs were still queued. Its output was thrown away, so the cause is not recorded.
+- Rule: a run's verdict is its `conclusion` once `status` is `completed`, never the watcher's exit code. watch-run.sh now watches again (up to six times) until the run is completed, stops on a gh error, and exits 0 only for `success`. Tested on a green run (exit 0), a failed run (exit 1) and a run id that does not exist (exit 1).
+- Evidence: verify-published run 36618478939 of m4bwav/seeded-random-utilities; the fixed script against runs 36621026089 and 36614300884 and run id 1 (2026-09-29)
+- Scope: skill (scripts/watch-run.sh, and through it verify-registry-npm.sh)
+- Status: active · extends L-121 · helpful 0 · harmful 0 · last_confirmed 2026-09-29
+
+### L-134 · 2026-09-29 · An `npm login` from days earlier is gone, and the agent's shell cannot log in (`npm-login-expires`)
+- Trigger: the overlay said the maintainer stays logged in since 2026-09-26 and the agent may run `npm deprecate` and `npm dist-tag`. On 2026-09-29 `npm whoami` answered 401. `npm login --auth-type=web`, started in the background from the agent's shell, printed a login URL, then fell back to a `Username:` prompt and exited 1, so the URL it had printed was dead. After the maintainer logged in in his own terminal, the agent's `npm deprecate` still failed with EOTP and the auth URL masked as `https://www.npmjs.com/auth/cli/***`, as L-037 already said (2026-09-29).
+- Hypothesis: npm's CLI logins are short-lived session tokens, not the long-lived tokens of before, so a login does not last from one run to the next (not confirmed against npm's documentation in this run). The overlay's line predated L-037 or ignored it.
+- Rule: plan the 2FA-gated npm commands as the maintainer's, in his terminal, from the start: give him `npm login` (when `npm whoami` fails), then the exact `npm deprecate` and `npm dist-tag` commands together, and read the results back. Never start `npm login` from the agent's shell. The overlay line was corrected the same day.
+- Evidence: m4bwav/seeded-random-utilities ai-docs/log.md (2026-09-29); npm 11.16.0 on Windows 11
+- Scope: skill (references/npm.md, the line on EOTP) and the maintainer's overlay
+- Status: active · extends L-037 · helpful 0 · harmful 0 · last_confirmed 2026-09-29
 
 ## Archived entries
 
