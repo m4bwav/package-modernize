@@ -260,7 +260,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Trigger: JsonPrettyPrinter's golden replay, adapted from templates/nuget/tests/GoldenTests.cs.template, failed on net48 with InvalidOperationException "Cannot read incomplete UTF-16 JSON text as string with missing low surrogate": JsonElement.GetString() refuses the lone surrogates the capture recorded (2026-09-28).
 - Hypothesis: earlier packages recorded no invalid UTF-16; the template compares strings through GetString() so it can strip the .NET parameter suffix.
 - Rule: with one recording per runtime, compare strings by raw JSON text (both sides come from the capture's writer, which escapes every character outside ASCII); keep GetString() only where the suffix must be stripped, and never for a package whose inputs include lone surrogates.
-- Evidence: DotNetJsonPrettyPrinter 7cbc419 (GoldenTests.cs); template comment added (C-20260928-6)
+- Evidence: DotNetJsonPrettyPrinter 7cbc419 (GoldenTests.cs); template comment added (C-20260928-7)
 - Scope: skill (templates/nuget/tests/GoldenTests.cs.template)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
@@ -268,7 +268,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Trigger: actionlint and shellcheck are not installed here; with both release zips in the scratchpad (actionlint 1.7.12, shellcheck 0.11.0, passed by absolute path with `-shellcheck`; a PATH entry written as C:/... does not work in Git Bash) actionlint reported SC2034 in templates/nuget verify-published.yml (an unused loop variable), which the earlier NuGet runs had linted without shellcheck (2026-09-28).
 - Hypothesis: L-030 said so for npm; the NuGet template never met shellcheck.
 - Rule: download both zips (`gh release download -R rhysd/actionlint -p '*windows_amd64.zip'`, `gh release download -R koalaman/shellcheck -p '*.zip'`), run `actionlint.exe -shellcheck <abs path>/shellcheck.exe` from the repository root, and log both versions. The template loop now uses `_`.
-- Evidence: DotNetJsonPrettyPrinter 613cc69; templates/nuget/.github/workflows/verify-published.yml (C-20260928-6)
+- Evidence: DotNetJsonPrettyPrinter 613cc69; templates/nuget/.github/workflows/verify-published.yml (C-20260928-7)
 - Scope: skill (references/nuget.md Phase 4; the template)
 - Status: active · recurrence of L-030 · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
@@ -284,7 +284,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Trigger: the independent review of JsonPrettyPrinter's retrofit (pull request #8) found that the template release.yml packs in its Linux job and pushes that nupkg after approval, while nothing checked its contents or ran the consumers on it (test-windows tested its own build), the "on master" check was ancestry only, and ci.yml cancelled master runs, so a tag on a commit whose ci was cancelled would publish unchecked. It also found that no workflow enforced the untouched golden files (2026-09-28). Its differential: 525,778 comparisons per runtime, 0 differences.
 - Hypothesis: the template was proven by releases that happened to follow a green master; the gate checks who approves, not what is approved.
 - Rule: release.yml requires a successful `ci` check run on the tagged SHA (check-runs API, checks read), runs the content check and the consumers on the artifact it will push (Linux, and Windows with net48 after downloading it); ci.yml cancels in-progress runs only for pull requests and runs `git diff --exit-code <phase-0> -- tests/Golden`. The templates carry all of it.
-- Evidence: DotNetJsonPrettyPrinter 637c6c3 (CI run 36490775529 green); templates/nuget ci.yml and release.yml (C-20260928-6)
+- Evidence: DotNetJsonPrettyPrinter 637c6c3 (CI run 36490775529 green); templates/nuget ci.yml and release.yml (C-20260928-7)
 - Scope: skill (templates/nuget)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-28
 
