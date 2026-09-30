@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260929-9 · 2026-09-29 · A .NET console app detects a closed pipe itself (`console-stream-swallows-epipe`)
+- because: L-142
+- files: references/nuget.md (Phase 2, the console app line), LEARNINGS.md (L-142), evergreen.json (counts)
+- FizzBuzzPlus's independent review found a program that ran forever after `| head` closed the pipe, on Linux and, checked afterwards, on Windows as well. The reference now says how a console app or dotnet tool writes its output and which exit codes it gives for a broken pipe and for other write failures, and asks for process-level tests.
+
 ### C-20260929-8 · 2026-09-29 · FizzBuzzPlus Phase 0: CPU and ICU capture traps, two script fixes, the repository variant's first lessons (`fizzbuzzplus-phase-0`)
 - because: L-136, L-137, L-138, L-139, L-140, L-141
 - files: references/nuget.md (Phase 0: architecture and ICU culture lines), scripts/watch-run.sh (argument checks), scripts/survey-github.sh (Dependabot alerts probe), LEARNINGS.md (L-136 to L-141), evergreen.json (counts)
