@@ -184,6 +184,30 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (scripts/golden-capture-nuget.template.cs, references/nuget.md)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
+### L-144 · 2026-09-29 · A Release made with the GITHUB_TOKEN starts no `on: release` workflow (`token-release-fires-nothing`)
+- Trigger: FizzBuzzPlus's release.yml creates the GitHub Release with `gh release create` and the job's GITHUB_TOKEN, and its verify-release.yml (written for the repository variant, outside the templates) listened for `release: published`. Read before the first tag: it would never have run (2026-09-29).
+- Hypothesis: GitHub starts no workflow from events caused by the GITHUB_TOKEN, apart from `workflow_dispatch` and `repository_dispatch`, so that workflows cannot trigger each other in loops. The npm and NuGet templates dispatch their verify workflow by hand (verify-registry-npm.sh through watch-run.sh), so they never met it.
+- Rule: a verify workflow that must follow a Release made by a workflow is started by that workflow: the gated job gets `actions: write` and ends with `gh workflow run verify-release.yml --ref master -f tag="$TAG"`. Keep `release: published` only for Releases made by hand. Never rely on an event another workflow causes through the GITHUB_TOKEN.
+- Evidence: m4bwav/FizzBuzzPlus pull request #2 (0408825; the release.yml comment and step); GitHub docs "Triggering a workflow from a workflow"
+- Scope: skill (the repository variant's release, references/repository.md when it lands)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-145 · 2026-09-29 · Workflow lint cost six calls and once checked nothing (`one-call-workflow-lint`)
+- Trigger: FizzBuzzPlus Phase 5: after a workflow edit, actionlint and shellcheck were not on PATH, so the session searched old scratchpads for copies, then ran actionlint, check-workflow-shell.py and zizmor separately. check-workflow-shell.py was given workflow file paths, took the first as the repository directory, found no workflows and exited 0: a clean result that checked nothing (2026-09-29).
+- Hypothesis: tools downloaded into a session scratchpad are lost to the next session, and a check that accepts any argument and reports only failures cannot tell "clean" from "saw nothing".
+- Rule: run `scripts/lint-workflows.sh REPO` after every workflow edit. It keeps actionlint and shellcheck in `~/.cache/package-modernize/tools` (downloaded once from pinned releases, sha256 checked), runs all three checks, and prints how many run blocks it checked. check-workflow-shell.py now refuses a path without `.github/workflows` (exit 2).
+- Evidence: FizzBuzzPlus `ai-docs/log.md` (Phase 5); the script's clean run on FizzBuzzPlus (10 run blocks) and its red run on a planted `[ "$X" = "y" ; then`, where actionlint and check-workflow-shell.py both failed
+- Scope: skill (scripts/lint-workflows.sh, scripts/check-workflow-shell.py, SKILL.md Phase 2, references/npm.md and nuget.md)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-146 · 2026-09-29 · A .NET version bump rewrites the lock files of referencing projects (`version-bump-rewrites-lock-files`)
+- Trigger: FizzBuzzPlus 2.0.0 to 2.0.0-beta.1 in Directory.Build.props: the two test projects' packages.lock.json record the library reference as `[2.0.0, )`, so CI's `dotnet restore --locked-mode` would fail with NU1004. `dotnet restore --force-evaluate` fixed them and also rewrote three other lock files with CRLF only. Finding and sorting that took four calls (2026-09-29).
+- Hypothesis: NuGet lock files include project references with the referenced project's version, so every version change is a lock file change in each project that references a versioned one.
+- Rule: set the version with `scripts/bump-version-dotnet.sh VERSION REPO`: it edits `<Version>`, regenerates and filters the lock files, proves a locked restore and checks the CHANGELOG heading, in one call.
+- Evidence: FizzBuzzPlus pull request #2 (two lock files changed); the script on a scratch clone at 7c567fd reproduced the same two files, and refused an undated heading for 2.0.0 (exit 1)
+- Scope: skill (scripts/bump-version-dotnet.sh, references/nuget.md Phases 5 and 6)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

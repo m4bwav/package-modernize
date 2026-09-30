@@ -20,6 +20,10 @@ import sys
 import tempfile
 
 root = sys.argv[1] if len(sys.argv) > 1 else "."
+# Given workflow files instead of the repository, it used to find nothing and exit 0 (FizzBuzzPlus, 2026-09-29).
+if len(sys.argv) > 2 or not os.path.isdir(os.path.join(root, ".github", "workflows")):
+    print(f"usage: python check-workflow-shell.py [REPO_DIR]; no .github/workflows under {root!r}")
+    sys.exit(2)
 
 
 def find_checker():
