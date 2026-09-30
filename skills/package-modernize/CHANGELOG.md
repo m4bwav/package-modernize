@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260929-11 · 2026-09-29 · One-call workflow lint and .NET version bump; a Release made by a workflow dispatches its verify (`token-savers-fizzbuzzplus-phase-5`)
+- because: L-144, L-145, L-146; user request ("Update the skills and docs with processes and scripts that will net-save tokens", 2026-09-29)
+- files: scripts/lint-workflows.sh (new), scripts/bump-version-dotnet.sh (new), scripts/check-workflow-shell.py (refuses a path without workflows), scripts/README.md, SKILL.md (Phase 2 exit criteria), references/npm.md and references/nuget.md (the actionlint lines; Phases 5 and 6 version line), LEARNINGS.md (L-144 to L-146), evergreen.json (counts)
+- FizzBuzzPlus Phase 5 spent about ten calls on two chores every run repeats: linting workflows (tools hunted in old scratchpads, three separate checks, one of which silently checked nothing) and bumping a .NET version (lock files). Each is now one script call, tested red and green. L-144 records that a Release created with the GITHUB_TOKEN never fires `on: release`, for the repository variant.
+
 ### C-20260929-10 · 2026-09-29 · Hand-over text: NuGet golden recordings are per runtime and OS from a capture project (`handover-nuget-golden`)
 - because: wikiwright's seventh run (IsImageUrlDotNet's wiki, its report); L-143
 - files: SKILL.md (the hand-over paragraph, the same text as wikiwright's); LEARNINGS.md (L-143); evergreen.json (counts)
