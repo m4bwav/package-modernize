@@ -168,6 +168,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
+### L-142 · 2026-09-29 · .NET's console stream swallows a closed pipe on Windows and Unix (`console-stream-swallows-epipe`)
+- Trigger: FizzBuzzPlus 2.0.0's program wrote through `Console.OpenStandardOutput()` and treated IOException as "the reader left". The Phase 3 review found that on Linux `fizzbuzzplus 1 9223372036854775807 | head -1` never ends: the Unix console stream ignores EPIPE. The review said Windows was fine, but the same command on Windows also ran until `timeout 20`, because the Windows console stream ignores ERROR_NO_DATA and ERROR_BROKEN_PIPE too. The catch-all also turned a full disk (`> /dev/full`) into exit 0 (2026-09-29).
+- Hypothesis: .NET's ConsoleStream drops broken-pipe errors on both systems so that ordinary programs do not crash in pipelines, and the cost is that a program writing a long output never learns the reader has gone. 57 passing tests had missed it, because every app test called `Run` with StringWriters.
+- Rule: a command-line program that can write a lot writes to a FileStream on the standard output handle: descriptor 1 on Unix, `GetStdHandle(-11)` through a LibraryImport on Windows (AllowUnsafeBlocks). A broken pipe (EPIPE 32 on Unix; 109 or 232 on Windows) ends quietly with 0, and any other write failure goes to stderr with exit 1. Buffer stderr, so a failing stderr cannot change the exit code. Test the real process: UTF-8 bytes, the exit codes, and a reader that closes the pipe after one line. Check a reviewer's "works on X" claim before relying on it.
+- Evidence: m4bwav/FizzBuzzPlus pull request #1 (b901e34; the review comment lists the findings); WSL Ubuntu with the self-contained linux-x64 build: pipe 106 ms exit 0, /dev/full exit 1; Windows: 563 ms (dll) and 1079 ms (trimmed exe), exit 0; ci run 36651132613 green on three OSes with the closed-pipe test
+- Scope: skill (references/nuget.md Phase 2, console apps and tools)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
