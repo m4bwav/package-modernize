@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20260929-10 · 2026-09-29 · Hand-over text: NuGet golden recordings are per runtime and OS from a capture project (`handover-nuget-golden`)
+- because: wikiwright's seventh run (IsImageUrlDotNet's wiki, its report); L-143
+- files: SKILL.md (the hand-over paragraph, the same text as wikiwright's); LEARNINGS.md (L-143); evergreen.json (counts)
+- The hand-over promised compare reports in `tests/Golden/upgrade/` for every NuGet package; IsImageUrlDotNet has none, only its recordings per runtime and OS and the capture project that made them. The text now names both, and the reports only where a run wrote them.
+
 ### C-20260929-9 · 2026-09-29 · A .NET console app detects a closed pipe itself (`console-stream-swallows-epipe`)
 - because: L-142
 - files: references/nuget.md (Phase 2, the console app line), LEARNINGS.md (L-142), evergreen.json (counts)

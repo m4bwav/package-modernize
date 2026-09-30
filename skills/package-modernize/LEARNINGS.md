@@ -176,6 +176,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (references/nuget.md Phase 2, console apps and tools)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
+### L-143 · 2026-09-29 · The NuGet capture template's view hides runtime differences a full recording shows (`capture-template-view`)
+- Trigger: wikiwright's seventh run replayed IsImageUrlDotNet's 1.0.2 recordings (2026-09-29). They keep each case's request heads, statuses, inner exceptions and culture, per runtime and OS. In the view `golden-capture-nuget.template.cs` records (method, arguments, result, `$throws`), 1.0.2 on net48 differs from net10.0 in 10 of 117 cases; the full recordings differ in 50. The template also keeps no requests (106 heads in 48 cases on net10.0).
+- Hypothesis: the template was shaped by offline packages; a package that makes requests or answers per runtime needs the richer record, and only a comment in the template points to one.
+- Rule: for a package that makes requests, or whose answers depend on the runtime, start from IsImageUrlDotNet's `tests/Golden/Capture` (per-runtime files, request heads, statuses, inner exceptions, per-case culture, a fixture server) rather than the template's view, and say so in the Phase 1 plan. Builds on L-065 `golden-per-runtime`.
+- Evidence: IsImageUrlDotNet `ai-docs/notes/2026-09-29-github-wiki.md` and `2026-09-29-golden-replay.py` (its PR #10); wikiwright's run report
+- Scope: skill (scripts/golden-capture-nuget.template.cs, references/nuget.md)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
