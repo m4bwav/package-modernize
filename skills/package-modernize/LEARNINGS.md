@@ -208,6 +208,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (scripts/bump-version-dotnet.sh, references/nuget.md Phases 5 and 6)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-29
 
+### L-147 · 2026-09-30 · A pointer in the body's phase table is skipped when the run jumps to the system reference's phase section (`repeat-pointer-where-the-run-lands`)
+- Trigger: after the body split (C-20260930-1), eval pointer-phase-5 passed 2 of 3 runs. The failing run read `references/npm.md` from its Phase 5 section (offset 55) and never opened `references/security.md`, which the Phase 5 "Read first" cell names. A first version of the case failed 0 of 3 for another reason: the pad-lite fixture is at Phase 2, so every run refused to start Phase 5 on a checkout that contradicted the prompt (correct behaviour, class `test-defect`).
+- Hypothesis: a run that knows its system goes straight to that file's section for the phase, so it sees only the pointers inside that section. A pointer only in the body's table is read once, at invocation, long before the phase begins.
+- Rule: when a reference must be read at a phase, put the pointer in the body's Read first cell and again as the first line of the matching phase section in each system reference. After the line was added to npm.md and nuget.md, the case passed 3 of 3.
+- Evidence: T-20260930-1 (runs in pm-pointer2 and pm-pointer3)
+- Scope: skill (references/npm.md and references/nuget.md, Phase 5 and 6)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-30
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

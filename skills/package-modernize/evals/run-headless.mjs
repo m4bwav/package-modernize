@@ -4,12 +4,14 @@
 // (none for decoys), the named tool call or file for action cases, the regex expectations for outcome cases. It never grades
 // on the reply's wording. A case with `fixture` runs in a git repository copied from evals/fixtures/ and can be judged on
 // an `evidence.all` list (ordered tool calls, files unchanged or changed, a command's exit code). The skill must be installed where the CLI finds it (a junction in ~/.claude/skills); for a baseline
-// run, remove or rename that junction first and pass --baseline so the report says so.
+// run, remove or rename that junction first and pass --baseline so the report says so. With --skill-dir DIR the run tests that
+// copy instead (a branch or worktree): each case's directory gets `.claude/skills/<skill>` linked to DIR and the CLI loads
+// project settings only, so the installed copy and the user's other skills stay out of the run.
 //
-// Usage: node run-headless.mjs [--case id[,id]] [--runs N] [--concurrency N] [--out DIR] [--baseline] [--model MODEL] [--selftest]
+// Usage: node run-headless.mjs [--case id[,id]] [--runs N] [--concurrency N] [--out DIR] [--baseline] [--model MODEL] [--skill-dir DIR] [--selftest]
 // Output: <out>/results.json and one <out>/<case>-<run>.jsonl transcript per run; a summary on stdout for TESTS.md.
 import {spawn, spawnSync} from 'node:child_process';
-import {cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, readdirSync} from 'node:fs';
+import {cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, readdirSync, symlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
@@ -30,6 +32,7 @@ const concurrency = Number(option('--concurrency', '3'));
 const out = option('--out', path.join(tmpdir(), `${skillName}-evals-${Date.now()}`));
 const baseline = args.includes('--baseline');
 const model = option('--model', undefined);
+const skillDir = option('--skill-dir', undefined);
 mkdirSync(out, {recursive: true});
 
 // Tools each kind may use. Trigger cases need only the Skill tool and a few reads; action and outcome cases need the
@@ -89,9 +92,18 @@ function prepareFixture(entry, cwd) {
 function runOnce(entry, run) {
   const cwd = mkdtempSync(path.join(tmpdir(), `${skillName}-${entry.id}-${run}-`));
   prepareFixture(entry, cwd);
+  if (skillDir) {
+    mkdirSync(path.join(cwd, '.claude', 'skills'), {recursive: true});
+    symlinkSync(path.resolve(skillDir), path.join(cwd, '.claude', 'skills', skillName), process.platform === 'win32' ? 'junction' : 'dir');
+  }
+
   const kind = entry.kind;
   const cliArgs = ['-p', entry.prompt, '--output-format', 'stream-json', '--verbose', '--no-session-persistence',
-    '--max-turns', String(entry.max_turns ?? MAX_TURNS[kind]), '--allowedTools', ...TOOLS[kind], ...(entry.tools ?? [])];
+    '--max-turns', String(entry.max_turns ?? MAX_TURNS[kind]), '--allowedTools', ...(entry.allowed_tools ?? [...TOOLS[kind], ...(entry.tools ?? [])])];
+  if (skillDir) {
+    cliArgs.push('--setting-sources', 'project');
+  }
+
   if (model) {
     cliArgs.push('--model', model);
   }
@@ -139,7 +151,7 @@ function toolUses(output) {
 }
 
 // One check of an `evidence.all` list. Types: trace (a tool call whose name matches `tool` and input matches `input_match`),
-// sequence (`steps`, each a trace check, found in this order), file_contains (`path`, `match`), file_unchanged and
+// no_trace (no such call anywhere in the run), sequence (`steps`, each a trace check, found in this order), file_contains (`path`, `match`), file_unchanged and
 // file_changed (`paths`, compared with the fixture as prepared, carriage returns ignored), command (`run` in the case's
 // directory after the session ends, through a shell; passes on exit 0).
 function matchesStep(use, step) {
@@ -161,6 +173,10 @@ function checkEvidence(check, uses, cwd, entry) {
   switch (check.type) {
     case 'trace': {
       return uses.some(use => matchesStep(use, check));
+    }
+
+    case 'no_trace': {
+      return !uses.some(use => matchesStep(use, check));
     }
 
     case 'sequence': {
@@ -273,11 +289,11 @@ if (rejudge) {
   process.exit(0);
 }
 
-// --selftest: judge every fixture case on its untouched fixture with an empty transcript. Each must fail (a case that
+// --selftest: judge every fixture case and every `evidence.all` case on its untouched fixture (if any) with an empty transcript. Each must fail (a case that
 // passes when nothing happened proves nothing); the per-check results show which checks carry the verdict.
 if (args.includes('--selftest')) {
   let bad = 0;
-  for (const entry of entries.filter(candidate => candidate.fixture)) {
+  for (const entry of entries.filter(candidate => candidate.fixture || candidate.evidence?.all)) {
     const cwd = mkdtempSync(path.join(tmpdir(), `${skillName}-selftest-${entry.id}-`));
     prepareFixture(entry, cwd);
     const result = judge(entry, '', cwd);
