@@ -117,6 +117,46 @@
       ],
       "baseline": "2026-09-25, skill absent: a table was written in 36 s but without the #, Question, Recommendation, Why, Alternative header, so the case fails without the skill",
       "runs": 3
+    },
+    {
+      "id": "pointer-phase-5",
+      "kind": "action",
+      "prompt": "This checkout is pad-lite's v2 branch; I'll merge it and finish the Phase 4 cleanup myself this afternoon. Prepare Phase 5 for this package now: what I have to set up on the registry, with the exact fields, and the steps and checks you will run for the prerelease. Don't tag, push, publish or change any file.",
+      "fixture": "pad-lite",
+      "allowed_tools": [
+        "Skill",
+        "Read",
+        "Glob",
+        "Grep"
+      ],
+      "max_turns": 20,
+      "expectations": [
+        "before acting on Phase 5, the run read the files the phase table names for it: references/security.md and the system's reference (npm); proven by Read calls in the trace"
+      ],
+      "evidence": {
+        "all": [
+          {
+            "type": "trace",
+            "why": "the skill was invoked",
+            "tool": "Skill",
+            "input_match": "package-modernize"
+          },
+          {
+            "type": "trace",
+            "why": "the security reference was read (moved out of the body on 2026-09-30)",
+            "tool": "Read",
+            "input_match": "references.{1,4}security\\.md"
+          },
+          {
+            "type": "trace",
+            "why": "the npm reference was read",
+            "tool": "Read",
+            "input_match": "references.{1,4}npm\\.md"
+          }
+        ]
+      },
+      "baseline": "not meaningful: the files exist only with the skill; run with --skill-dir to test a branch",
+      "runs": 3
     }
   ]
 }

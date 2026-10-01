@@ -8,6 +8,13 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20260930-1 · 2026-09-30 · claude -p stream-json (evals/run-headless.mjs) · Windows 11, Claude Code 2.1.281 · 7/7
+- For the body split C-20260930-1. New case `pointer-phase-5` ran against the branch's worktree with the new `--skill-dir` option (the skill linked as `.claude/skills/package-modernize` in each run's folder, CLI on `--setting-sources project`). Tools were Skill, Read, Glob and Grep, so nothing could be tagged or published. Evidence: Read calls for `references/security.md` and `references/npm.md`.
+- First wording 0/3, class `test-defect`: the pad-lite fixture is at Phase 2, and every run refused to start Phase 5 on a checkout that contradicted the prompt, which is the right behaviour. Reworded ("prepare Phase 5", merge still to come): 2/3. The failing run read npm.md's Phase 5 section and never opened security.md, class `pointer-skipped`. After a pointer line was added to the Phase 5 and 6 sections of npm.md and nuget.md: 3/3 (L-147 `repeat-pointer-where-the-run-lands`).
+- Trigger cases against the installed skill (the description is unchanged): triggers 9/9 invoked, decoys 0/9.
+- The other action and outcome cases were not re-run; no baseline (the files exist only with the skill).
+- led to: L-147, C-20260930-1
+
 ### T-20260926-2 · 2026-09-26 · claude -p stream-json (evals/run-headless.mjs) · Windows 11 · 6/6 (trigger cases only)
 - Re-run after the description edit C-20260926-12: `--case trigger-1,trigger-2,trigger-3,decoy-1,decoy-2,decoy-3 --runs 1`. Triggers invoked 3/3, decoys 0/3. Action and outcome cases not re-run (the body did not change).
 - led to: none
