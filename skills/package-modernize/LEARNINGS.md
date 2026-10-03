@@ -216,6 +216,34 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (references/npm.md and references/nuget.md, Phase 5 and 6)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-09-30
 
+### L-148 · 2026-10-02 · A package extracted from an app: survey how the app stores the output before ruling on compatibility (`extract-check-what-the-app-saves`)
+- Trigger: the first brand-new package id (UniverseGenerator, extracted from the maintainer's private Unity game). The plan assumed the game's saves regenerate galaxies from seeds, so a new PRNG would change the galaxy behind every save and need a save-format bump. Reading the consumers showed the opposite: the game draws a random seed, copies names, positions and star types into the save, never regenerates, and stores no seed at all.
+- Rule: for a package lifted out of an application, Phase 0's survey covers the application's consumers and its save or storage format, not only the code being extracted. Decide the compatibility promise from what the application persists (copies or seeds), and record whether the application must start storing something (here the seed) for a later "same as the package" claim to be checkable. The golden capture then records the application's own output in its own host (Unity batchmode here); when the plan changes every output on purpose, the recording is a record of the old behaviour, not a contract.
+- Evidence: the run's Stage 0 note in the maintainer's private record; the game repository's capture branch
+- Scope: skill (references/survey-and-golden.md when a third extraction confirms it)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-02
+
+### L-149 · 2026-10-02 · Unity's Mono computes float expressions in double precision, and its "R" format is not round-trip (`mono-floats-in-double`)
+- Trigger: the same generator code recorded in Unity 6000.6.0f1 (Mono 6.13) and in a .NET harness differed in the last bit in 1,188 values. A stub `Mathf.Lerp` written as `a + (b - a) * t` in single precision did not match; `(float)((double)a + ((double)b - a) * t)` matched all 200 systems. Separately, Mono's `float.ToString("R")` printed 7 significant digits where 9 were needed.
+- Rule: a .NET harness that replays Unity code must model Mono's double-precision float evaluation; write floats with `G9` (or round to fixed decimals) on every runtime; compare as float32 values. A library meant to give the same output in the Editor (Mono) and players (IL2CPP) must not let a float expression decide anything or reach output unrounded: integer draws for decisions, maths from + - * / and sqrt only, rounded storage.
+- Evidence: the capture harness's Unity stub and comparer on the game repository's capture branch; the Stage 0 note
+- Scope: skill (references/nuget.md, a Unity section when OpenUPM is added)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-02
+
+### L-150 · 2026-10-02 · Unity repositories ignore every csproj, and batchmode rewrites project settings (`unity-repo-commit-traps`)
+- Trigger: committing a capture harness to the game repository: `git add` skipped `Harness.csproj` (Unity's `.gitignore` ignores `*.csproj`), and the batchmode import had modified `.vscode/settings.json`, `ProjectSettings/*.asset` and a render pipeline asset in the worktree. An IDE also recreated `obj/` folders between commands.
+- Rule: in a Unity repository, `git add -f` a non-Unity project file on purpose, revert what the batchmode run changed (`git checkout -- ProjectSettings/ ...`) before committing, and check `git status --short` for `obj/` and `bin/` right before the commit. `unity run <worktree> -- -executeMethod Class.Method` imported a fresh worktree and ran the capture in about 3 minutes, beside an Editor open on the main clone.
+- Evidence: the game repository's capture branch
+- Scope: skill (the Unity section of references/nuget.md when OpenUPM is added)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-02
+
+### L-151 · 2026-10-02 · Research for a new package becomes a Markdown knowledge base with a generated feature matrix (`research-as-a-knowledge-base`)
+- Trigger: the maintainer, mid-run: "The AI should store a knowledge base in md files and/or the repo wiki". Three research subagents had been given one shared vocabulary of feature keys, so their reports could be merged by a script into one matrix (176 sources, 128 features, every feature with a status).
+- Rule: for a package whose plan says "out-do every existing X", give every research subagent the same feature-key file and ask for a table with a "feature keys" column; keep the reports, rules and a `status.json` in a knowledge-base folder (`kb/` in the new repository) and generate the matrix from them, never by hand; publish the matrix and rules to the wiki. Record it as a plan decision.
+- Evidence: the knowledge base in the maintainer's private record, to move into the new repository's kb/
+- Scope: skill (references/plan-skeleton.md for brand-new packages)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-02
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
