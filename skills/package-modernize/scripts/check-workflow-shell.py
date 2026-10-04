@@ -5,7 +5,8 @@ actionlint only checks shell when shellcheck is on PATH; without it a truncated 
 (`[ "$a" = "true"` with no closing bracket) passes, and `bash -n` passes it too because
 `[` is a command. It then fails only in the workflow run (L-030).
 
-shellcheck comes from PATH, else `uvx --from shellcheck-py shellcheck` (no install).
+shellcheck comes from PATH, else `uvx --from shellcheck-py==0.11.0.1 shellcheck` (no install; pinned, as
+lint-workflows.sh pins shellcheck 0.11.0).
 Without either, the script falls back to `bash -n` and says it cannot see this class of bug.
 
 Usage: python check-workflow-shell.py [REPO_DIR]   (default: the current directory)
@@ -26,13 +27,16 @@ if len(sys.argv) > 2 or not os.path.isdir(os.path.join(root, ".github", "workflo
     sys.exit(2)
 
 
+SHELLCHECK_PY = "shellcheck-py==0.11.0.1"  # pinned: the package uvx runs (2026-10-03)
+
+
 def find_checker():
     if shutil.which("shellcheck"):
         return ["shellcheck", "-S", "error", "-s", "bash"]
     if shutil.which("uvx"):
-        probe = subprocess.run(["uvx", "--from", "shellcheck-py", "shellcheck", "--version"], capture_output=True, text=True)
+        probe = subprocess.run(["uvx", "--from", SHELLCHECK_PY, "shellcheck", "--version"], capture_output=True, text=True)
         if probe.returncode == 0:
-            return ["uvx", "--from", "shellcheck-py", "shellcheck", "-S", "error", "-s", "bash"]
+            return ["uvx", "--from", SHELLCHECK_PY, "shellcheck", "-S", "error", "-s", "bash"]
     return None
 
 

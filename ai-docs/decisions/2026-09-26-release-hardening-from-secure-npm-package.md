@@ -33,4 +33,4 @@ R-20260926-1 found Evil Martians' `secure-npm-package` skill (evilmartians/agent
 - **Immutable releases**: not in the prompt's list. release.yml creates the GitHub Release when the version is staged, before the maintainer's approval; how an immutable release behaves when the staged version is rejected has not been checked. Left for the next refresh.
 - **Moving the build to a dependency-free publish without artifacts**: the template already packs in the build job and stages the tested tarball; nothing to change.
 
-Related: builds on [2026-09-25-skill-layout-public-skill-repository-private-overlay-eight-p.md](2026-09-25-skill-layout-public-skill-repository-private-overlay-eight-p.md)
+Related: builds on [2026-09-25-skill-layout-public-repo-private-overlay.md](2026-09-25-skill-layout-public-repo-private-overlay.md)

@@ -14,7 +14,7 @@ Files a run copies into the package repository and adapts; do not write them fro
 - [npm/.github/workflows/live.yml](npm/.github/workflows/live.yml): optional weekly live smoke for a package that talks to the internet; delete for a pure library.
 - [npm/.npmrc](npm/.npmrc): `min-release-age=3`, a three-day cooldown on resolving new dependency versions (npm 11.10 and later; `npm ci` from the lockfile is unaffected).
 - [npm/.github/dependabot.yml](npm/.github/dependabot.yml): weekly, Monday, minor and patch grouped, a 7-day cooldown, held majors with dated comments.
-- [npm/.github/zizmor.yml](npm/.github/zizmor.yml): zizmor's one deliberate exception (verify-published installs the version just published); run `uvx zizmor --offline .` from the repository root.
+- [npm/.github/zizmor.yml](npm/.github/zizmor.yml): zizmor's one deliberate exception (verify-published installs the version just published); run `uvx zizmor@1.30.1 --offline .` (the version `scripts/lint-workflows.sh` pins) from the repository root.
 - [npm/AGENTS.md](npm/AGENTS.md), [npm/CLAUDE.md](npm/CLAUDE.md), [npm/.github/copilot-instructions.md](npm/.github/copilot-instructions.md): the agent rules and the two pointers to them.
 - [npm/SECURITY.md](npm/SECURITY.md), [npm/README.template.md](npm/README.template.md): reporting, supported versions, three live badges.
 - [npm/.editorconfig](npm/.editorconfig), [npm/.gitattributes](npm/.gitattributes), [npm/.gitignore](npm/.gitignore): LF everywhere.

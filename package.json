@@ -12,8 +12,8 @@
     "url": "git+https://github.com/m4bwav/package-modernize.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Mark Rogers",
+  "license": "MIT",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/m4bwav/package-modernize/issues"
