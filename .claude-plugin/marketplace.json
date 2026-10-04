@@ -1,0 +1,8 @@
+{
+  "name": "package-modernize",
+  "owner": { "name": "Mark Rogers" },
+  "metadata": { "description": "Modernize and safely re-release old npm and NuGet libraries" },
+  "plugins": [
+    { "name": "package-modernize", "source": "./", "description": "Take an old published library to a verified new release with current tooling: survey, golden capture, plan, rewrite, review, cleanup, approved release rehearsal and registry verification (npm and NuGet complete)" }
+  ]
+}

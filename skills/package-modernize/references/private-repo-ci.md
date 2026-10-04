@@ -14,7 +14,7 @@ Read in Phase 0, when the survey shows the repository is private or will be made
 
 `scripts/add-self-hosted-runner.ps1 -Repo OWNER/NAME -Label <short-label>` does all of it and is safe to run again:
 
-- A personal account's runner serves one repository, so each private repository gets its own folder (default `D:\actions-runner-<label>`). A runner of another repository cannot take its jobs.
+- A personal account's runner serves one repository, so each private repository gets its own folder (default `%SystemDrive%\actions-runner-<label>`; pass `-Dir` for another drive). A runner of another repository cannot take its jobs.
 - It downloads the latest runner and registers it with the label.
 - It writes `start.cmd`, which does three things before `run.cmd`:
   - puts Git's `bin` first on PATH. Without it, `shell: bash` finds WSL's `bash.exe` in WindowsApps on a normal PATH.
@@ -40,6 +40,6 @@ The runner runs as the maintainer, with their files in reach. Keep it on reposit
 
 npm trusted publishing and provenance accept OIDC tokens from GitHub-hosted runners only ([npm docs](https://docs.npmjs.com/trusted-publishers/)). A private repository that publishes to npm keeps its release job on `ubuntu-latest`; that costs a few minutes a release. Otherwise, make the repository public before the release. Check the other registries' trusted-publishing pages for the same limit before relying on a self-hosted publish job.
 
-Evidence: m4bwav/markdavidrogers-web PR #24 and `ai-docs/decisions/2026-09-29-self-hosted-runner.md` (CI and Preview green on the runner, 2026-09-29); L-135 `private-repo-ci-on-own-runner`.
+Evidence: a private website repository's CI and Preview runs, green on its new runner on 2026-09-29; L-135 `private-repo-ci-on-own-runner`.
 
 Related: builds on [../SKILL.md](../SKILL.md); see also [../scripts/README.md](../scripts/README.md), [npm.md](npm.md), [nuget.md](nuget.md).

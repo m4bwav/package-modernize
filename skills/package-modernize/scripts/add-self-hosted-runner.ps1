@@ -19,12 +19,12 @@ repository, so each private repository gets its own runner folder. This script:
 Workflows then use: runs-on: ${{ fromJSON(vars.RUNS_ON || '["self-hosted","<label>"]') }}
 
 .EXAMPLE
-pwsh -File add-self-hosted-runner.ps1 -Repo m4bwav/markdavidrogers-web -Label mdr
+pwsh -File add-self-hosted-runner.ps1 -Repo OWNER/NAME -Label web
 #>
 param(
   [Parameter(Mandatory)] [string] $Repo,
   [Parameter(Mandatory)] [string] $Label,
-  [string] $Dir = "D:\actions-runner-$Label",
+  [string] $Dir = "$env:SystemDrive\actions-runner-$Label",
   [string] $GitBin = 'C:\Program Files\Git\bin',
   [string] $Name = "$env:COMPUTERNAME-$Label"
 )
