@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261006-1 · 2026-10-06 · SECURITY.md invites issues, pull requests and discussions; private reporting kept for exploitable problems; variants for tools and old code (`security-md-tiered`)
+- because: user request (a SECURITY.md in every public repository, reporters sent to issues, pull requests or Discussions); the OpenSSF maintainer guide and GitHub's docs both say exploitable vulnerabilities should not be disclosed in public, so the private form stays for those
+- files: templates/npm/SECURITY.md and templates/nuget/SECURITY.md (Reporting a problem), templates/security/SECURITY-tool.md and SECURITY-example.md (new), templates/README.md (Security policy), references/security.md (the SECURITY.md sentence)
+- The old templates sent every report to the private form and asked for no public issue. The maintainer prefers issues, pull requests and discussions, so those are now the default and the private form is for problems that could hurt users before a fix. Repositories released before this keep their old policy until a retrofit touches them.
+
 ### C-20261005-1 · 2026-10-05 · Lessons from listing the plugins in awesome-copilot (`awesome-copilot-listings`)
 - because: user request (list the Claude-directory plugins in github/awesome-copilot); L-152 to L-155
 - files: LEARNINGS.md (L-152 to L-155)
