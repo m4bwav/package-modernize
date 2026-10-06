@@ -244,6 +244,34 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: skill (references/plan-skeleton.md for brand-new packages)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-02
 
+### L-152 · 2026-10-05 · awesome-copilot's intake never reads `.claude-plugin/`: add a root `plugin.json` (`awesome-copilot-ignores-claude-plugin-dir`)
+- Trigger: listing ten Claude plugins in github/awesome-copilot. Copilot CLI itself falls back to `.claude-plugin/plugin.json`, but the intake gates (`eng/external-plugin-quality-gates.mjs`) look only at `.github/plugin/plugin.json`, `.plugin/plugin.json` and `plugin.json`; issue #4188 (mirrord) failed the version gate for exactly this.
+- Rule: give a Claude plugin a root `plugin.json` in the Agent Plugins 1.0 shape (`$schema` https://agent-plugins.org/schemas/1.0.0/plugin.schema.json, name, version, description, author with url, homepage, repository, license, at most 10 keywords matching `^[a-z0-9-]+$`), keep its version equal to `.claude-plugin/plugin.json`, then release a tag at the merge commit. Skills under `skills/NAME/SKILL.md` are found without a field. Before submitting, run `copilot plugin install <path>` (Copilot CLI, `npm install -g @github/copilot`) and `npx @microsoft/vally-cli@0.17.0 lint <path>`.
+- Evidence: everwrite PR #2, chartwright #2, threewright #2, unity-agent #2, obsidian-notes #5, wikiwright #5 (all 2026-10-05); awesome-copilot #4529 passed every gate on the first try
+- Scope: release (plugins listed outside the Claude directory)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-05
+
+### L-153 · 2026-10-05 · awesome-copilot pins a release tag and its full SHA, and lints every SKILL.md (`awesome-copilot-wants-tag-and-sha`)
+- Trigger: the external-plugin form's version must equal plugin.json's version at both the ref and the SHA, the ref must resolve to the SHA, and `vally lint` fails a SKILL.md over 500 lines or any relative link that leaves the skill folder (everscout's five skills link to `../../kb/*.md`, so it was held back).
+- Rule: survey first: tag at the default branch head (a tag behind head means a patch release), keywords cut to 10 and dots removed (`chart.js` becomes `chartjs`), the form's short description at most 500 characters (chartwright's 663-character manifest description failed intake on #4530; write a shorter one for the form, the manifest can stay), vally run locally. Links in inline code are ignored by vally. A plugin with shared `kb/` files linked from skills needs a structural fix before it can be listed; ask the maintainer.
+- Evidence: the 2026-10-05 survey in package-modernization ai-docs/plans/2026-10-04-claude-directory-listings.md (Copilot section)
+- Scope: release
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-05
+
+### L-154 · 2026-10-05 · Copilot CLI runs Claude-format `hooks/hooks.json` as is (`copilot-runs-claude-hooks`)
+- Trigger: context-health ships SessionStart and UserPromptSubmit hooks in Claude's nested format with `${CLAUDE_PLUGIN_ROOT}`; the Copilot docs show a different shape (`{"version":1,...}`).
+- Rule: no Copilot-specific hooks file is needed for those two events: Copilot CLI 1.0.92 loaded the plugin, ran both hooks (hook.start and hook.end in its debug log, no errors) and answered the prompt. Test with `copilot -p "..." --log-level debug --log-dir <dir>` before writing a converted hooks file.
+- Evidence: local run 2026-10-05, session log in the scratchpad (not kept)
+- Scope: env:windows, copilot-cli 1.0.92
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-05
+
+### L-155 · 2026-10-05 · GitHub issue forms prefill from the URL; tick their checkboxes with a DOM click (`issue-form-prefill-dom-click`)
+- Trigger: filling the awesome-copilot form in Claude in Chrome: coordinate clicks on the checklist worked once and then stopped registering, and screenshots of the scrolled form timed out (one tab froze).
+- Rule: open `issues/new?template=<file>.yml&title=...&<field-id>=<value>` with every field prefilled (newlines as `%0A`), read the values back with javascript, tick the checklist with `element.click()` on each checkbox input and verify `checked`, then click Create the same way and confirm the issue with `gh issue list --author`. Checkboxes cannot be prefilled. Post bot commands such as `/rerun-intake` from PowerShell or with `MSYS_NO_PATHCONV=1`: Git Bash turned the argument into `C:/Program Files/Git/rerun-intake` on #4536, and editing the comment afterwards does not trigger the command (only a new comment does).
+- Evidence: awesome-copilot #4529 and #4530 (2026-10-05)
+- Scope: browser, github
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-05
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
