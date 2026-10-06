@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261005-1 · 2026-10-05 · Lessons from listing the plugins in awesome-copilot (`awesome-copilot-listings`)
+- because: user request (list the Claude-directory plugins in github/awesome-copilot); L-152 to L-155
+- files: LEARNINGS.md (L-152 to L-155)
+- Learnings only; SKILL.md is unchanged.
+
 ### C-20261003-1 · 2026-10-03 · Ready for the Claude plugin directory: plugin manifest, Privacy, pinned launchers, private names removed (`directory-prep`)
 - because: user request (submission to the Claude plugin directory and its pre-submission checklist)
 - files: ../../.claude-plugin/plugin.json and marketplace.json (new; version 1.0.0 as in package.json), ../../README.md (plugin install, Privacy), ../../package.json (licence MIT and author, matching LICENSE), scripts/check-workflow-shell.py (`shellcheck-py==0.11.0.1`), references/npm.md (publint 0.3.25, @arethetypeswrong/cli 0.18.5, zizmor 1.30.1, node 20.20.2), references/nuget.md (Fantomas 8.0.6), templates/README.md (zizmor 1.30.1), RESEARCH.md (actions-up 1.21.0), scripts/add-self-hosted-runner.ps1 and scripts/README.md and references/private-repo-ci.md (runner folder default `%SystemDrive%`, example repository generic), LEARNINGS.md (L-135 without the private repository, runner host name or quotes about payment), ../../ai-docs (private companion repository named generically; a 92-character decision file name shortened)
