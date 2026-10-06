@@ -1,0 +1,22 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "package-modernize",
+  "version": "1.0.0",
+  "description": "Modernize an old published library end to end and release it again safely: survey, a golden capture of the published behaviour, a decisions-table plan that stops for the maintainer, a tested rewrite, an independent review, repository cleanup, a release rehearsal through trusted publishing with a human approval, registry verification and a handoff. npm and NuGet complete; PyPI, crates.io, Maven and Go documented and unverified. Nothing is published without the maintainer's approval. Evergreen.",
+  "author": {
+    "name": "Mark Rogers",
+    "url": "https://github.com/m4bwav"
+  },
+  "homepage": "https://github.com/m4bwav/package-modernize",
+  "repository": "https://github.com/m4bwav/package-modernize",
+  "license": "MIT",
+  "keywords": [
+    "npm",
+    "nuget",
+    "modernization",
+    "release",
+    "trusted-publishing",
+    "agent-skills",
+    "evergreen"
+  ]
+}
