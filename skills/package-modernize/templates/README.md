@@ -16,9 +16,17 @@ Files a run copies into the package repository and adapts; do not write them fro
 - [npm/.github/dependabot.yml](npm/.github/dependabot.yml): weekly, Monday, minor and patch grouped, a 7-day cooldown, held majors with dated comments.
 - [npm/.github/zizmor.yml](npm/.github/zizmor.yml): zizmor's one deliberate exception (verify-published installs the version just published); run `uvx zizmor@1.30.1 --offline .` (the version `scripts/lint-workflows.sh` pins) from the repository root.
 - [npm/AGENTS.md](npm/AGENTS.md), [npm/CLAUDE.md](npm/CLAUDE.md), [npm/.github/copilot-instructions.md](npm/.github/copilot-instructions.md): the agent rules and the two pointers to them.
-- [npm/SECURITY.md](npm/SECURITY.md), [npm/README.template.md](npm/README.template.md): reporting, supported versions, three live badges.
+- [npm/SECURITY.md](npm/SECURITY.md), [npm/README.template.md](npm/README.template.md): reporting (see Security policy below), supported versions, three live badges.
 - [npm/.editorconfig](npm/.editorconfig), [npm/.gitattributes](npm/.gitattributes), [npm/.gitignore](npm/.gitignore): LF everywhere.
 - `npm/test/`: [helpers/builds.js](npm/test/helpers/builds.js) (both builds), [package/shape.test.js](npm/test/package/shape.test.js) (tarball, exports, portability, bare engine), [golden/golden.test.template.js](npm/test/golden/golden.test.template.js) (the contract; the capture script is [../scripts/golden-capture-npm.template.cjs](../scripts/golden-capture-npm.template.cjs); both use [golden/codec.cjs](npm/test/golden/codec.cjs), which keeps NaN, -0, Infinity, undefined and wrapper objects through JSON and records thrown errors with their class; a capture that records requests through its own proxy takes its setup from [../scripts/capture-proxy.cjs](../scripts/capture-proxy.cjs), written from the markdown-plain-link-replacer replay of 2026-09-29, L-125), [consumers/consumers.test.js](npm/test/consumers/consumers.test.js) with the `esm-node`, `cjs-node` and four TypeScript fixtures and [consumers/types/assertions.ts](npm/test/consumers/types/assertions.ts).
+
+## Security policy (2026-10-06, the maintainer's ruling)
+
+Every public repository gets a SECURITY.md, a new one from its first commit. The rule in all of them: ordinary problems go in an issue, a pull request or, where the repository has Discussions on, a discussion; anything that could hurt someone before it is fixed goes through GitHub's private **Report a vulnerability** form, so turn that on (`gh api -X PUT repos/OWNER/REPO/private-vulnerability-reporting`). `{{DISCUSSIONS_CLAUSE}}` is `, or start a thread in [Discussions](https://github.com/OWNER/REPO/discussions)` when `gh repo view OWNER/REPO --json hasDiscussionsEnabled` is true, and empty otherwise.
+
+- [npm/SECURITY.md](npm/SECURITY.md), [nuget/SECURITY.md](nuget/SECURITY.md): a published package; adds the advisory, supported majors and "What this package is not".
+- [security/SECURITY-tool.md](security/SECURITY-tool.md): a skill, plugin or CLI repository that is not on a registry; scope covers agent permissions and prompt injection.
+- [security/SECURITY-example.md](security/SECURITY-example.md): old example or unmaintained code (`{{WHAT_IT_IS}}`, `{{YEAR}}`); says not to deploy it and promises no fix.
 
 ## Rulesets
 
