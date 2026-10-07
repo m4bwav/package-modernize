@@ -272,6 +272,13 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: browser, github
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-05
 
+### L-156 · 2026-10-06 · Dependabot drops the net48 section from NuGet lock files (`dependabot-drops-net48-lock`)
+- Trigger: the NUnit 4.6.1 to 5.0.0 bumps in five NuGet repositories failed `dotnet restore --locked-mode` on every OS with NU1004 (lock file net10.0,net48; project net10.0). Dependabot restores on Linux, where the test projects leave out net48, and rewrote packages.lock.json without it.
+- Rule: check out the Dependabot branch on Windows, run `dotnet restore <sln> --force-evaluate`, commit the lock files (`git add -A` normalises the CRLF noise) and push. Then fix real NUnit 5 breaks: `TestDelegate` is gone (use `Action` in F#), and the new nullable annotations turn a `Matches<T>(p => p.X)` lambda into CS8602 under warnings-as-errors (add a null check).
+- Evidence: TrailerClipperLib #6, CachingServiceWithAOPSupport #6, DotNetJsonPrettyPrinter #12, IsImageUrlDotNet #11, UniverseGenerator #55 (2026-10-06, all merged with CI green)
+- Scope: nuget, dependabot, env:windows
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-06
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
