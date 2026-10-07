@@ -22,7 +22,7 @@ Files a run copies into the package repository and adapts; do not write them fro
 
 ## Security policy (2026-10-06, the maintainer's ruling)
 
-Every public repository gets a SECURITY.md, a new one from its first commit. The rule in all of them: ordinary problems go in an issue, a pull request or, where the repository has Discussions on, a discussion; anything that could hurt someone before it is fixed goes through GitHub's private **Report a vulnerability** form, so turn that on (`gh api -X PUT repos/OWNER/REPO/private-vulnerability-reporting`). `{{DISCUSSIONS_CLAUSE}}` is `, or start a thread in [Discussions](https://github.com/OWNER/REPO/discussions)` when `gh repo view OWNER/REPO --json hasDiscussionsEnabled` is true, and empty otherwise.
+Every public repository gets a SECURITY.md, a new one from its first commit. Every one invites an issue, a pull request or, where the repository has Discussions on, a discussion, and lists GitHub's private **Report a vulnerability** form as another option. It never tells a reporter what to keep out of public view; the reporter decides (maintainer's ruling, 2026-10-06). Turn the form on (`gh api -X PUT repos/OWNER/REPO/private-vulnerability-reporting`). `{{DISCUSSIONS_CLAUSE}}` is `, or start a thread in [Discussions](https://github.com/OWNER/REPO/discussions)` when `gh repo view OWNER/REPO --json hasDiscussionsEnabled` is true, and empty otherwise.
 
 - [npm/SECURITY.md](npm/SECURITY.md), [nuget/SECURITY.md](nuget/SECURITY.md): a published package; adds the advisory, supported majors and "What this package is not".
 - [security/SECURITY-tool.md](security/SECURITY-tool.md): a skill, plugin or CLI repository that is not on a registry; scope covers agent permissions and prompt injection.

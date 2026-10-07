@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261006-2 · 2026-10-06 · SECURITY.md no longer tells reporters what to keep out of public view (`security-md-neutral`)
+- because: user request (the maintainer judged advice to hold back a dangerous problem unethical and a legal risk; the reporter should decide)
+- files: templates/security/SECURITY-tool.md, templates/security/SECURITY-example.md, templates/npm/SECURITY.md, templates/nuget/SECURITY.md (Reporting a problem), templates/README.md (Security policy), references/security.md (the SECURITY.md sentence)
+- The "don't post the details in public" paragraph and "Please do not open a public issue" are gone; the private form is one option among issues, pull requests and discussions. The same edit went to the SECURITY.md of all 32 public source repositories the same day.
+
 ### C-20261006-1 · 2026-10-06 · SECURITY.md invites issues, pull requests and discussions; private reporting kept for exploitable problems; variants for tools and old code (`security-md-tiered`)
 - because: user request (a SECURITY.md in every public repository, reporters sent to issues, pull requests or Discussions); the OpenSSF maintainer guide and GitHub's docs both say exploitable vulnerabilities should not be disclosed in public, so the private form stays for those
 - files: templates/npm/SECURITY.md and templates/nuget/SECURITY.md (Reporting a problem), templates/security/SECURITY-tool.md and SECURITY-example.md (new), templates/README.md (Security policy), references/security.md (the SECURITY.md sentence)
