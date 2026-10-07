@@ -279,6 +279,20 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: nuget, dependabot, env:windows
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-06
 
+### L-157 · 2026-10-06 · Shared docs linked from several skills: generate per-skill copies, keep one source (`shared-docs-synced-into-skills`)
+- Trigger: everscout (`../../kb/*.md`), everlast (`../../protocol/*.md`) and evergreen-protocol (`../../RESEARCH.md` and the other unit files) failed `vally lint` in every skill, which held them out of awesome-copilot (L-153 `awesome-copilot-wants-tag-and-sha`).
+- Rule: for docs a skill needs at run time, link `references/<dir>/X.md` and generate the copy with a stdlib `scripts/sync-skill-refs.py` (copies only the files each SKILL.md links; a link inside a copy to a file the skill does not carry becomes a GitHub URL; example links to missing files stay); `--check` runs in the test suite or CI and fails when a copy drifts. For bookkeeping files the agent rarely opens (an evergreen unit's RESEARCH, CHANGELOG, LEARNINGS, TESTS), link them on the public repository instead and keep the words "at the plugin root". Rewording links into code spans to dodge the linter is not a fix. Both routes were the maintainer's choice.
+- Evidence: everscout #2 (0.3.3), everlast #8 (0.6.2), evergreen-protocol #14 (0.15.1); vally 5/5, 4/4, 15/15; awesome-copilot #4615, #4616 passed intake (2026-10-06)
+- Scope: release (plugins listed outside the Claude directory)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-06
+
+### L-158 · 2026-10-06 · Read release.yml before `gh release create`, and write reviewer notes from the README (`release-workflow-and-readme-notes`)
+- Trigger: everlast and evergreen-protocol publish their GitHub release from a `v*` tag push (release.yml packs the plugin); a `gh release create` there would have raced the workflow. Reviewer notes drafted from changelog memory missed hooks (Stop, SessionEnd, PostToolUse) and opt-in routes the README lists, and claimed the hooks run only in Claude Code although Copilot CLI runs Claude-format hooks (L-154 `copilot-runs-claude-hooks`).
+- Rule: before releasing, `ls .github/workflows` and read any tag-triggered release job: if it exists, push the tag only and wait for the release; otherwise `gh release create --target <merge sha>`. Write the form's additional notes from the README's Hooks and Privacy sections, naming every hook and every route that sends data. Check `gh pr view --json state` before merging: Mark may merge a PR himself while answering the question (all three on 2026-10-06).
+- Evidence: everlast v0.6.2 and evergreen v0.15.1 (workflow releases), everscout v0.3.3 (gh release create), 2026-10-06
+- Scope: release, github
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-06
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
