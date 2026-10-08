@@ -27,6 +27,12 @@ else
   printf '%s' "$search" | json 'const p=r.data[0]; if(!p){console.log("(not found)");return} console.log(JSON.stringify({id:p.id, latest:p.version, totalDownloads:p.totalDownloads, verified:p.verified, owners:p.owners, authors:p.authors, license:p.licenseUrl, project:p.projectUrl, tags:p.tags, deprecation:p.deprecation??null, vulnerabilities:p.vulnerabilities??[]},null,1)); for(const v of p.versions) console.log(" "+v.version+" downloads="+v.downloads)'
 fi
 
+section "Download cross-check: the other search replica and nuget.org's 6-week stats report" "curl -s 'https://azuresearch-ussc.nuget.org/query?q=packageid:$ID&prerelease=true'; curl -s 'https://www.nuget.org/stats/reports/packages/$ID?groupby=Version'"
+# The two search replicas lag nuget.org and disagree: on 2026-10-08 usnc said 0 downloads for a package whose page
+# showed 251, and ussc said 183. Trust the highest number here (L-157 `nuget-search-replicas-lag`).
+curl -s "https://azuresearch-ussc.nuget.org/query?q=packageid:$ID&prerelease=true" | json 'const p=r.data[0]; console.log("ussc totalDownloads=" + (p ? p.totalDownloads : "(not found)"))' || echo "(ussc unreachable)"
+curl -s "https://www.nuget.org/stats/reports/packages/$ID?groupby=Version" | json 'const v={}; for(const f of r.Facts||[]) v[f.Dimensions.Version]=(v[f.Dimensions.Version]||0)+f.Amount; console.log("last 6 weeks total=" + r.Total + " " + Object.entries(v).map(([k,n])=>k+"="+n).join(" "))' || echo "(stats report unreachable)"
+
 section "Registration index: per-version listed flag, published date, deprecation, target frameworks" "curl -s --compressed https://api.nuget.org/v3/registration5-gz-semver2/$LOWER/index.json"
 curl -s --compressed "https://api.nuget.org/v3/registration5-gz-semver2/$LOWER/index.json" | json 'for(const page of r.items){ if(!page.items){console.log("(page not inlined: "+page["@id"]+")");continue} for(const it of page.items){const c=it.catalogEntry; console.log(c.version+" listed="+c.listed+" published="+(c.published||"").slice(0,10)+(c.deprecation?" DEPRECATED("+c.deprecation.reasons.join(",")+")":"")+(c.vulnerabilities?" VULN="+c.vulnerabilities.length:"")); for(const g of c.dependencyGroups||[]) console.log("   "+(g.targetFramework||"(any)")+": "+(g.dependencies||[]).map(d=>d.id+" "+d.range).join(", "))}}'
 
