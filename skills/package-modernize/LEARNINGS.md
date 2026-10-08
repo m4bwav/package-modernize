@@ -293,7 +293,7 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: release, github
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-06
 
-### L-157 · 2026-10-08 · NuGet's search replicas lag nuget.org and disagree on downloads; take the highest (`nuget-search-replicas-lag`)
+### L-159 · 2026-10-08 · NuGet's search replicas lag nuget.org and disagree on downloads; take the highest (`nuget-search-replicas-lag`)
 - Trigger: `azuresearch-usnc` reported 0 total downloads for UniverseGenerator while its nuget.org page showed 251; `azuresearch-ussc` said 183, and usnc trailed on every package checked (3,894,453 against 3,923,964 for RandomNameGeneratorLibrary). Both hosts are listed as SearchQueryService in api.nuget.org/v3/index.json.
 - Rule: never quote one replica's `totalDownloads` as the count. Compare both replicas with `www.nuget.org/stats/reports/packages/ID?groupby=Version` (the JSON behind the page's Full stats link: last 6 weeks, by version and client) and use the highest. survey-nuget.sh prints all three. The stats report is undocumented, so treat it as a cross-check, not a dependency.
 - Evidence: survey-nuget.sh UniverseGenerator on 2026-10-08: usnc totalDownloads=0, ussc 183, stats report total 251 (1.0.0=199, 1.0.0-beta.1=52), matching the package page

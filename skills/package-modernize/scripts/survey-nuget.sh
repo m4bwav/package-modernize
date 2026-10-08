@@ -29,7 +29,7 @@ fi
 
 section "Download cross-check: the other search replica and nuget.org's 6-week stats report" "curl -s 'https://azuresearch-ussc.nuget.org/query?q=packageid:$ID&prerelease=true'; curl -s 'https://www.nuget.org/stats/reports/packages/$ID?groupby=Version'"
 # The two search replicas lag nuget.org and disagree: on 2026-10-08 usnc said 0 downloads for a package whose page
-# showed 251, and ussc said 183. Trust the highest number here (L-157 `nuget-search-replicas-lag`).
+# showed 251, and ussc said 183. Trust the highest number here (L-159 `nuget-search-replicas-lag`).
 curl -s "https://azuresearch-ussc.nuget.org/query?q=packageid:$ID&prerelease=true" | json 'const p=r.data[0]; console.log("ussc totalDownloads=" + (p ? p.totalDownloads : "(not found)"))' || echo "(ussc unreachable)"
 curl -s "https://www.nuget.org/stats/reports/packages/$ID?groupby=Version" | json 'const v={}; for(const f of r.Facts||[]) v[f.Dimensions.Version]=(v[f.Dimensions.Version]||0)+f.Amount; console.log("last 6 weeks total=" + r.Total + " " + Object.entries(v).map(([k,n])=>k+"="+n).join(" "))' || echo "(stats report unreachable)"
 

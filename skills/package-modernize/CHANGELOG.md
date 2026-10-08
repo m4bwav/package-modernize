@@ -3,8 +3,8 @@
 Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with the reason. Reasons cite findings in [RESEARCH.md](RESEARCH.md) (`R-`), lessons in [LEARNINGS.md](LEARNINGS.md) (`L-`), and test runs in [TESTS.md](TESTS.md) (`T-`). State in `evergreen.json`. Protocol: [MAINTENANCE.md](MAINTENANCE.md).
 
 Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downloads against the other search replica and the 6-week stats report (`nuget-download-cross-check`)
-- because: L-157 (one search replica reported 0 downloads for a package with 251)
-- files: scripts/survey-nuget.sh (new section "Download cross-check"), LEARNINGS.md (L-157)
+- because: L-159 (one search replica reported 0 downloads for a package with 251)
+- files: scripts/survey-nuget.sh (new section "Download cross-check"), LEARNINGS.md (L-159)
 - The survey printed `totalDownloads` from azuresearch-usnc only, which can lag by days. It now also prints azuresearch-ussc's total and the per-version counts from nuget.org's stats report, so the survey shows the real figure.
 
 ### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
