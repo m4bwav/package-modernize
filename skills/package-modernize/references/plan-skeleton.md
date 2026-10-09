@@ -71,6 +71,7 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 | D13 | Release and version, rehearsal | | | |
 | D14 | Default branch and optional extras | | | |
 | D15 | Dependents: what the next run can rely on | | | |
+| D16 | Repository topics (5 to 12, `scripts/topics.py suggest`; the registry keywords use the same terms; generic only when private) | | | |
 
 ## Proposed public API (vN)
 
@@ -99,7 +100,7 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 - [ ] Independent read-only review (prompts/review-subagent.md); findings fixed or answered; summary on the pull request
 ### Phase 4: CI, settings, merge, cleanup
 - [ ] CI green (run id); ruleset on master before the merge; merge after the maintainer's review (read the SHA and method back)
-- [ ] One go from the maintainer for the whole cleanup list (the dry run of `post-merge-cleanup.sh` with ai-docs/notes/dispositions.tsv), then `--apply` (with `--tag-ruleset`): alerts 0; tag ruleset (admins only); old bot pull requests closed with one comment each; issues answered; webhooks removed; repo settings; secret scanning and push protection; private vulnerability reporting; workflow permissions read
+- [ ] One go from the maintainer for the whole cleanup list (the dry run of `post-merge-cleanup.sh` with ai-docs/notes/dispositions.tsv), then `--apply` (with `--tag-ruleset`): alerts 0; tag ruleset (admins only); old bot pull requests closed with one comment each; issues answered; webhooks removed; repo settings; topics (`scripts/topics.py check` exits 0); secret scanning and push protection; private vulnerability reporting; workflow permissions read
 ### Phase 5: release rehearsal
 - [ ] The maintainer adds the trusted publisher (fields in the reference). **Stop.**
 - [ ] `preflight-tag-npm.sh N.0.0-beta.1` READY; tagged; `watch-run.sh` shows the stage id; **stop** for the approval; `verify-registry-npm.sh` VERIFIED (run id)

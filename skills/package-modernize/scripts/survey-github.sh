@@ -18,7 +18,7 @@ run() { section "$1" "$2"; eval "$2" 2>&1 || printf '(command failed: exit %s)\n
 
 printf '# GitHub survey: %s (%s)\n' "$REPO" "$(date -u +%Y-%m-%dT%H:%MZ)"
 
-run "Repository" "gh repo view $REPO --json name,description,defaultBranchRef,pushedAt,createdAt,licenseInfo,stargazerCount,forkCount,isArchived,homepageUrl --jq '{name,description,defaultBranch:.defaultBranchRef.name,pushedAt,createdAt,license:.licenseInfo.key,stars:.stargazerCount,forks:.forkCount,archived:.isArchived,homepage:.homepageUrl}'"
+run "Repository" "gh repo view $REPO --json name,description,defaultBranchRef,pushedAt,createdAt,licenseInfo,stargazerCount,forkCount,isArchived,homepageUrl,repositoryTopics --jq '{name,description,defaultBranch:.defaultBranchRef.name,pushedAt,createdAt,license:.licenseInfo.key,stars:.stargazerCount,forks:.forkCount,archived:.isArchived,homepage:.homepageUrl,topics:[.repositoryTopics[]?.name]}'"
 run "Settings and security features" "gh api repos/$REPO --jq '{delete_branch_on_merge, has_wiki, has_projects, allow_squash_merge, web_commit_signoff_required, security_and_analysis}'"
 run "Default workflow permissions" "gh api repos/$REPO/actions/permissions/workflow"
 run "Branches" "gh api repos/$REPO/branches --paginate --jq '.[].name'"
