@@ -46,7 +46,7 @@ Before starting a phase, read its **Read first** files; the procedure is there, 
 |---|---|---|
 | npm | complete (two runs, 2026-09-24 and 25) | `references/npm.md` |
 | NuGet | complete (TrailerClipper, 2026-09-27; two earlier runs) | `references/nuget.md` |
-| PyPI | docs only | `references/pypi.md` |
+| PyPI | one run through Phase 4 (repo-traffic, a single-file CLI, 2026-10-08); the release path written, not yet proven | `references/pypi.md`, `templates/pypi/` |
 | crates.io | docs only | `references/crates.md` |
 | Maven Central | docs only | `references/maven.md` |
 | Go modules | docs only | `references/go.md` |

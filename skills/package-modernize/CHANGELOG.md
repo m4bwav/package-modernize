@@ -9,6 +9,11 @@ Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downlo
 
 ### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261008-2 · 2026-10-08 · First PyPI run: a single-file command-line tool, PyPI templates, the process-level golden harness (`pypi-first-run`)
+- because: L-160 to L-166 (repo-traffic, the first Python and first command-line-tool run, 2026-10-08)
+- files: references/pypi.md (coverage line; new section "First run"), SKILL.md (Package systems: PyPI row), templates/pypi/ (new: ci.yml, release.yml, dependabot.yml, requirements-dev.txt, scripts/check_size.py), templates/README.md (new section PyPI; the SECURITY note for tools), LEARNINGS.md (L-160 to L-166)
+- PyPI moves from "docs only" to one run through Phase 4. The release workflow is written and linted but unproven until its first tag publishes; the next PyPI run or repo-traffic's 1.0.0b1 confirms it.
+
 ### C-20261006-2 · 2026-10-06 · SECURITY.md no longer tells reporters what to keep out of public view (`security-md-neutral`)
 - because: user request (the maintainer judged advice to hold back a dangerous problem unethical and a legal risk; the reporter should decide)
 - files: templates/security/SECURITY-tool.md, templates/security/SECURITY-example.md, templates/npm/SECURITY.md, templates/nuget/SECURITY.md (Reporting a problem), templates/README.md (Security policy), references/security.md (the SECURITY.md sentence)
