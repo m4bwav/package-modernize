@@ -300,6 +300,56 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: nuget, survey
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
 
+### L-160 · 2026-10-08 · A Python tool that calls a CLI and HTTPS APIs is captured as a process through a shim and a fake CLI (`python-tool-golden-harness`)
+- Trigger: repo-traffic (the first PyPI run) calls `gh` and four HTTPS APIs with hard-coded hosts, sleeps between requests and stamps files with today's date; the npm capture template assumes a library called in process.
+- Hypothesis: for a tool, the contract is what the process does (files, stdout, exit code, calls), so the capture must run it as a process with every outside dependency stood in, and the same harness must replay the rewrite.
+- Rule: a shim fixes the clock (a patched copy of the `datetime` module in `sys.modules`), records sleeps, sends every https request to a local `http.server` through an installed urllib opener, and guards sockets to 127.0.0.1; a fake CLI on PATH answers from a fixture (on Windows an `.exe` made with pip's distlib `ScriptMaker`, since `subprocess` finds only `.exe`). Record exit code, stdout, last stderr line, calls, requests, sleeps and files; capture twice and compare. references/pypi.md, "First run", has the recipe.
+- Evidence: m4bwav/repo-traffic tests/golden (commit 896876d): 18 cases recorded twice identical on Windows and WSL; replays on Python 3.9.25 and 3.12.14; macOS replayed the posix recording in CI
+- Scope: pypi, golden
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-161 · 2026-10-08 · Exceptions to a recording are written per OS from the test's own difference list, then compared beyond line endings (`exceptions-per-os`)
+- Trigger: the rewrite's ruled differences contain file contents, which carry CRLF on Windows and LF elsewhere, so one exceptions file cannot serve both recordings; WSL's Python had no pip or venv to write the Linux one.
+- Rule: the golden test writes `exceptions-<os>.json` when an environment variable asks (and fails, so a write is never a pass), each entry carrying the change ids the plan ruled; a reviewer reads the values; the posix file comes from a throwaway workflow on a scratch branch (ubuntu and macos, byte-identical, hash checked against the log); a script compares the two files after normalising CRLF; the test fails on an unlisted difference, a listed field that no longer differs, or an unknown change id.
+- Evidence: repo-traffic run 37875372415 (both artifacts sha256 fe5c0d2c...), comparison "differ beyond CRLF: 0", commit 663af0b
+- Scope: golden, ci
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-162 · 2026-10-08 · pytest 9 and current coverage need Python 3.10; a 3.9 floor needs marker pins (`pytest9-needs-310`)
+- Trigger: the plan kept Python 3.9 (macOS's system python3); pytest 9.1.1, coverage 7.16.2, build 1.6.1 and twine 7.0.0 all require 3.10.
+- Rule: requirements-dev.txt pins `pytest==8.4.2` and `coverage==7.10.7` behind `python_version < "3.10"` and the current versions behind `>= "3.10"`; lint, build and twine run on the newest line only. Check `requires_python` of every dev tool against the floor before writing the matrix.
+- Evidence: pypi.org JSON on 2026-10-08; repo-traffic CI green on 3.9 for Ubuntu, Windows and macOS
+- Scope: pypi
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-163 · 2026-10-08 · argparse help differs on Python 3.9; a recorded `--help` needs a named group (`argparse-help-title`)
+- Trigger: the golden exception for `--help` was written on 3.14; the fresh-clone run on 3.9 failed because 3.9 titles the option list "optional arguments:".
+- Rule: build the parser with `add_help=False`, one `add_argument_group("options")`, and `-h/--help` added to it with `action="help"`; then every Python prints the same help. Run the golden test on the floor version before pushing.
+- Evidence: repo-traffic commit 99a1d3c; the fresh clone on 3.9.25 failed once, then 80 passed
+- Scope: pypi, golden
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-164 · 2026-10-08 · The SECURITY-tool template is written for agent skills, not command-line tools (`security-template-for-skills`)
+- Trigger: templates/security/SECURITY-tool.md's scope speaks of agent permissions and prompt injection; repo-traffic is a CLI whose risks are what it reads, writes and sends.
+- Rule: for a command-line tool, write the scope around its own data flows (the folders it writes, the hosts it calls, private data it handles) and keep the template's reporting paragraphs; templates/README.md says so.
+- Evidence: repo-traffic SECURITY.md (commit 7d3b176)
+- Scope: security, templates
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-165 · 2026-10-08 · PyPI's Publishing page needs 2FA first, and sensitive pages ask for the password again (`pypi-2fa-first`)
+- Trigger: with the maintainer logged in, pypi.org/manage/account/publishing/ redirected to the two-factor setup page; after that it asked to confirm the password.
+- Rule: at the plan review, ask the maintainer for both: turn on 2FA (recovery codes, an authenticator), then add the pending publisher (owner, repository, workflow release.yml, environment pypi). The agent never types the password or sets up 2FA. The rest of the run goes on; only the first tag waits.
+- Evidence: pypi.org on 2026-10-08, in the maintainer's browser
+- Scope: pypi, account
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-166 · 2026-10-08 · Test a migration with the rows the old version really wrote, and check a plan's "no recorded change" claims with the harness (`migrate-real-old-rows`)
+- Trigger: the review found that the downloads.csv header migration lost values, because 0.1.0 had appended seven-column rows under its six-column header (the plan's own exceptions table said so) while the unit test used six-column rows only. Separately, the plan claimed the new tie-break changed no recorded output; the golden test showed one case that changed (E7).
+- Rule: a migration's test fixture is copied from the golden recording's actual file, odd rows included; a plan sentence about which recorded outputs change is checked by running the replay against a prototype before the plan stop, or written as a hypothesis.
+- Evidence: repo-traffic review finding 1 (fixed in 2368555 with a test), E7 in the plan
+- Scope: golden, plan
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
