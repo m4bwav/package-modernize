@@ -350,6 +350,13 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: golden, plan
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
 
+### L-167 · 2026-10-08 · Every repository the run touches leaves with its topics set (`topics-on-every-repo`)
+- Trigger: the maintainer asked for topics on every repository. `scripts/topics.py audit` found 40 of 54 source repositories under five topics and 35 with none, among them IsImageUrlDotNet and DotNetJsonPrettyPrinter, which had been through this skill: the npm reference named topics in a list of `gh repo edit` settings, the NuGet reference did not, and no exit criterion checked them.
+- Rule: topics are a Phase 1 decision (D16) and a Phase 4 exit criterion with evidence (`scripts/topics.py check` exits 0, output logged), by references/community.md (Topics): language, ecosystem, what it does, the kind of thing; the registry keywords use the same terms; generic terms only on a private repository, because topic names are public.
+- Evidence: the sweep on 2026-10-08 set topics on all 40 repositories and each `topics.py check` exited 0; the remaining keyword warnings are plugin.json lists longer than useful topics (evergreen, chartwright), left for those repositories' next release.
+- Scope: phase 4, repo settings, all systems, repository runs
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
 ## Archived entries
 
 One line per promoted or merged ID, in order; the full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

@@ -9,6 +9,11 @@ Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downlo
 
 ### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261008-3 · 2026-10-08 · Topics on every repository: a decision, an exit criterion and a script (`topics-on-every-repo`)
+- because: user request; L-167
+- files: references/community.md (new section "Topics"), SKILL.md (Phases 1 and 4), references/plan-skeleton.md (D16, Phase 4 checklist), references/retrofit.md (gap table), references/npm.md and references/nuget.md (cleanup), scripts/topics.py (new), scripts/survey-github.sh (Repository section prints topics), scripts/README.md, LEARNINGS.md (L-167)
+- Topics were one word in the npm cleanup list and absent elsewhere, so modernized repositories shipped with none. They are now chosen in the plan and checked in Phase 4; `topics.py audit` finds the gaps across an account, `suggest` gathers the evidence, `check` proves the result.
+
 ### C-20261008-2 · 2026-10-08 · First PyPI run: a single-file command-line tool, PyPI templates, the process-level golden harness (`pypi-first-run`)
 - because: L-160 to L-166 (repo-traffic, the first Python and first command-line-tool run, 2026-10-08)
 - files: references/pypi.md (coverage line; new section "First run"), SKILL.md (Package systems: PyPI row), templates/pypi/ (new: ci.yml, release.yml, dependabot.yml, requirements-dev.txt, scripts/check_size.py), templates/README.md (new section PyPI; the SECURITY note for tools), LEARNINGS.md (L-160 to L-166)
