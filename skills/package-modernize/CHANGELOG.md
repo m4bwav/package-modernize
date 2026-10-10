@@ -9,6 +9,11 @@ Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downlo
 
 ### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261009-2 · 2026-10-09 · Live catalog listings are linked like registry pages (`catalog-listing-links`)
+- because: user request
+- files: references/rewrite-and-review.md (Rewrite: the README list), references/wrap-up.md (Wiki), references/retrofit.md (gap table)
+- A plugin or skill listed in a catalog (Claude directory, awesome-copilot, Cursor Marketplace, curated lists) now gets a "Listed in" section near the end of the README and the same link in the wiki footer, once the listing is live. The Claude directory has no per-plugin public URL, so the link is the directory page with the display name to search.
+
 ### C-20261009-1 · 2026-10-09 · Registry-page links near the end of the README and in the wiki footer (`registry-page-links`)
 - because: user request
 - files: references/rewrite-and-review.md (Rewrite: the README list), templates/npm/README.template.md (new section "Package page"), references/retrofit.md (gap table), references/wrap-up.md (Wiki)
