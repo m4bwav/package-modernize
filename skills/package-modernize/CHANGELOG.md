@@ -9,6 +9,11 @@ Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downlo
 
 ### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261009-1 · 2026-10-09 · Registry-page links near the end of the README and in the wiki footer (`registry-page-links`)
+- because: user request
+- files: references/rewrite-and-review.md (Rewrite: the README list), templates/npm/README.template.md (new section "Package page"), references/retrofit.md (gap table), references/wrap-up.md (Wiki)
+- A README linked its registry page only from the badge at the top, and the wiki only from its sidebar. Every README now ends with a "Package page" section listing one link per registry page the repository publishes, and the wiki footer carries the same links, so the link is on every wiki page.
+
 ### C-20261008-3 · 2026-10-08 · Topics on every repository: a decision, an exit criterion and a script (`topics-on-every-repo`)
 - because: user request; L-167
 - files: references/community.md (new section "Topics"), SKILL.md (Phases 1 and 4), references/plan-skeleton.md (D16, Phase 4 checklist), references/retrofit.md (gap table), references/npm.md and references/nuget.md (cleanup), scripts/topics.py (new), scripts/survey-github.sh (Repository section prints topics), scripts/README.md, LEARNINGS.md (L-167)
