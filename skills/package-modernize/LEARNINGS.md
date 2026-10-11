@@ -128,6 +128,20 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: golden, plan
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
 
+### L-170 · 2026-10-11 · The Claude directory reads a plugin's icon from `plugin.json`, not from a file it finds (`plugin-json-icon-field`)
+- Trigger: every card in the directory portal, the two live listings included, showed a letter placeholder; the page's `GetPluginSubmissionIconPreview` calls returned 404. All 13 submitted repositories still held `.claude-plugin/icon.png`, which the portal had picked up on its own when they were submitted (2026-10-03/04), but none set the `icon` field.
+- Rule: a plugin sets `"icon": "./.claude-plugin/icon.png"` in `.claude-plugin/plugin.json` (references/readme-images.md, "The icon"). No version bump is needed for the directory: it scans each new commit on the tracked branch as a new version; a live listing changes only once that version is published.
+- Evidence: the 13 pull requests of 2026-10-11 titled "plugin.json names the listing icon for the Claude directory"; `claude plugin validate --strict` 2.1.281 passed on each with the field set
+- Scope: global (every Claude Code plugin the run touches)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-11
+
+### L-169 · 2026-10-11 · Every package gets an icon, whether or not its registry shows one (`icon-for-every-package`)
+- Trigger: the maintainer asked that the system generate an icon for every package, for catalogs and anywhere else a default graphic is needed. L-070 had scoped the icon to registries that display one (NuGet), so npm, PyPI and plugin runs shipped without one, and catalog submissions had nothing to upload.
+- Rule: Phase 0 notes the icon, the plan decides it, Phase 2 makes a 512 by 512 master in `.github/images/icon.png` (`scripts/make-icon.py --size 512`, or the maintainer's image tools) and a copy at each size a registry or catalog asks for; NuGet keeps its packed 128 by 128 `icon.png` (references/readme-images.md, "The icon").
+- Evidence: C-20261011-3; `make-icon.py` without `--size` still writes the same bytes as before for `--text "{ }"` and `--picture image`.
+- Scope: global (every package the run touches; the maintainer's overlay can opt out)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-11
+
 ## Archived entries
 
 Every promoted or merged ID, in order, ten IDs to a line (one line per ID until C-20261011-2, when the list outgrew the 200-line budget): title, then where it went. The full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.

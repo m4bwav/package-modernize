@@ -4,6 +4,12 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261011-3 · 2026-10-11 · Every package gets an icon, with a 512 master for catalogs (`icon-for-every-package`)
+- because: L-169 (user request), widening L-070; L-170
+- files: references/readme-images.md (new section "The icon"), references/plan-skeleton.md (survey table, badges and images), references/retrofit.md (gap table), references/nuget.md (package metadata), SKILL.md (Phase 2 exit criteria), scripts/make-icon.py (`--size`), scripts/README.md, LEARNINGS.md (L-169)
+- Plugins: the icon is `.claude-plugin/icon.png`, named by the `icon` field in `plugin.json`, which is where the Claude directory reads it (L-170 `plugin-json-icon-field`).
+- The icon was made only for registries that show one. Now every package gets a 512 by 512 master in `.github/images/icon.png` for catalogs, listings, manifests and the wiki, plus a copy at each size a registry or catalog asks for. `make-icon.py --size` draws any size; its default output is unchanged.
+
 ### C-20261011-2 · 2026-10-11 · Third learnings consolidation, L-013 to L-168 (`consolidate-learnings-3`)
 - because: consolidation pass (lint flagged 47 active entries against consolidate_every 25, 19 entries without a Hypothesis, and LEARNINGS.md at 492 lines against a 200-line budget)
 - files: LEARNINGS.md (header paragraph; Hypothesis added to L-148 to L-159 and L-161 to L-167; Active: 15 entries; the Archived entries index now lists ten IDs to a line), LEARNINGS-ARCHIVE.md (Retired: L-150, L-153, L-154, L-155, L-157; Promoted: full text of 27 entries)
