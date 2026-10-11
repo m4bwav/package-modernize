@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261011-4 · 2026-10-11 · release.yml moves `next` to the release once it is live (`next-tag-job`)
+- because: R-20261011-1; user request (maintainer's ruling 2026-10-11: automate the `next` dist-tag)
+- files: templates/npm/.github/workflows/release.yml (new job `next-tag`, header comment), templates/npm/.github/zizmor.yml (adhoc-packages ignore for the pinned npm install), references/npm.md (Phase 4 trusted publisher setup, the `next` rule), SKILL.md (Phases table, Phase 6 exit criteria), RESEARCH.md (open question answered)
+- After a stable tag the new job installs npm 11.21.0 (no Node release bundles an npm that runs `npm dist-tag` over OIDC yet), waits up to two hours for the maintainer's approval to make the version live, then moves `next` to it when `next` is below. It needs the trusted publisher's dist-tag permission, which the maintainer ticks once per package; without it the job fails and prints the command for his terminal. `scripts/check-next-tag-npm.sh` stays as the read-back. Linted with `scripts/lint-workflows.sh` on a copy with the placeholder filled in: actionlint, shellcheck, check-workflow-shell and zizmor clean.
+
 ### C-20261011-3 · 2026-10-11 · Every package gets an icon, with a 512 master for catalogs (`icon-for-every-package`)
 - because: L-169 (user request), widening L-070; L-170
 - files: references/readme-images.md (new section "The icon"), references/plan-skeleton.md (survey table, badges and images), references/retrofit.md (gap table), references/nuget.md (package metadata), SKILL.md (Phase 2 exit criteria), scripts/make-icon.py (`--size`), scripts/README.md, LEARNINGS.md (L-169)
