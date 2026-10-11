@@ -104,6 +104,46 @@ Promoted and retired entries from [LEARNINGS.md](LEARNINGS.md), each with the re
 - Scope: skill (SKILL.md golden capture; references/nuget.md Phase 2)
 - Status: retired 2026-09-28 · merged into L-052 in the consolidation pass C-20260928-1 · helpful 1 · harmful 0 · last_confirmed 2026-09-27
 
+### L-150 · 2026-10-02 · Unity repositories ignore every csproj, and batchmode rewrites project settings (`unity-repo-commit-traps`)
+- Trigger: committing a capture harness to the game repository: `git add` skipped `Harness.csproj` (Unity's `.gitignore` ignores `*.csproj`), and the batchmode import had modified `.vscode/settings.json`, `ProjectSettings/*.asset` and a render pipeline asset in the worktree. An IDE also recreated `obj/` folders between commands.
+- Hypothesis: Unity's generated .gitignore treats project files as Editor output, and a batchmode import reserializes settings for the running Editor version, so a commit from a Unity checkout inherits both.
+- Rule: in a Unity repository, `git add -f` a non-Unity project file on purpose, revert what the batchmode run changed (`git checkout -- ProjectSettings/ ...`) before committing, and check `git status --short` for `obj/` and `bin/` right before the commit. `unity run <worktree> -- -executeMethod Class.Method` imported a fresh worktree and ran the capture in about 3 minutes, beside an Editor open on the main clone.
+- Evidence: the game repository's capture branch
+- Scope: skill (the Unity section of references/nuget.md when OpenUPM is added)
+- Status: retired 2026-10-11 · merged into L-149 in the consolidation pass C-20261011-2 · helpful 1 · harmful 0 · last_confirmed 2026-10-02
+
+### L-153 · 2026-10-05 · awesome-copilot pins a release tag and its full SHA, and lints every SKILL.md (`awesome-copilot-wants-tag-and-sha`)
+- Trigger: the external-plugin form's version must equal plugin.json's version at both the ref and the SHA, the ref must resolve to the SHA, and `vally lint` fails a SKILL.md over 500 lines or any relative link that leaves the skill folder (everscout's five skills link to `../../kb/*.md`, so it was held back).
+- Hypothesis: the gate checks a reproducible pin (tag and SHA must agree) and runs vally's portability lint, which treats the skill folder as the unit that ships; Claude Code checks neither.
+- Rule: survey first: tag at the default branch head (a tag behind head means a patch release), keywords cut to 10 and dots removed (`chart.js` becomes `chartjs`), the form's short description at most 500 characters (chartwright's 663-character manifest description failed intake on #4530; write a shorter one for the form, the manifest can stay), vally run locally. Links in inline code are ignored by vally. A plugin with shared `kb/` files linked from skills needs a structural fix before it can be listed; ask the maintainer.
+- Evidence: the 2026-10-05 survey in package-modernization ai-docs/plans/2026-10-04-claude-directory-listings.md (Copilot section)
+- Scope: release
+- Status: retired 2026-10-11 · merged into L-152 in the consolidation pass C-20261011-2 · helpful 1 · harmful 0 · last_confirmed 2026-10-05
+
+### L-154 · 2026-10-05 · Copilot CLI runs Claude-format `hooks/hooks.json` as is (`copilot-runs-claude-hooks`)
+- Trigger: context-health ships SessionStart and UserPromptSubmit hooks in Claude's nested format with `${CLAUDE_PLUGIN_ROOT}`; the Copilot docs show a different shape (`{"version":1,...}`).
+- Hypothesis: Copilot CLI adopted Claude's plugin format, hooks included, ahead of its own documentation, which shows only Copilot's shape.
+- Rule: no Copilot-specific hooks file is needed for those two events: Copilot CLI 1.0.92 loaded the plugin, ran both hooks (hook.start and hook.end in its debug log, no errors) and answered the prompt. Test with `copilot -p "..." --log-level debug --log-dir <dir>` before writing a converted hooks file.
+- Evidence: local run 2026-10-05, session log in the scratchpad (not kept)
+- Scope: env:windows, copilot-cli 1.0.92
+- Status: retired 2026-10-11 · merged into L-158 in the consolidation pass C-20261011-2 · helpful 1 · harmful 0 · last_confirmed 2026-10-05
+
+### L-155 · 2026-10-05 · GitHub issue forms prefill from the URL; tick their checkboxes with a DOM click (`issue-form-prefill-dom-click`)
+- Trigger: filling the awesome-copilot form in Claude in Chrome: coordinate clicks on the checklist worked once and then stopped registering, and screenshots of the scrolled form timed out (one tab froze).
+- Hypothesis: the issue form's UI re-renders as it scrolls, so coordinate clicks hit stale positions while DOM events do not depend on layout; MSYS path conversion rewrites any argument that starts with a slash.
+- Rule: open `issues/new?template=<file>.yml&title=...&<field-id>=<value>` with every field prefilled (newlines as `%0A`), read the values back with javascript, tick the checklist with `element.click()` on each checkbox input and verify `checked`, then click Create the same way and confirm the issue with `gh issue list --author`. Checkboxes cannot be prefilled. Post bot commands such as `/rerun-intake` from PowerShell or with `MSYS_NO_PATHCONV=1`: Git Bash turned the argument into `C:/Program Files/Git/rerun-intake` on #4536, and editing the comment afterwards does not trigger the command (only a new comment does).
+- Evidence: awesome-copilot #4529 and #4530 (2026-10-05)
+- Scope: browser, github
+- Status: retired 2026-10-11 · merged into L-152 in the consolidation pass C-20261011-2 · helpful 1 · harmful 0 · last_confirmed 2026-10-05
+
+### L-157 · 2026-10-06 · Shared docs linked from several skills: generate per-skill copies, keep one source (`shared-docs-synced-into-skills`)
+- Trigger: everscout (`../../kb/*.md`), everlast (`../../protocol/*.md`) and evergreen-protocol (`../../RESEARCH.md` and the other unit files) failed `vally lint` in every skill, which held them out of awesome-copilot (L-153 `awesome-copilot-wants-tag-and-sha`).
+- Hypothesis: vally treats a skill folder as what gets installed, so a link that leaves it is broken once the skill ships alone; docs shared outside the folder suit the repository, not the installed skill.
+- Rule: for docs a skill needs at run time, link `references/<dir>/X.md` and generate the copy with a stdlib `scripts/sync-skill-refs.py` (copies only the files each SKILL.md links; a link inside a copy to a file the skill does not carry becomes a GitHub URL; example links to missing files stay); `--check` runs in the test suite or CI and fails when a copy drifts. For bookkeeping files the agent rarely opens (an evergreen unit's RESEARCH, CHANGELOG, LEARNINGS, TESTS), link them on the public repository instead and keep the words "at the plugin root". Rewording links into code spans to dodge the linter is not a fix. Both routes were the maintainer's choice.
+- Evidence: everscout #2 (0.3.3), everlast #8 (0.6.2), evergreen-protocol #14 (0.15.1); vally 5/5, 4/4, 15/15; awesome-copilot #4615, #4616 passed intake (2026-10-06)
+- Scope: release (plugins listed outside the Claude directory)
+- Status: retired 2026-10-11 · merged into L-152 in the consolidation pass C-20261011-2 · helpful 1 · harmful 0 · last_confirmed 2026-10-06
+
 ## Promoted
 
 ### L-001 · 2026-09-25 · Survey claims can be wrong; the golden capture is the arbiter
@@ -966,3 +1006,219 @@ Promoted and retired entries from [LEARNINGS.md](LEARNINGS.md), each with the re
 - Evidence: m4bwav/seeded-random-utilities pull request #18 review comment (findings 1 and 2), commit 1896ce2
 - Scope: skill (references/retrofit.md gap audit step 1)
 - Status: promoted: C-20260929-5 (references/retrofit.md gap audit step 1) · helpful 0 · harmful 1 · last_confirmed 2026-09-29
+
+### L-014 · 2026-09-25 · An eval that only sees the script call passes a script that dies halfway
+- Trigger: the first real run (replace-string-at-position Phase 0) found `survey-npm.sh` exiting on "url: unbound variable" whenever OWNER/REPO was passed, so the whole GitHub half (issues, webhooks, alerts) never ran; action-1 had passed 3 of 3 because its evidence was the call in the trace (2026-09-25). Merged L-033 (2026-09-26): the first pass of action-canary graded run 1 as a failure although the run had planted `<=` in src/index.js, seen 10 of 15 golden cases fail, reverted with `git checkout -- src/` and logged it; it ran the suite as `npm --prefix "<dir>" test`, which the sequence regex for `npm test` and `npm run test` did not match.
+- Hypothesis: `set -u` plus a variable set only on one branch; the eval grades that the script ran, not that it finished. A regex written from one imagined command misses the forms an agent actually uses (`--prefix`, `-C`, PowerShell instead of Bash); the grade then measures the regex, not the skill (L-033).
+- Rule: action evidence for a script also checks the saved file for a fact only the script's late section produces (`and: file_contains`, for example a webhook id), never for a heading, because the agent may save its own report instead of the raw output (T-20260925-2); run each script once end to end on a real package before calling it tested. Write trace checks for the effect (npm and test as whole words, in Bash or PowerShell), prefer file and command checks over command spelling, and run `run-headless.mjs --selftest` so every fixture case fails on an idle run. When a check turns out wrong, fix it and `--rejudge` the stored transcripts and case directories instead of spending new runs; record both gradings in TESTS.md (L-033).
+- Evidence: C-20260925-3; evals/evals.json action-1; evals/run-headless.mjs; T-20260925-2; L-033: T-20260926-1, evals/run-headless.mjs (`--rejudge`, `--selftest`), C-20260926-7
+- Scope: skill, harness
+- Status: promoted: C-20261011-2 (rule already in evals/run-headless.mjs (`--rejudge`, `--selftest`, effect-based trace checks) and evals/evals.json action-1 (`and: file_contains`)) · merged: L-033 · helpful 2 · harmful 0 · last_confirmed 2026-09-26
+
+### L-121 · 2026-09-28 · A wait loop must stop on an empty id or a gh error (`wait-loop-exits`)
+- Trigger: after JsonPrettyPrinter's merge, `gh run list -b master -L 1` returned a Dependabot run without the fields asked for, the loop `until [ "$(gh run view $id ...)" = completed ]` polled run id "null" for ten minutes and was stopped by hand (2026-09-28).
+- Hypothesis: `until` on a command substitution never ends when the command fails, and a list query can return a run of another workflow.
+- Rule: filter the run by workflow and head (`-w release`, headBranch equal to the tag), exit when the id is empty, bound the loop (`for i in $(seq 1 N)`), and exit on a gh error; scripts/watch-run.sh is the tested form.
+- Evidence: DotNetJsonPrettyPrinter ai-docs/log.md (2026-09-28, pull request #8 merged)
+- Scope: skill
+- Status: promoted: C-20261011-2 (rule already in scripts/watch-run.sh: run found by workflow file, bounded loops, exits on an empty id or a gh error) · helpful 2 · harmful 0 · last_confirmed 2026-09-29
+
+### L-127 · 2026-09-29 · With `npm version`, the tag's release run starts before ci on the same commit ends (`npm-version-tags-before-ci`)
+- Trigger: bringing L-120 to the npm templates: `npm version` makes the version commit and the tag together and `git push --follow-tags` pushes both, so ci.yml and release.yml start on the same commit in the same second, and a plain "ci passed on the tagged commit" check always fails. The NuGet flow tags after a green pull request merge and never meets it (2026-09-29).
+- Hypothesis: the npm ritual predates the check; the fix is either a bounded wait for the check run in release.yml or tagging after green.
+- Rule: npm's release.yml waits for the `ci` check run on the tagged commit (bounded, fails on a missing, red or timed-out check, L-121) before it builds; the alternative is `npm version --no-git-tag-version`, push, wait for green, then tag. Confirmed by the 2.0.1-beta.2 and 2.0.1 release runs (the beta.1 run failed later, for L-132); ready to promote at the next consolidation.
+- Evidence: m4bwav/seeded-random-utilities ai-docs/plans/2026-09-29-retrofit-and-2.0.1-release.md (R3); release runs 36615374214 (2.0.1-beta.2) and 36619659747 (2.0.1), each waiting for ci's push run on its tagged commit and then green (2026-09-29)
+- Scope: skill (templates/npm/.github/workflows/release.yml, references/npm.md Phases 5 and 6)
+- Status: promoted: C-20261011-2 (rule already in templates/npm/.github/workflows/release.yml (the ci-passed gate step) and references/npm.md "The release gate") · extends L-120 · helpful 2 · harmful 0 · last_confirmed 2026-09-29
+
+### L-125 · 2026-09-29 · A capture's proxy setup is one function that the recording and the replay both call (`replayable-proxy-setup`)
+- Trigger: markdown-plain-link-replacer's 2026-09-29 replay of the 1.1.16 capture against 2.0.0 needed four patched copies; two of them were proxy setup spread through the capture: undici's agent installed after the capture set the variables (it set them only once its server listened, too late for `NODE_USE_ENV_PROXY`, which Node reads at startup), and a fixture `connect` handler that sent port 80 to the plain server. wikiwright met the same pattern twice the same day: L-116 `by-host-name-proxy` (a proxy that routes by port, variables set before each child starts) and L-117 `guard-normalised-args` (the guard that let plain http out). Writing the setup as one function and running it with request 2.88 and a real TLS fixture found one more thing: with `NO_PROXY` empty and `NODE_USE_ENV_PROXY=1` (children on Node 24) or `http.setGlobalProxyFromEnv` (this process), Node 24.18.0 also proxied request 2.88's own connection to the proxy, and its http request line arrived as `http://host:<proxy port>/path` instead of `http://host/path`.
+- Hypothesis: a capture is written for the old version's transport (request 2.88 reads the proxy variables per call), so its setup happens whenever the capture gets round to it; a fetch-based major needs the same setup done before anything starts and routed by port. Setup that lives in one function, called first, is the same for both, and a probe at start says which route each process got instead of letting an unrouted `fetch` record errors as behaviour.
+- Rule: a capture that records through its own proxy calls `startCaptureProxy()` from scripts/capture-proxy.cjs first, before it requires the package and before any child starts: guard (L-124 form, tested on `.invalid` hosts), a proxy routing CONNECT by port (443 to TLS, any other to plain), the variables in `process.env` with `NO_PROXY` set to the loopback names only, and `fetch` routed here and in children (undici's `EnvHttpProxyAgent`, `http.setGlobalProxyFromEnv`, or `NODE_USE_ENV_PROXY=1`, picked by probe). Print `report()` to stderr, and treat the guard's message in the golden output as a failure.
+- Evidence: wikiwright L-116 and L-117 and its templates/npm/host-fixture.mjs; markdown-plain-link-replacer's 2026-09-29 replay (wikiwright references/npm.md, "Golden captures that record through a proxy with TLS"); `node capture-proxy.cjs --selftest` 23 of 23 on Node 24.18.0 (undici 7 and none) and 20.20.2 with undici, 21 of 21 plus two skips on 20.20.2 without undici; the same self-test with `NO_PROXY` empty failed its two absolute-form checks on Node 24.18.0 (`plain GET http://selftest.invalid:49188/abs-self`); request 2.88.2 and `fetch` through the function with a real TLS fixture (2026-09-29)
+- Scope: skill (scripts/capture-proxy.cjs, scripts/golden-capture-npm.template.cjs, references/npm.md)
+- Status: promoted: C-20261011-2 (rule already in references/npm.md "One proxy setup for the recording and the replay" and scripts/capture-proxy.cjs) · extends L-123 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-132 · 2026-09-29 · publint reads dist/ from disk, so a job that checks before it builds fails, and a local preflight cannot see it (`build-before-publint`)
+- Trigger: seeded-random-utilities' 2.0.1-beta.1 release run (36614300884) failed in `npm run check`: publint reported that `dist/index.mjs`, `index.cjs` and `index.d.cts` do not exist. C-20260929-5 had moved check ahead of `npm test` (so the tested dist/ is the one packed), and `npm test` was the job's only build. `preflight-tag-npm.sh` had printed READY, because the clone's dist/ was already on disk. Nothing was staged; the tag v2.0.1-beta.1 stays with no npm version, and the rehearsal went out as 2.0.1-beta.2 after the fix (pull request #19). The template had the same order (2026-09-29).
+- Hypothesis: every step of a release job is checked locally in the working tree, never in the job's own order from a fresh checkout, so a reorder that only breaks on a clean tree passes every local check. ci.yml builds before check, which is why the pull request was green.
+- Rule: the npm release.yml's build job runs `npm run build` before `npm run check` (template fixed). After any change to a release job's steps, rehearse them before the tag: `git clone` the branch into scratch, `npm ci --ignore-scripts`, then the job's `run:` lines in order. One failing command there costs a minute; a failing release run costs a prerelease number.
+- Evidence: m4bwav/seeded-random-utilities release runs 36614300884 (failure) and 36615374214 (success), pull request #19 (3f0a841); in a clean clone `npm run check` failed without the build and passed with it, and `npm test` passed 2255 of 2255 (2026-09-29)
+- Scope: skill (templates/npm/.github/workflows/release.yml, references/npm.md Phases 5 and 6)
+- Status: promoted: C-20261011-2 (rule already in templates/npm release.yml (build before check), references/npm.md Phases 5 and 6 (the fresh-clone line under Shortcuts) and Traps (publint needs a build)) · extends L-120 · helpful 0 · harmful 0 · last_confirmed 2026-09-29
+
+### L-133 · 2026-09-29 · `gh run watch --exit-status` can exit non-zero before the run ends (`watch-exits-early`)
+- Trigger: `verify-registry-npm.sh seeded-random-utilities 2.0.1-beta.2 m4bwav/seeded-random-utilities` dispatched verify-published and printed `conclusion:` empty, every job with no result, and NOT VERIFIED; the same run (36618478939) finished green in all 15 jobs a few minutes later (2026-09-29).
+- Hypothesis: watch-run.sh took `gh run watch`'s exit status as the verdict; watching a run dispatched seconds earlier, gh returned non-zero while jobs were still queued. Its output was thrown away, so the cause is not recorded.
+- Rule: a run's verdict is its `conclusion` once `status` is `completed`, never the watcher's exit code. watch-run.sh now watches again (up to six times) until the run is completed, stops on a gh error, and exits 0 only for `success`. Tested on a green run (exit 0), a failed run (exit 1) and a run id that does not exist (exit 1).
+- Evidence: verify-published run 36618478939 of m4bwav/seeded-random-utilities; the fixed script against runs 36621026089 and 36614300884 and run id 1 (2026-09-29)
+- Scope: skill (scripts/watch-run.sh, and through it verify-registry-npm.sh)
+- Status: promoted: C-20261011-2 (rule already in scripts/watch-run.sh: the verdict is the run's conclusion once completed) · extends L-121 · helpful 0 · harmful 0 · last_confirmed 2026-09-29
+
+### L-134 · 2026-09-29 · An `npm login` from days earlier is gone, and the agent's shell cannot log in (`npm-login-expires`)
+- Trigger: the overlay said the maintainer stays logged in since 2026-09-26 and the agent may run `npm deprecate` and `npm dist-tag`. On 2026-09-29 `npm whoami` answered 401. `npm login --auth-type=web`, started in the background from the agent's shell, printed a login URL, then fell back to a `Username:` prompt and exited 1, so the URL it had printed was dead. After the maintainer logged in in his own terminal, the agent's `npm deprecate` still failed with EOTP and the auth URL masked as `https://www.npmjs.com/auth/cli/***`, as L-037 already said (2026-09-29).
+- Hypothesis: npm's CLI logins are short-lived session tokens, not the long-lived tokens of before, so a login does not last from one run to the next (not confirmed against npm's documentation in this run). The overlay's line predated L-037 or ignored it.
+- Rule: plan the 2FA-gated npm commands as the maintainer's, in his terminal, from the start: give him `npm login` (when `npm whoami` fails), then the exact `npm deprecate` and `npm dist-tag` commands together, and read the results back. Never start `npm login` from the agent's shell. The overlay line was corrected the same day.
+- Evidence: m4bwav/seeded-random-utilities ai-docs/log.md (2026-09-29); npm 11.16.0 on Windows 11
+- Scope: skill (references/npm.md, the line on EOTP) and the maintainer's overlay
+- Status: promoted: C-20261011-2 (rule already in references/npm.md Phases 5 and 6, the EOTP line (L-134 part)) · extends L-037 · helpful 0 · harmful 0 · last_confirmed 2026-09-29
+
+### L-135 · 2026-09-29 · A private repository's CI runs on the maintainer's own runner (`private-repo-ci-on-own-runner`)
+- Trigger: on 2026-09-29 GitHub stopped starting hosted jobs in a private website repository (GitHub's billing message: "recent account payments have failed or your spending limit needs to be increased"). About 650 minutes had been used that month, and about 1 GB of artifacts was held against a 500 MB allowance. The maintainer ruled that private repositories build on their own machine rather than on paid minutes. A self-hosted runner on that machine ran CI and the preview green the same hour, while hosted jobs stayed blocked.
+- Hypothesis: GitHub bills a private repository's hosted minutes and its artifact and package storage, and blocks at the allowance with no budget; self-hosted minutes are free (checked 2026-09-29; a postponed fee may return). Setting up the runner on Windows had three traps: WSL's bash.exe ahead of Git Bash on the normal PATH; azure/login writing into the user's own az profile; and setup-dotnet installing into Program Files.
+- Rule: in Phase 0, record the repository's visibility. For a private one, run `scripts/add-self-hosted-runner.ps1` and follow references/private-repo-ci.md: `RUNS_ON` with a self-hosted default, setup actions only on hosted runners, `--ignore-scripts`, short-lived artifacts, containers built by the SDK. Keep an npm publish job on a hosted runner, or make the repository public before the release.
+- Evidence: that repository's CI and Preview runs green on the new self-hosted runner (2026-09-29), recorded in its decision notes; GitHub's billing docs and the npm trusted-publishing docs, read 2026-09-29
+- Scope: skill (SKILL.md rule, references/private-repo-ci.md, scripts/add-self-hosted-runner.ps1) and the maintainer's overlay (standing decision)
+- Status: promoted: C-20261011-2 (rule already in SKILL.md Private repositories line, references/private-repo-ci.md, scripts/add-self-hosted-runner.ps1) · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-136 · 2026-09-29 · A piped watcher hid its own failure, and swapped arguments cost a minute (`pipe-hid-the-watcher`)
+- Trigger: FizzBuzzPlus Phase 0 ran `bash watch-run.sh 36645300631 m4bwav/FizzBuzzPlus 2>&1 | tail -15`, with the run id first. It printed "failed to determine base repo" twelve times, then "no run of m4bwav/FizzBuzzPlus started since", and the background task reported exit 0, which was tail's (2026-09-29).
+- Hypothesis: L-129 `pipe-hides-status` again, this time in a background call. The script took any first argument as OWNER/REPO and treated a gh error as "no run yet".
+- Rule: never pipe a script whose exit status is the verdict; read the status. watch-run.sh now exits 2 at once unless the first argument has a slash and the second ends in .yml or .yaml.
+- Evidence: m4bwav/FizzBuzzPlus ai-docs/log.md (2026-09-29). The fixed script exits 2 with a usage line for swapped arguments and for a missing workflow file, and exits 0 on run 36645600812.
+- Scope: skill (scripts/watch-run.sh), env:any
+- Status: promoted: C-20261011-2 (rule already in scripts/watch-run.sh: argument check, exit 2) · extends L-129 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-137 · 2026-09-29 · Where an arithmetic exception comes from depends on the CPU (`exception-source-depends-on-cpu`)
+- Trigger: FizzBuzzPlus's golden capture records where each exception was thrown (the namespace or assembly of `TargetSite`). On Windows and ubuntu-latest (x64), DivideByZeroException and OverflowException from `long %` came from the library. On macos-latest they came from System.Private.CoreLib, in the same four cases. The header recorded the bitness but not the architecture, so the difference looked like an OS difference (2026-09-29).
+- Hypothesis: macos-latest runs on arm64, where the runtime checks 64-bit division in a CoreLib helper instead of relying on a hardware trap.
+- Rule: the capture header records `RuntimeInformation.ProcessArchitecture`. When exceptions' sources are recorded, the recordings are per runtime, OS and CPU, and a replay on another architecture compares that field only through a named rule.
+- Evidence: m4bwav/FizzBuzzPlus golden-capture runs 36645300631 and 36645600812; tests/Golden/1.0.0.net10.0-macos.json (architecture arm64) against 1.0.0.net10.0-linux.json (x64), commit 2835ec0
+- Scope: skill (references/nuget.md Phase 0, the capture templates)
+- Status: promoted: C-20261011-2 (rule already in references/nuget.md Phase 0, the CPU architecture line) · extends L-098 · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-138 · 2026-09-29 · On .NET, ICU writes a negative number differently in five cultures (`icu-minus-sign`)
+- Trigger: the same 2014 FizzBuzzPlus source, compiled for net48 and for net10.0, wrote different lines for negative numbers under five cultures. `"Current Number: " + n` formats with the current culture. .NET 10 writes U+2212 (sv-SE, nb-NO), U+200E then "-" (he-IL), U+200E U+2212 (fa-IR), or U+061C then "-" (ar-SA); .NET Framework wrote "-" in all five. Linux gave the same answers as Windows (2026-09-29).
+- Hypothesis: .NET 5 moved number formatting to ICU (CLDR) data on every OS. A Framework-era package that formats with the current culture changes its output in the port without any code change, and a capture under invariant and en-US alone never sees it.
+- Rule: golden captures of .NET code include negative numbers under sv-SE, nb-NO, he-IL, fa-IR and ar-SA, beside invariant and en-US, on both runtimes. The plan then chooses, per method, invariant formatting (the Framework's answer) or the current culture.
+- Evidence: m4bwav/FizzBuzzPlus tests/Golden/1.0.0.net48-windows.json against 1.0.0.net10.0-windows.json and -linux.json, group culture; ai-docs/notes/2026-09-29-phase-0-findings.md
+- Scope: skill (references/nuget.md Phase 0)
+- Status: promoted: C-20261011-2 (rule already in references/nuget.md Phase 0, the Culture line) · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-139 · 2026-09-29 · A repository that was never published: the frozen source is the reference (`frozen-source-reference`)
+- Trigger: FizzBuzzPlus, the first repository run (never published; a 2014 .NET Framework kata), needed a golden reference where the skill says "install the published old version" (2026-09-29).
+- Hypothesis: for such a repository the last old commit's source is the only contract, and a capture that compiles files the rewrite will change would end up recording the new code.
+- Rule: copy the files the capture needs byte for byte (`git show COMMIT:PATH > tests/Golden/Original/FILE`), let the capture script check `git hash-object` against `git rev-parse COMMIT:PATH` before every run, and mark the folder `-text`. Compile the files unchanged in the capture; rebuild an app from its frozen source in a project of its own and run it as a process. The maintainer's machine gives the Windows recordings; Linux and macOS come from a throwaway workflow on a scratch branch (capture twice, `cmp`, upload, check the artifact's hash against the log). The whole variant is drafted during the run and becomes references/repository.md when the run has proved it.
+- Evidence: m4bwav/FizzBuzzPlus branch v2 (tests/Golden with capture.sh; commits 7c455b9 to 2835ec0), ai-docs/notes/2026-09-29-repository-variant.md
+- Scope: skill (the repository variant)
+- Status: promoted: C-20261011-2 (rule already in references/pypi.md "Never published, so the frozen source is the reference") · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-140 · 2026-09-29 · With Dependabot alerts off, gh's scope hint makes the survey look broken (`alerts-off-scope-hint`)
+- Trigger: survey-github.sh on FizzBuzzPlus printed "Dependabot alerts are disabled for this repository (HTTP 403)" in the alert sections, with gh's hint "This API operation needs the admin:repo_hook scope". That reads as if the webhooks section had failed, but the hooks call returned `[]` with exit 0 (2026-09-29).
+- Hypothesis: gh adds a scope hint to any 403, whether or not a scope would help.
+- Rule: the survey first probes `repos/OWNER/REPO/vulnerability-alerts` (success when on, 404 when off) and prints OFF plainly; the hint under the alert sections is to be ignored.
+- Evidence: m4bwav/FizzBuzzPlus ai-docs/notes/2026-09-29-survey.txt; the fixed script prints OFF for FizzBuzzPlus, and the probe answers on for TrailerClipperLib, IsImageUrlDotNet and DotNetJsonPrettyPrinter
+- Scope: skill (scripts/survey-github.sh)
+- Status: promoted: C-20261011-2 (rule already in scripts/survey-github.sh, the Dependabot alerts probe) · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-142 · 2026-09-29 · .NET's console stream swallows a closed pipe on Windows and Unix (`console-stream-swallows-epipe`)
+- Trigger: FizzBuzzPlus 2.0.0's program wrote through `Console.OpenStandardOutput()` and treated IOException as "the reader left". The Phase 3 review found that on Linux `fizzbuzzplus 1 9223372036854775807 | head -1` never ends: the Unix console stream ignores EPIPE. The review said Windows was fine, but the same command on Windows also ran until `timeout 20`, because the Windows console stream ignores ERROR_NO_DATA and ERROR_BROKEN_PIPE too. The catch-all also turned a full disk (`> /dev/full`) into exit 0 (2026-09-29).
+- Hypothesis: .NET's ConsoleStream drops broken-pipe errors on both systems so that ordinary programs do not crash in pipelines, and the cost is that a program writing a long output never learns the reader has gone. 57 passing tests had missed it, because every app test called `Run` with StringWriters.
+- Rule: a command-line program that can write a lot writes to a FileStream on the standard output handle: descriptor 1 on Unix, `GetStdHandle(-11)` through a LibraryImport on Windows (AllowUnsafeBlocks). A broken pipe (EPIPE 32 on Unix; 109 or 232 on Windows) ends quietly with 0, and any other write failure goes to stderr with exit 1. Buffer stderr, so a failing stderr cannot change the exit code. Test the real process: UTF-8 bytes, the exit codes, and a reader that closes the pipe after one line. Check a reviewer's "works on X" claim before relying on it.
+- Evidence: m4bwav/FizzBuzzPlus pull request #1 (b901e34; the review comment lists the findings); WSL Ubuntu with the self-contained linux-x64 build: pipe 106 ms exit 0, /dev/full exit 1; Windows: 563 ms (dll) and 1079 ms (trimmed exe), exit 0; ci run 36651132613 green on three OSes with the closed-pipe test
+- Scope: skill (references/nuget.md Phase 2, console apps and tools)
+- Status: promoted: C-20261011-2 (rule already in references/nuget.md Phase 2, the console app line) · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-144 · 2026-09-29 · A Release made with the GITHUB_TOKEN starts no `on: release` workflow (`token-release-fires-nothing`)
+- Trigger: FizzBuzzPlus's release.yml creates the GitHub Release with `gh release create` and the job's GITHUB_TOKEN, and its verify-release.yml (written for the repository variant, outside the templates) listened for `release: published`. Read before the first tag: it would never have run (2026-09-29).
+- Hypothesis: GitHub starts no workflow from events caused by the GITHUB_TOKEN, apart from `workflow_dispatch` and `repository_dispatch`, so that workflows cannot trigger each other in loops. The npm and NuGet templates dispatch their verify workflow by hand (verify-registry-npm.sh through watch-run.sh), so they never met it.
+- Rule: a verify workflow that must follow a Release made by a workflow is started by that workflow: the gated job gets `actions: write` and ends with `gh workflow run verify-release.yml --ref master -f tag="$TAG"`. Keep `release: published` only for Releases made by hand. Never rely on an event another workflow causes through the GITHUB_TOKEN.
+- Evidence: m4bwav/FizzBuzzPlus pull request #2 (0408825; the release.yml comment and step); GitHub docs "Triggering a workflow from a workflow"
+- Scope: skill (the repository variant's release, references/repository.md when it lands)
+- Status: promoted: C-20261011-2 (rule already in references/pypi.md "A Release made with the GITHUB_TOKEN starts no other workflow") · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-145 · 2026-09-29 · Workflow lint cost six calls and once checked nothing (`one-call-workflow-lint`)
+- Trigger: FizzBuzzPlus Phase 5: after a workflow edit, actionlint and shellcheck were not on PATH, so the session searched old scratchpads for copies, then ran actionlint, check-workflow-shell.py and zizmor separately. check-workflow-shell.py was given workflow file paths, took the first as the repository directory, found no workflows and exited 0: a clean result that checked nothing (2026-09-29).
+- Hypothesis: tools downloaded into a session scratchpad are lost to the next session, and a check that accepts any argument and reports only failures cannot tell "clean" from "saw nothing".
+- Rule: run `scripts/lint-workflows.sh REPO` after every workflow edit. It keeps actionlint and shellcheck in `~/.cache/package-modernize/tools` (downloaded once from pinned releases, sha256 checked), runs all three checks, and prints how many run blocks it checked. check-workflow-shell.py now refuses a path without `.github/workflows` (exit 2).
+- Evidence: FizzBuzzPlus `ai-docs/log.md` (Phase 5); the script's clean run on FizzBuzzPlus (10 run blocks) and its red run on a planted `[ "$X" = "y" ; then`, where actionlint and check-workflow-shell.py both failed
+- Scope: skill (scripts/lint-workflows.sh, scripts/check-workflow-shell.py, SKILL.md Phase 2, references/npm.md and nuget.md)
+- Status: promoted: C-20261011-2 (rule already in scripts/lint-workflows.sh, scripts/check-workflow-shell.py, references/npm.md and nuget.md) · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-146 · 2026-09-29 · A .NET version bump rewrites the lock files of referencing projects (`version-bump-rewrites-lock-files`)
+- Trigger: FizzBuzzPlus 2.0.0 to 2.0.0-beta.1 in Directory.Build.props: the two test projects' packages.lock.json record the library reference as `[2.0.0, )`, so CI's `dotnet restore --locked-mode` would fail with NU1004. `dotnet restore --force-evaluate` fixed them and also rewrote three other lock files with CRLF only. Finding and sorting that took four calls (2026-09-29).
+- Hypothesis: NuGet lock files include project references with the referenced project's version, so every version change is a lock file change in each project that references a versioned one.
+- Rule: set the version with `scripts/bump-version-dotnet.sh VERSION REPO`: it edits `<Version>`, regenerates and filters the lock files, proves a locked restore and checks the CHANGELOG heading, in one call.
+- Evidence: FizzBuzzPlus pull request #2 (two lock files changed); the script on a scratch clone at 7c567fd reproduced the same two files, and refused an undated heading for 2.0.0 (exit 1)
+- Scope: skill (scripts/bump-version-dotnet.sh, references/nuget.md Phases 5 and 6)
+- Status: promoted: C-20261011-2 (rule already in scripts/bump-version-dotnet.sh and references/nuget.md Phases 5 and 6) · helpful 1 · harmful 0 · last_confirmed 2026-09-29
+
+### L-147 · 2026-09-30 · A pointer in the body's phase table is skipped when the run jumps to the system reference's phase section (`repeat-pointer-where-the-run-lands`)
+- Trigger: after the body split (C-20260930-1), eval pointer-phase-5 passed 2 of 3 runs. The failing run read `references/npm.md` from its Phase 5 section (offset 55) and never opened `references/security.md`, which the Phase 5 "Read first" cell names. A first version of the case failed 0 of 3 for another reason: the pad-lite fixture is at Phase 2, so every run refused to start Phase 5 on a checkout that contradicted the prompt (correct behaviour, class `test-defect`).
+- Hypothesis: a run that knows its system goes straight to that file's section for the phase, so it sees only the pointers inside that section. A pointer only in the body's table is read once, at invocation, long before the phase begins.
+- Rule: when a reference must be read at a phase, put the pointer in the body's Read first cell and again as the first line of the matching phase section in each system reference. After the line was added to npm.md and nuget.md, the case passed 3 of 3.
+- Evidence: T-20260930-1 (runs in pm-pointer2 and pm-pointer3)
+- Scope: skill (references/npm.md and references/nuget.md, Phase 5 and 6)
+- Status: promoted: C-20261011-2 (rule already in references/npm.md and references/nuget.md, first line of the Phase 5 section) · helpful 1 · harmful 0 · last_confirmed 2026-09-30
+
+### L-159 · 2026-10-08 · NuGet's search replicas lag nuget.org and disagree on downloads; take the highest (`nuget-search-replicas-lag`)
+- Trigger: `azuresearch-usnc` reported 0 total downloads for UniverseGenerator while its nuget.org page showed 251; `azuresearch-ussc` said 183, and usnc trailed on every package checked (3,894,453 against 3,923,964 for RandomNameGeneratorLibrary). Both hosts are listed as SearchQueryService in api.nuget.org/v3/index.json.
+- Hypothesis: NuGet's search service runs a replica per Azure region, each indexing downloads on its own schedule, while the gallery page reads a more current store.
+- Rule: never quote one replica's `totalDownloads` as the count. Compare both replicas with `www.nuget.org/stats/reports/packages/ID?groupby=Version` (the JSON behind the page's Full stats link: last 6 weeks, by version and client) and use the highest. survey-nuget.sh prints all three. The stats report is undocumented, so treat it as a cross-check, not a dependency.
+- Evidence: survey-nuget.sh UniverseGenerator on 2026-10-08: usnc totalDownloads=0, ussc 183, stats report total 251 (1.0.0=199, 1.0.0-beta.1=52), matching the package page
+- Scope: nuget, survey
+- Status: promoted: C-20261011-2 (rule already in scripts/survey-nuget.sh, the download cross-check section) · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-160 · 2026-10-08 · A Python tool that calls a CLI and HTTPS APIs is captured as a process through a shim and a fake CLI (`python-tool-golden-harness`)
+- Trigger: repo-traffic (the first PyPI run) calls `gh` and four HTTPS APIs with hard-coded hosts, sleeps between requests and stamps files with today's date; the npm capture template assumes a library called in process.
+- Hypothesis: for a tool, the contract is what the process does (files, stdout, exit code, calls), so the capture must run it as a process with every outside dependency stood in, and the same harness must replay the rewrite.
+- Rule: a shim fixes the clock (a patched copy of the `datetime` module in `sys.modules`), records sleeps, sends every https request to a local `http.server` through an installed urllib opener, and guards sockets to 127.0.0.1; a fake CLI on PATH answers from a fixture (on Windows an `.exe` made with pip's distlib `ScriptMaker`, since `subprocess` finds only `.exe`). Record exit code, stdout, last stderr line, calls, requests, sleeps and files; capture twice and compare. references/pypi.md, "First run", has the recipe.
+- Evidence: m4bwav/repo-traffic tests/golden (commit 896876d): 18 cases recorded twice identical on Windows and WSL; replays on Python 3.9.25 and 3.12.14; macOS replayed the posix recording in CI
+- Scope: pypi, golden
+- Status: promoted: C-20261011-2 (rule already in references/pypi.md "First run", the process capture) · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-161 · 2026-10-08 · Exceptions to a recording are written per OS from the test's own difference list, then compared beyond line endings (`exceptions-per-os`)
+- Trigger: the rewrite's ruled differences contain file contents, which carry CRLF on Windows and LF elsewhere, so one exceptions file cannot serve both recordings; WSL's Python had no pip or venv to write the Linux one.
+- Hypothesis: the recorded differences include file contents, which carry each OS's newline convention, so the differences themselves differ per OS and one file can match only one of them.
+- Rule: the golden test writes `exceptions-<os>.json` when an environment variable asks (and fails, so a write is never a pass), each entry carrying the change ids the plan ruled; a reviewer reads the values; the posix file comes from a throwaway workflow on a scratch branch (ubuntu and macos, byte-identical, hash checked against the log); a script compares the two files after normalising CRLF; the test fails on an unlisted difference, a listed field that no longer differs, or an unknown change id.
+- Evidence: repo-traffic run 37875372415 (both artifacts sha256 fe5c0d2c...), comparison "differ beyond CRLF: 0", commit 663af0b
+- Scope: golden, ci
+- Status: promoted: C-20261011-2 (rule already in references/pypi.md "One recording per newline convention") · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-162 · 2026-10-08 · pytest 9 and current coverage need Python 3.10; a 3.9 floor needs marker pins (`pytest9-needs-310`)
+- Trigger: the plan kept Python 3.9 (macOS's system python3); pytest 9.1.1, coverage 7.16.2, build 1.6.1 and twine 7.0.0 all require 3.10.
+- Hypothesis: the dev tools dropped Python 3.9 when it reached end of life, while the package kept 3.9 for macOS's system Python.
+- Rule: requirements-dev.txt pins `pytest==8.4.2` and `coverage==7.10.7` behind `python_version < "3.10"` and the current versions behind `>= "3.10"`; lint, build and twine run on the newest line only. Check `requires_python` of every dev tool against the floor before writing the matrix.
+- Evidence: pypi.org JSON on 2026-10-08; repo-traffic CI green on 3.9 for Ubuntu, Windows and macOS
+- Scope: pypi
+- Status: promoted: C-20261011-2 (rule already in references/pypi.md, the Python floor line, and templates/pypi/requirements-dev.txt) · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-163 · 2026-10-08 · argparse help differs on Python 3.9; a recorded `--help` needs a named group (`argparse-help-title`)
+- Trigger: the golden exception for `--help` was written on 3.14; the fresh-clone run on 3.9 failed because 3.9 titles the option list "optional arguments:".
+- Hypothesis: Python 3.10 renamed argparse's default group title from "optional arguments" to "options", so recorded help text depends on the interpreter version.
+- Rule: build the parser with `add_help=False`, one `add_argument_group("options")`, and `-h/--help` added to it with `action="help"`; then every Python prints the same help. Run the golden test on the floor version before pushing.
+- Evidence: repo-traffic commit 99a1d3c; the fresh clone on 3.9.25 failed once, then 80 passed
+- Scope: pypi, golden
+- Status: promoted: C-20261011-2 (rule already in references/pypi.md, the Python floor line (argparse)) · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-164 · 2026-10-08 · The SECURITY-tool template is written for agent skills, not command-line tools (`security-template-for-skills`)
+- Trigger: templates/security/SECURITY-tool.md's scope speaks of agent permissions and prompt injection; repo-traffic is a CLI whose risks are what it reads, writes and sends.
+- Hypothesis: the template was written from the plugin repositories first, and the command-line tool case was never considered.
+- Rule: for a command-line tool, write the scope around its own data flows (the folders it writes, the hosts it calls, private data it handles) and keep the template's reporting paragraphs; templates/README.md says so.
+- Evidence: repo-traffic SECURITY.md (commit 7d3b176)
+- Scope: security, templates
+- Status: promoted: C-20261011-2 (rule already in templates/README.md, the SECURITY.md for a command-line tool line) · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-165 · 2026-10-08 · PyPI's Publishing page needs 2FA first, and sensitive pages ask for the password again (`pypi-2fa-first`)
+- Trigger: with the maintainer logged in, pypi.org/manage/account/publishing/ redirected to the two-factor setup page; after that it asked to confirm the password.
+- Hypothesis: PyPI requires 2FA on every account that manages projects and treats publishing settings as sensitive, so the page is gated twice.
+- Rule: at the plan review, ask the maintainer for both: turn on 2FA (recovery codes, an authenticator), then add the pending publisher (owner, repository, workflow release.yml, environment pypi). The agent never types the password or sets up 2FA. The rest of the run goes on; only the first tag waits.
+- Evidence: pypi.org on 2026-10-08, in the maintainer's browser
+- Scope: pypi, account
+- Status: promoted: C-20261011-2 (rule already in references/pypi.md "PyPI account order") · helpful 1 · harmful 0 · last_confirmed 2026-10-08
+
+### L-168 · 2026-10-10 · A README opens with a banner (`readme-banner`)
+- Trigger: a new public plugin repository shipped with a modern README, CI, SECURITY.md and a wiki but no banner, and the maintainer asked why the modernization system missed it. Six of his repositories already open with one (Z-Image Turbo, 1536x640, `.github/images/banner.jpg`), but no reference said so, so the run never looked.
+- Hypothesis: a convention that lives only in finished repositories is invisible to a run that reads the references; it has to be a row the survey and the plan check.
+- Rule: Phase 0 lists whether the README has a banner; the plan decides it; Phase 2 makes one when missing (references/readme-images.md, "The banner").
+- Evidence: references/readme-images.md "The banner"; C-20261010-1
+- Scope: global (every README the run touches; the maintainer's overlay can opt out)
+- Status: promoted: C-20261011-2 (rule already in references/readme-images.md "The banner" (C-20261010-1)) · helpful 1 · harmful 0 · last_confirmed 2026-10-10
+
+### L-167 · 2026-10-08 · Every repository the run touches leaves with its topics set (`topics-on-every-repo`)
+- Trigger: the maintainer asked for topics on every repository. `scripts/topics.py audit` found 40 of 54 source repositories under five topics and 35 with none, among them IsImageUrlDotNet and DotNetJsonPrettyPrinter, which had been through this skill: the npm reference named topics in a list of `gh repo edit` settings, the NuGet reference did not, and no exit criterion checked them.
+- Hypothesis: topics were a line in one system's reference and in no exit criterion, so a run on another system, or one that skipped that line, never set them.
+- Rule: topics are a Phase 1 decision (D16) and a Phase 4 exit criterion with evidence (`scripts/topics.py check` exits 0, output logged), by references/community.md (Topics): language, ecosystem, what it does, the kind of thing; the registry keywords use the same terms; generic terms only on a private repository, because topic names are public.
+- Evidence: the sweep on 2026-10-08 set topics on all 40 repositories and each `topics.py check` exited 0; the remaining keyword warnings are plugin.json lists longer than useful topics (evergreen, chartwright), left for those repositories' next release.
+- Scope: phase 4, repo settings, all systems, repository runs
+- Status: promoted: C-20261011-2 (rule already in references/community.md (Topics), references/plan-skeleton.md D16 and its Phase 4 checklist) · helpful 1 · harmful 0 · last_confirmed 2026-10-08
