@@ -9,6 +9,11 @@ Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downlo
 
 ### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261010-1 · 2026-10-10 · README banner becomes a checked row (`readme-banner`)
+- because: L-168 (user request: a new repository shipped without the banner his other repositories have)
+- files: references/readme-images.md (new section "The banner"), LEARNINGS.md (L-168)
+- The badges-and-images step now covers the banner: noted in the survey, decided in the plan, made in Phase 2 when missing, with the size, location, alt text and no-brand rules.
+
 ### C-20261009-2 · 2026-10-09 · Live catalog listings are linked like registry pages (`catalog-listing-links`)
 - because: user request
 - files: references/rewrite-and-review.md (Rewrite: the README list), references/wrap-up.md (Wiki), references/retrofit.md (gap table)

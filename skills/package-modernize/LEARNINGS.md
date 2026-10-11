@@ -350,6 +350,14 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: golden, plan
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
 
+### L-168 · 2026-10-10 · A README opens with a banner (`readme-banner`)
+- Trigger: a new public plugin repository shipped with a modern README, CI, SECURITY.md and a wiki but no banner, and the maintainer asked why the modernization system missed it. Six of his repositories already open with one (Z-Image Turbo, 1536x640, `.github/images/banner.jpg`), but no reference said so, so the run never looked.
+- Hypothesis: a convention that lives only in finished repositories is invisible to a run that reads the references; it has to be a row the survey and the plan check.
+- Rule: Phase 0 lists whether the README has a banner; the plan decides it; Phase 2 makes one when missing (references/readme-images.md, "The banner").
+- Evidence: references/readme-images.md "The banner"; C-20261010-1
+- Scope: global (every README the run touches; the maintainer's overlay can opt out)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-10
+
 ### L-167 · 2026-10-08 · Every repository the run touches leaves with its topics set (`topics-on-every-repo`)
 - Trigger: the maintainer asked for topics on every repository. `scripts/topics.py audit` found 40 of 54 source repositories under five topics and 35 with none, among them IsImageUrlDotNet and DotNetJsonPrettyPrinter, which had been through this skill: the npm reference named topics in a list of `gh repo edit` settings, the NuGet reference did not, and no exit criterion checked them.
 - Rule: topics are a Phase 1 decision (D16) and a Phase 4 exit criterion with evidence (`scripts/topics.py check` exits 0, output logged), by references/community.md (Topics): language, ecosystem, what it does, the kind of thing; the registry keywords use the same terms; generic terms only on a private repository, because topic names are public.
