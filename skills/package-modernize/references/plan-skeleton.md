@@ -43,7 +43,7 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 | Issues, pull requests (by author and kind), forks | | |
 | Dependabot alerts, webhooks, secrets, security features | | |
 | Dead services (badge, config, webhook, app for each) | | |
-| README images and badges (`scripts/check-readme-images.mjs` on the repository README and the published one) | | |
+| README images and badges (`scripts/check-readme-images.mjs` on the repository README and the published one); banner; package icon (repository, package, registry) | | |
 | Leaked credentials | | |
 | Baseline: old build and tests as they are | | |
 | Golden capture: cases, quirks, claims confirmed or refuted | | |
@@ -129,7 +129,7 @@ summary: "the living plan for <package> N.0.0: survey, what the old version gets
 
 ## Badges and images: disposition
 
-One row per image in the old README (the script's Phase 0 output). New badges or images the new README adds get a row too.
+One row per image in the old README (the script's Phase 0 output). New badges or images the new README adds get a row too. The banner and the package icon get a row each even when the package has neither (readme-images.md, "The banner" and "The icon").
 
 | Image or badge | What it shows now | Decision | New URL or reason |
 |---|---|---|---|

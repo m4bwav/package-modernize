@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Draw a basic package icon: a white glyph on a rounded square, 128 x 128 PNG (nuget.org's size; under 1 MB).
+"""Draw a basic package icon: a white glyph on a rounded square, a square PNG (128 x 128 by default, nuget.org's size).
 
-For a package whose registry shows an icon (NuGet's PackageIcon) and that has none (package-modernize L-070
-`generate-missing-icon`). The glyph says what the package does in one or two characters, or is one of the drawn
+Every package gets an icon for registries, catalogs, listings and anywhere else a picture of it is shown
+(package-modernize L-070 `generate-missing-icon`, L-169 `icon-for-every-package`): a 512 x 512 master in
+.github/images/icon.png, and a 128 x 128 copy packed in the package where the registry shows one (NuGet's PackageIcon). The glyph says what the package does in one or two characters, or is one of the drawn
 pictures below. Use the maintainer's colour when their other packages have one (their overlay says so).
 
     python make-icon.py icon.png --text "{ }"                 # JsonPrettyPrinter's style
     python make-icon.py icon.png --text N --color "#1E4078"
     python make-icon.py icon.png --picture image              # a framed picture (IsImageUrlDotNet 2.0.0)
+    python make-icon.py .github/images/icon.png --text "{ }" --size 512   # the master for catalogs
 
 Needs Pillow (pip install pillow). Look at the result (open the PNG) before committing it.
 """
@@ -17,7 +19,7 @@ import sys
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 SCALE = 4  # draw at 4x, downscale for smooth edges
-SIZE = 128
+SIZE = 128  # the design grid; --size scales it
 WHITE = (255, 255, 255, 255)
 
 
@@ -72,18 +74,21 @@ def main():
     glyph.add_argument("--text", help="one or two characters, such as '{ }' or 'N'")
     glyph.add_argument("--picture", choices=sorted(PICTURES), help="a drawn picture")
     parser.add_argument("--color", type=hex_color, default=hex_color("#1E4078"), help="background, default #1E4078")
+    parser.add_argument("--size", type=int, default=SIZE, help="width and height in pixels, default 128; 512 for the master")
     args = parser.parse_args()
+    if args.size < 16:
+        parser.error("--size must be at least 16")
 
-    n = SIZE * SCALE
+    n = args.size * SCALE
     canvas = Image.new("RGBA", (n, n), (0, 0, 0, 0))
     draw = ImageDraw.Draw(canvas)
-    draw.rounded_rectangle([0, 0, n - 1, n - 1], radius=16 * SCALE, fill=args.color)
+    draw.rounded_rectangle([0, 0, n - 1, n - 1], radius=n / 8, fill=args.color)
     if args.text:
         text_glyph(draw, n, args.text)
     else:
         PICTURES[args.picture](draw, canvas, n)
-    canvas.resize((SIZE, SIZE), Image.LANCZOS).save(args.output, optimize=True)
-    print(f"wrote {args.output} ({SIZE}x{SIZE})")
+    canvas.resize((args.size, args.size), Image.LANCZOS).save(args.output, optimize=True)
+    print(f"wrote {args.output} ({args.size}x{args.size})")
     return 0
 
 

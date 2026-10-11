@@ -9,6 +9,11 @@ Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downlo
 
 ### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261011-1 · 2026-10-11 · Every package gets an icon, with a 512 master for catalogs (`icon-for-every-package`)
+- because: L-169 (user request), widening L-070
+- files: references/readme-images.md (new section "The icon"), references/plan-skeleton.md (survey table, badges and images), references/retrofit.md (gap table), references/nuget.md (package metadata), SKILL.md (Phase 2 exit criteria), scripts/make-icon.py (`--size`), scripts/README.md, LEARNINGS.md (L-169)
+- The icon was made only for registries that show one. Now every package gets a 512 by 512 master in `.github/images/icon.png` for catalogs, listings, manifests and the wiki, plus a copy at each size a registry or catalog asks for. `make-icon.py --size` draws any size; its default output is unchanged.
+
 ### C-20261010-1 · 2026-10-10 · README banner becomes a checked row (`readme-banner`)
 - because: L-168 (user request: a new repository shipped without the banner his other repositories have)
 - files: references/readme-images.md (new section "The banner"), LEARNINGS.md (L-168)

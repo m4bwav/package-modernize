@@ -350,6 +350,13 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: golden, plan
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-08
 
+### L-169 · 2026-10-11 · Every package gets an icon, whether or not its registry shows one (`icon-for-every-package`)
+- Trigger: the maintainer asked that the system generate an icon for every package, for catalogs and anywhere else a default graphic is needed. L-070 had scoped the icon to registries that display one (NuGet), so npm, PyPI and plugin runs shipped without one, and catalog submissions had nothing to upload.
+- Rule: Phase 0 notes the icon, the plan decides it, Phase 2 makes a 512 by 512 master in `.github/images/icon.png` (`scripts/make-icon.py --size 512`, or the maintainer's image tools) and a copy at each size a registry or catalog asks for; NuGet keeps its packed 128 by 128 `icon.png` (references/readme-images.md, "The icon").
+- Evidence: C-20261011-1; `make-icon.py` without `--size` still writes the same bytes as before for `--text "{ }"` and `--picture image`.
+- Scope: global (every package the run touches; the maintainer's overlay can opt out)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-11
+
 ### L-168 · 2026-10-10 · A README opens with a banner (`readme-banner`)
 - Trigger: a new public plugin repository shipped with a modern README, CI, SECURITY.md and a wiki but no banner, and the maintainer asked why the modernization system missed it. Six of his repositories already open with one (Z-Image Turbo, 1536x640, `.github/images/banner.jpg`), but no reference said so, so the run never looked.
 - Hypothesis: a convention that lives only in finished repositories is invisible to a run that reads the references; it has to be a row the survey and the plan check.
