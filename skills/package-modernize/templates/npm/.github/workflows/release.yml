@@ -10,6 +10,9 @@
 # build job waits for it (up to 30 minutes) and stops unless it succeeded (L-120, L-127 in package-modernize).
 # No npm token exists anywhere: npm exchanges the job's OIDC token for a short-lived one, and adds provenance itself.
 # The trusted publisher on npmjs.com names this file, release.yml; renaming it breaks publishing.
+# After a stable release (not a prerelease) the next-tag job waits for the maintainer's approval to go live, then moves
+# `next` to the release if it still points below it. That needs the trusted publisher's dist-tag permission, ticked once per
+# package by the maintainer on npmjs.com (off by default). Without it the job fails and prints the command for his terminal.
 name: release
 
 on:
@@ -242,6 +245,72 @@ jobs:
         run: |
           echo "$SHA512  $TARBALL" | sha512sum -c -
           npm stage publish "./$TARBALL" --tag "$DIST_TAG" --ignore-scripts
+
+  next-tag:
+    name: move next to the release once it is live
+    needs: [build, publish]
+    if: needs.build.outputs.prerelease == 'false'
+    runs-on: ubuntu-24.04
+    # Polls for up to 2 hours. If the maintainer approves later, re-run this job after approving (a re-run gets a new token).
+    timeout-minutes: 125
+    # The same trust as the publish job: this file, no environment, id-token for npm's OIDC exchange. It runs no package code.
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      # npm runs dist-tag over OIDC from 11.21.0 (12.2.0 on the 12 line); no Node release bundles it yet (2026-10-11).
+      - name: npm 11.21.0, the first 11.x that runs dist-tag over OIDC
+        run: |
+          npm install --global --ignore-scripts npm@11.21.0
+          npm --version
+      - name: Wait until the maintainer's approval makes the version live (up to 2 hours)
+        env:
+          PACKAGE: '{{PACKAGE}}'
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          for attempt in $(seq 1 120); do
+            if [ "$(npm view "$PACKAGE@$VERSION" version 2>/dev/null)" = "$VERSION" ]; then
+              echo "$PACKAGE@$VERSION is live"
+              exit 0
+            fi
+            echo "waiting for the approval of $PACKAGE@$VERSION (attempt $attempt of 120)"
+            sleep 60
+          done
+          echo "::error::$PACKAGE@$VERSION is not live after 2 hours; approve it on npmjs.com, then re-run this job"
+          exit 1
+      - name: Move next to the release when next points below it (absent stays absent)
+        env:
+          PACKAGE: '{{PACKAGE}}'
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          next=$(npm view "$PACKAGE" dist-tags.next 2>/dev/null || true)
+          if [ -z "$next" ]; then
+            echo "$PACKAGE has no next tag; nothing to move"
+            exit 0
+          fi
+          # Semver order with a prerelease below its release (2.0.0-beta.1 < 2.0.0): major, minor, patch, then release over
+          # prerelease. VERSION is a release here, so prerelease identifiers never need comparing.
+          below=$(node -e '
+            const [a, b] = process.argv.slice(1);
+            const parse = v => { const [core, pre] = v.split("-"); return [...core.split(".").map(Number), pre === undefined ? 1 : 0]; };
+            const x = parse(a), y = parse(b);
+            for (let i = 0; i < 4; i++) { if (x[i] !== y[i]) { console.log(x[i] < y[i]); process.exit(0); } }
+            console.log(false);
+          ' "$next" "$VERSION")
+          if [ "$below" != true ]; then
+            echo "next is $next, not below $VERSION; leaving it"
+            exit 0
+          fi
+          if ! npm dist-tag add "$PACKAGE@$VERSION" next; then
+            echo "::error::npm refused to move next. Tick the trusted publisher's dist-tag permission on npmjs.com for $PACKAGE, or run in your own terminal: npm dist-tag add $PACKAGE@$VERSION next"
+            exit 1
+          fi
+          echo "next now points to $(npm view "$PACKAGE" dist-tags.next)"
 
   github-release:
     name: GitHub Release

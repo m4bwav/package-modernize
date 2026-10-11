@@ -26,7 +26,7 @@ Topic: modernizing and re-releasing old published libraries: npm, NuGet, PyPI, c
 - When will TypeScript 7 be accepted by xo, so the held Dependabot major can be released? Still open 2026-10-11 (typescript-eslint caps below 6.1; a TypeScript 7.1 with the programmatic API is rumoured for November).
 - Should the skill's release path adopt `npm stage` tooling such as release-it's `stage: true`, or keep the plain `npm version` ritual? Partly answered 2026-10-11: keep the ritual; review the stage with Drydock or review-npm-stage's `collect` (R-20261011-3).
 - Does an approved stage-only publish validate a new trusted publisher configuration before its 48-hour expiry? The docs do not say (R-20261011-1).
-- Should release.yml use the opt-in dist-tag permission to fix `next` after a release? Needs the maintainer's ruling (R-20261011-1).
+- Answered 2026-10-11: release.yml uses the opt-in dist-tag permission to fix `next` after a release (maintainer's ruling; C-20261011-4).
 
 ## Search plan
 
