@@ -8,6 +8,11 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20261011-1 · 2026-10-11 · claude -p stream-json (evals/run-headless.mjs --skill-dir) · Windows 11, Claude Code 2.1.281 · 6/6 (trigger cases only)
+- Regression run after the 2026-10-11 refresh (C-20261011-1) and the icon step (C-20261011-3), against a worktree of origin/master linked with `--skill-dir`: `--case trigger-1,trigger-2,trigger-3,decoy-1,decoy-2,decoy-3 --runs 3`. Triggers invoked 9/9, decoys 0/9, 11 to 28 s a run, about $4.00 in all.
+- Headless CLI sessions, a proxy for the interactive loop. Action and outcome cases not re-run; no baseline. `git status --short` of the worktree clean after the runs.
+- led to: none
+
 ### T-20260930-1 · 2026-09-30 · claude -p stream-json (evals/run-headless.mjs) · Windows 11, Claude Code 2.1.281 · 7/7
 - For the body split C-20260930-1. New case `pointer-phase-5` ran against the branch's worktree with the new `--skill-dir` option (the skill linked as `.claude/skills/package-modernize` in each run's folder, CLI on `--setting-sources project`). Tools were Skill, Read, Glob and Grep, so nothing could be tagged or published. Evidence: Read calls for `references/security.md` and `references/npm.md`.
 - First wording 0/3, class `test-defect`: the pad-lite fixture is at Phase 2, and every run refused to start Phase 5 on a checkout that contradicted the prompt, which is the right behaviour. Reworded ("prepare Phase 5", merge still to come): 2/3. The failing run read npm.md's Phase 5 section and never opened security.md, class `pointer-skipped`. After a pointer line was added to the Phase 5 and 6 sections of npm.md and nuget.md: 3/3 (L-147 `repeat-pointer-where-the-run-lands`).
