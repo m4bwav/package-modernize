@@ -2,12 +2,17 @@
 
 Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with the reason. Reasons cite findings in [RESEARCH.md](RESEARCH.md) (`R-`), lessons in [LEARNINGS.md](LEARNINGS.md) (`L-`), and test runs in [TESTS.md](TESTS.md) (`T-`). State in `evergreen.json`. Protocol: [MAINTENANCE.md](MAINTENANCE.md).
 
-Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downloads against the other search replica and the 6-week stats report (`nuget-download-cross-check`)
-- because: L-159 (one search replica reported 0 downloads for a package with 251)
-- files: scripts/survey-nuget.sh (new section "Download cross-check"), LEARNINGS.md (L-159)
-- The survey printed `totalDownloads` from azuresearch-usnc only, which can lag by days. It now also prints azuresearch-ussc's total and the per-version counts from nuget.org's stats report, so the survey shows the real figure.
+Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
-### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
+### C-20261011-2 · 2026-10-11 · Third learnings consolidation, L-013 to L-168 (`consolidate-learnings-3`)
+- because: consolidation pass (lint flagged 47 active entries against consolidate_every 25, 19 entries without a Hypothesis, and LEARNINGS.md at 492 lines against a 200-line budget)
+- files: LEARNINGS.md (header paragraph; Hypothesis added to L-148 to L-159 and L-161 to L-167; Active: 15 entries; the Archived entries index now lists ten IDs to a line), LEARNINGS-ARCHIVE.md (Retired: L-150, L-153, L-154, L-155, L-157; Promoted: full text of 27 entries)
+- Merged 5 near-duplicates into the lowest ID: L-150 into L-149 (Unity-hosted code), L-153, L-155 and L-157 into L-152 (awesome-copilot intake), L-154 into L-158 (release workflow and reviewer notes). Moved 27 entries whose rule a later change had already written into SKILL.md, a reference, a template, a script or the eval harness, each marked promoted with the place: L-014 (evals/run-headless.mjs, evals.json), L-121, L-133, L-136 (scripts/watch-run.sh), L-125, L-127, L-132, L-134 (references/npm.md, templates/npm release.yml, scripts/capture-proxy.cjs), L-135 (SKILL.md, references/private-repo-ci.md), L-137, L-138, L-142, L-146 (references/nuget.md, scripts/bump-version-dotnet.sh), L-139, L-144, L-160 to L-163, L-165 (references/pypi.md, templates/pypi), L-140 (scripts/survey-github.sh), L-145 (scripts/lint-workflows.sh), L-147 (Phase 5 first lines of npm.md and nuget.md), L-159 (scripts/survey-nuget.sh), L-164 (templates/README.md), L-167 (references/community.md, plan-skeleton.md D16), L-168 (references/readme-images.md). Retired none. Proposed for promotion and left active: L-013, L-108, L-111, L-116, L-141, L-143, L-156, L-166.
+
+### C-20261011-1 · 2026-10-11 · Refresh: the 48-hour trusted publisher window, opt-in dist-tag automation, Python 3.11 floor, review-npm-stage (`refresh-2026-10-11`)
+- because: R-20261011-1, R-20261011-2, R-20261011-3
+- files: references/npm.md (Phase 4: trusted publisher, rehearsal, the `next` rule; Language and build row), references/pypi.md (Python floor; Deprecate, yank, delete), RESEARCH.md (Current understanding, Open questions, Search plan, three findings), CHANGELOG.md (header repaired: C-20261008-1 had been merged into the Entry shape line; the second R-20260925-4 renumbered R-20260925-6; the dist-tag entries C-20260927-1 to 4 at the bottom renumbered C-20260927-17 to 20)
+- The maintainer now saves the trusted publisher in the same sitting as the rehearsal tag, since an unused configuration expires after 48 hours; the `next` fix can become a workflow step once the maintainer opts in to dist-tag permission; the default Python floor is 3.11 and PyPI's 14-day file window is noted; the rehearsal points at review-npm-stage's diff beside Drydock; TypeScript stays on `~6.0.3` although `latest` is now 7.
 
 ### C-20261010-1 · 2026-10-10 · README banner becomes a checked row (`readme-banner`)
 - because: L-168 (user request: a new repository shipped without the banner his other repositories have)
@@ -33,6 +38,11 @@ Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downlo
 - because: L-160 to L-166 (repo-traffic, the first Python and first command-line-tool run, 2026-10-08)
 - files: references/pypi.md (coverage line; new section "First run"), SKILL.md (Package systems: PyPI row), templates/pypi/ (new: ci.yml, release.yml, dependabot.yml, requirements-dev.txt, scripts/check_size.py), templates/README.md (new section PyPI; the SECURITY note for tools), LEARNINGS.md (L-160 to L-166)
 - PyPI moves from "docs only" to one run through Phase 4. The release workflow is written and linted but unproven until its first tag publishes; the next PyPI run or repo-traffic's 1.0.0b1 confirms it.
+
+### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downloads against the other search replica and the 6-week stats report (`nuget-download-cross-check`)
+- because: L-159 (one search replica reported 0 downloads for a package with 251)
+- files: scripts/survey-nuget.sh (new section "Download cross-check"), LEARNINGS.md (L-159)
+- The survey printed `totalDownloads` from azuresearch-usnc only, which can lag by days. It now also prints azuresearch-ussc's total and the per-version counts from nuget.org's stats report, so the survey shows the real figure.
 
 ### C-20261006-2 · 2026-10-06 · SECURITY.md no longer tells reporters what to keep out of public view (`security-md-neutral`)
 - because: user request (the maintainer judged advice to hold back a dangerous problem unethical and a legal risk; the reporter should decide)
@@ -304,7 +314,7 @@ Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downlo
 - The survey missed a misspelled Snyk policy file and a branch no pull request pointed at; the capture template could not record a callback or a request; nothing told the run to try the CLI, which turned out to have crashed on every call since 2019; and "sync push" would have pushed a run that was told not to.
 
 ### C-20260925-5 · 2026-09-25 · Badges and images: a rule for every phase and a checker script
-- because: user request; R-20260925-4
+- because: user request; R-20260925-6
 - files: SKILL.md (new "Badges and images" section; Phase 0 and Phase 2 exit criteria; the plan's questions), scripts/check-readme-images.mjs (new), scripts/README.md, references/plan-skeleton.md (survey row, D11 widened, a badges-and-images disposition table), references/npm.md (Phase 0 bullet, Phase 2 README line, checklist row), references/nuget.md (the allow-list, checklist row), templates/npm/README.template.md, prompts/kickoff-skeleton.md
 - The skill removed dead badges only in passing and said nothing about images: screenshots and GIFs from dead hosts or showing the old API, relative paths that break on npmjs.com and nuget.org, badges that answer 200 but say "not found". Every image now gets a keep, replace or remove decision in the plan, and the script proves the result before and after the release.
 
@@ -328,14 +338,14 @@ Entry shape: `### C-20261008-1 · 2026-10-08 · NuGet survey cross-checks downlo
 - files: SKILL.md (all sections), references/ (npm, nuget, pypi, crates, maven, go, plan-skeleton), scripts/ (survey-npm, survey-nuget, survey-github, golden-capture templates, check-line-endings), templates/npm and templates/nuget, prompts/ (kickoff-skeleton, review-subagent), RESEARCH.md, LEARNINGS.md, TESTS.md, evals/evals.json, evergreen.json
 - Initial version. Eight phases the same for every system, with exit criteria and stops; shared checklists written once; a per-system table; npm complete from two runs, NuGet from two runs plus docs, four systems documented and marked unverified. Tier `fast`, interval 14 days. The private overlay mechanism (`PACKAGE_MODERNIZE_OVERLAY` or `~/.package-modernize/OVERLAY.md`) keeps the maintainer's identities and decisions out of the public skill. The npm templates come from seeded-random-utilities and get-title-at-url with placeholders; the NuGet release, verify and CI workflows are new (pinned actions, tag check before packing, attestation, environment gate) and marked unverified until a run uses them.
 
-## C-20260927-1 · 2026-09-27 · Template ignores the generated release notes
+### C-20260927-17 · 2026-09-27 · Template ignores the generated release notes
 - templates/npm/xo.config.js ignores `release-notes.md` and templates/npm/.gitignore lists it: release.yml writes the file before `npm run lint`, and xo failed on its unused link definition in the format-json-files beta.1 run (L-039).
 
-## C-20260927-2 · 2026-09-27 · Remove the stale next dist-tag after release
+### C-20260927-18 · 2026-09-27 · Remove the stale next dist-tag after release
 - references/npm.md and SKILL.md Phase 6: after X.0.0 is live the maintainer runs `npm dist-tag rm PACKAGE next` and the agent reads back `npm dist-tag ls`; the old note that `next` may stay on the beta is gone. Mark asked for it after seeing `next` below `latest` on seeded-random-utilities, format-json-files and is-an-image-url.
 
-## C-20260927-3 · 2026-09-27 · Stale next detection script
+### C-20260927-19 · 2026-09-27 · Stale next detection script
 - scripts/check-next-tag-npm.sh: read-only semver check of `next` against `latest` for any list of packages; references/npm.md cites it with the research (OIDC cannot edit dist-tags yet, npm/cli#8547; move-to-stable is the common alternative to removal).
 
-## C-20260927-4 · 2026-09-27 · next rule: never below latest
+### C-20260927-20 · 2026-09-27 · next rule: never below latest
 - Rule restated per Mark: `next` may equal `latest`, lead it, or be absent, never trail it. check-next-tag-npm.sh flags only `next < latest` and prints `dist-tag add PKG@latest next` (default) or `rm`; npm.md, SKILL.md Phase 6 and the overlay match.

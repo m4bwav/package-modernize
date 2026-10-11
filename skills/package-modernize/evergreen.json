@@ -13,9 +13,9 @@
   "source": null,
   "topic": "modernizing and re-releasing old published libraries: npm, NuGet, PyPI, crates.io, Maven Central and Go registry mechanics (trusted publishing, staged or gated publishing, provenance, deprecation, audit tooling), TypeScript and .NET library packaging defaults, and how AI agents modernize legacy libraries safely",
   "tier": "fast",
-  "interval_days": 9.33,
-  "last_checked": "2026-09-26",
-  "next_due": "2026-10-05",
+  "interval_days": 6.22,
+  "last_checked": "2026-10-11",
+  "next_due": "2026-10-18",
   "verify_at_use": false,
   "volatile_claims": [
     {
@@ -34,6 +34,16 @@
     {
       "date": "2026-10-28",
       "label": "node-26-active-lts",
+      "settle_days": 2.0
+    },
+    {
+      "date": "2026-11-01",
+      "label": "nuget-old-api-keys-expire",
+      "settle_days": 2.0
+    },
+    {
+      "date": "2026-11-10",
+      "label": "dotnet-8-9-eol-dotnet-11-ga",
       "settle_days": 2.0
     }
   ],
@@ -55,12 +65,18 @@
       "m": 0.4,
       "interval_after": 9.33,
       "note": "R-20260926-1, R-20260926-2: Node 20 action runtime gone, npm stage-only tokens, code-modernization 1.0.0 canary, RepoRescue, secure-npm-package, Drydock"
+    },
+    {
+      "date": "2026-10-11",
+      "m": 0.5,
+      "interval_after": 6.22,
+      "note": "refresh 2026-10-11: npm trusted publisher 48h expiry, opt-in dist-tag OIDC, Python 3.11 floor, PyPI 14-day window, review-npm-stage pointer; consolidation C-20261011-2 (47->15 active); cost: searches 20 · fetches 32 · tool calls 62"
     }
   ],
   "counts": {
     "learnings": 146,
     "changes": 51,
-    "research": 8,
+    "research": 9,
     "tests": 5
   },
   "consolidate_every": 25,
