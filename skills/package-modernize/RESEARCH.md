@@ -67,6 +67,20 @@ Best sources (primary first): docs.npmjs.com and github.blog/changelog; learn.mi
 
 Newest first. One entry per material finding; a quiet refresh gets one entry saying so. `Track` is subject, tooling, practice, or testing.
 
+### R-20261018-1 · 2026-10-18 · Subject: SlugFest, npm trusted publisher bindings matched by name until the first publish
+- summary: Bloom Security (disclosed 2026-10-13) found a configuration stayed bound to the readable `owner/repo` name until its first successful publish bound it to the numeric repository id; a renamed, transferred or deleted repository let whoever claimed the old name publish. Over 1,500 packages were exposed; no exploitation seen. GitHub's 48-hour expiry (R-20261011-1) is the fix. Actions: `npm trust list` per package, delete a binding before a rename, transfer or delete, recreate and publish through it promptly. Whether a staged publish validates a binding is still undocumented; whether pre-2026-10-02 bindings were rebound retroactively is not stated.
+- track: subject
+- sources: https://workos.com/blog/npm-trusted-publishing-slugfest, https://thehackernews.com/2026/10/github-tightens-npm-publishing-after.html, https://github.blog/changelog/2026-10-02-unvalidated-npm-trusted-publishing-configurations-now-expire
+- magnitude: 0.4
+- applied: C-20261018-1
+
+### R-20261018-2 · 2026-10-18 · Tooling and practice: workflow lockfiles (preview); Tensorlake provenance-signed worm; zizmor 1.31; versions
+- summary: GitHub Actions workflow lockfiles (`gh extension install github/gh-actions-lock`, `.github/workflows/actions.lock`, `--verify` in CI, Dependabot regenerates, a "Require lockfile" policy) entered public preview 2026-10-14; pre-1.0, skips local `./` actions, interaction with SHA pins undocumented: point, not adopt. tensorlake@0.5.144 (2026-10-08) shipped a Shai-Hulud/ChainDrop payload through its own release workflow with valid provenance after a hijacked account pushed to `main`; its `gh-token-monitor` wipes the home directory when the token is revoked. zizmor 1.31.0/1.31.1 (2026-10-15) flags `issue_comment` as a dangerous trigger. Versions: Rust 1.99.1 (2026-10-15), Go 1.27.2, npm 12.2.1/11.21.1 bug fixes, publint 0.3.25, typescript-eslint 8.71.2 still caps TypeScript below 6.1 (xo and TS 7 still open). Tooling: nothing new on the producer side (dotnet/skills nuget-trusted-publishing about 325 installs a week). Testing: nothing new beyond zizmor.
+- track: tooling, practice, testing, subject
+- sources: https://github.blog/changelog/2026-10-14-github-actions-workflow-lockfiles-in-public-preview/, https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2, https://github.com/zizmorcore/zizmor/releases, https://blog.rust-lang.org/
+- magnitude: 0.3
+- applied: C-20261018-2, C-20261018-3
+
 ### R-20261011-1 · 2026-10-11 · Subject: npm trusted publisher configurations expire after 48 hours unused; opt-in dist-tag permission
 - Summary: from 2026-10-02 a new trusted publisher configuration must complete a publish within two days or it expires and can be neither used nor edited (delete and recreate); OIDC tokens from `issue_comment` events are now rejected like `pull_request_target`; the docs give Node 22.14.0+. From 2026-09-30 a configuration can opt in to dist-tag permission (off by default, existing configurations included), and npm 12.2.0 / 11.21.0 run `npm dist-tag` over OIDC, which ends "automation is not possible yet" for the `next` fix. Staged publishing can also create a new package (2026-10-02), which matters only for renames and new names. Whether an approved stage counts as the validating publish is undocumented.
 - Track: subject

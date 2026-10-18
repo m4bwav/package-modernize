@@ -4,6 +4,20 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261018-1 · 2026-10-18 · npm trusted publisher: survey existing bindings, delete before a rename or transfer (`slugfest-binding-rule`)
+- because: R-20261018-1
+- files: references/npm.md (Phase 5 trusted publisher)
+- A revived package often renames or transfers its repository; the binding is now listed in the survey and deleted and recreated around any identity change.
+
+### C-20261018-2 · 2026-10-18 · Security: provenance is not proof; hostage-token order; lockfiles as an optional extra
+- because: R-20261018-2
+- files: references/security.md (workflows; incident note)
+- Names Tensorlake as why staging and branch protection stay mandatory, the remove-the-monitor-before-revoking step, and `gh actions-lock` as optional on top of SHA pins.
+
+### C-20261018-3 · 2026-10-18 · zizmor 1.31.1; Rust stable 1.99.1
+- because: R-20261018-2
+- files: scripts/lint-workflows.sh (ZIZMOR_VERSION), references/crates.md (Package shape)
+
 ### C-20261011-4 · 2026-10-11 · release.yml moves `next` to the release once it is live (`next-tag-job`)
 - because: R-20261011-1; user request (maintainer's ruling 2026-10-11: automate the `next` dist-tag)
 - files: templates/npm/.github/workflows/release.yml (new job `next-tag`, header comment), templates/npm/.github/zizmor.yml (adhoc-packages ignore for the pinned npm install), references/npm.md (Phase 4 trusted publisher setup, the `next` rule), SKILL.md (Phases table, Phase 6 exit criteria), RESEARCH.md (open question answered)

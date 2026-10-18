@@ -13,7 +13,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 TOOLS="${PACKAGE_MODERNIZE_TOOLS:-$HOME/.cache/package-modernize/tools}"
 ACTIONLINT_VERSION=1.7.12
 SHELLCHECK_VERSION=0.11.0
-ZIZMOR_VERSION=1.30.1
+ZIZMOR_VERSION=1.31.1
 
 if [ ! -d "$REPO_DIR/.github/workflows" ]; then
   echo "lint-workflows.sh: no .github/workflows in $REPO_DIR" >&2
