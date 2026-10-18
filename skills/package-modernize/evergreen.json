@@ -13,9 +13,9 @@
   "source": null,
   "topic": "modernizing and re-releasing old published libraries: npm, NuGet, PyPI, crates.io, Maven Central and Go registry mechanics (trusted publishing, staged or gated publishing, provenance, deprecation, audit tooling), TypeScript and .NET library packaging defaults, and how AI agents modernize legacy libraries safely",
   "tier": "fast",
-  "interval_days": 6.22,
-  "last_checked": "2026-10-11",
-  "next_due": "2026-10-18",
+  "interval_days": 4.15,
+  "last_checked": "2026-10-18",
+  "next_due": "2026-10-22",
   "verify_at_use": false,
   "volatile_claims": [
     {
@@ -45,6 +45,11 @@
       "date": "2026-11-10",
       "label": "dotnet-8-9-eol-dotnet-11-ga",
       "settle_days": 2.0
+    },
+    {
+      "date": "2026-11-01",
+      "label": "nuget-api-keys-before-2026-08-17-expire",
+      "settle_days": 2.0
     }
   ],
   "streak": {
@@ -71,12 +76,18 @@
       "m": 0.5,
       "interval_after": 6.22,
       "note": "refresh 2026-10-11: npm trusted publisher 48h expiry, opt-in dist-tag OIDC, Python 3.11 floor, PyPI 14-day window, review-npm-stage pointer; consolidation C-20261011-2 (47->15 active); cost: searches 20 · fetches 32 · tool calls 62"
+    },
+    {
+      "date": "2026-10-18",
+      "m": 0.4,
+      "interval_after": 4.15,
+      "note": "SlugFest binding rule in npm.md; provenance-not-proof and hostage-token order; gh actions-lock pointed; zizmor 1.31.1; cost: searches 13 · fetches 31 · tool calls 47"
     }
   ],
   "counts": {
     "learnings": 146,
     "changes": 51,
-    "research": 9,
+    "research": 10,
     "tests": 6
   },
   "consolidate_every": 25,
