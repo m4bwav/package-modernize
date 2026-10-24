@@ -23,9 +23,10 @@ Topic: modernizing and re-releasing old published libraries: npm, NuGet, PyPI, c
 - Does Dependabot update `packages.lock.json` for NuGet, and what does "supported versions <=6.12.0" mean on its ecosystems page?
 - PyPI: is un-yank possible, and how long does the JSON API take to show a new release?
 - crates.io: how soon does a published version appear in the sparse index?
-- When will TypeScript 7 be accepted by xo, so the held Dependabot major can be released? Still open 2026-10-11 (typescript-eslint caps below 6.1; a TypeScript 7.1 with the programmatic API is rumoured for November).
+- When will TypeScript 7 be accepted by xo, so the held Dependabot major can be released? Still open 2026-10-23 (typescript-eslint 8.72.0 caps below 6.1; a TypeScript 7.1 with the programmatic API is rumoured for November).
 - Should the skill's release path adopt `npm stage` tooling such as release-it's `stage: true`, or keep the plain `npm version` ritual? Partly answered 2026-10-11: keep the ritual; review the stage with Drydock or review-npm-stage's `collect` (R-20261011-3).
 - Does an approved stage-only publish validate a new trusted publisher configuration before its 48-hour expiry? The docs do not say (R-20261011-1).
+- Does Node 26 bump its bundled npm to 11.21+ or 12.x at the 2026-10-28 LTS switch? If so, release.yml's exact npm install can go (R-20261023-1).
 - Answered 2026-10-11: release.yml uses the opt-in dist-tag permission to fix `next` after a release (maintainer's ruling; C-20261011-4).
 
 ## Search plan
@@ -34,7 +35,7 @@ Four tracks; every refresh runs at least one query on each (scope each to the pe
 
 Subject (the goal and the latest thinking on reaching it):
 
-- Fetch `github.blog/changelog/month/MM-YYYY/` pages 1 to 3 directly (best source on 2026-10-11); `registry.npmjs.org/PACKAGE/latest` for current versions (full documents get truncated); python.org/downloads and blog.pypi.org
+- Fetch `github.blog/changelog/month/MM-YYYY/` pages 1 to 3 directly (best source on 2026-10-11; numbering shifts, pages 1 and 2 cover about a week); `nodejs.org/dist/index.json` for the npm each Node release bundles; the npm docs pages' 'Last edited' date as a change detector; `registry.npmjs.org/PACKAGE/latest` for current versions (full documents get truncated); python.org/downloads and blog.pypi.org
 - `npm staged publishing changelog site:github.blog <year>`; `docs.npmjs.com trusted publishers` (re-read the page); `npm cli releases <year>`
 - `nuget.org trusted publishing docs updated`; `devblogs.microsoft.com/dotnet nuget <year>`; `NuGet/Home issue 13581 provenance`
 - `tsdown release notes <year>`; `xo typescript 7 support`; `Node.js release schedule <year>`
@@ -66,6 +67,13 @@ Best sources (primary first): docs.npmjs.com and github.blog/changelog; learn.mi
 ## Findings log
 
 Newest first. One entry per material finding; a quiet refresh gets one entry saying so. `Track` is subject, tooling, practice, or testing.
+
+### R-20261023-1 · 2026-10-23 · Quiet check: versions, two GitHub previews, nothing core
+- summary: Subject: .NET SDK 10.0.402 (2026-10-13 security patch) current, .NET 11 RC2, .NET 8/9 EOL and .NET 11 GA still 2026-11-10; Node 26.12.1 bundles npm 11.20.0 and 24.22.1 bundles 11.19.1, so no Node ships the npm 11.21+ that runs `npm dist-tag` over OIDC and release.yml's exact npm install stays (re-check after Node 26 Active LTS on 2026-10-28); typescript-eslint 8.72.0 still caps TypeScript below 6.1, xo 5.0.1, `typescript@latest` 7.0.2, tsdown 0.23.2, publint 0.3.25, attw 0.18.5, npm 12.2.1; Dependabot supports npm 12, pnpm 11/12 and Bun 1.4 (2026-10-20; pnpm 12 lockfiles with a pinned pnpm version get no alerts yet). Tooling: GitHub package firewall (npm, Enterprise Cloud only, public preview 2026-10-20) is a consumer-side cooldown and malware proxy, out of reach for personal accounts: note. skills.sh unchanged apart from installs (nuget-trusted-publishing 3,247). Practice: nothing new (no new npm worm since 10-18). Testing: nothing new (zizmor 1.31.1, actionlint 1.7.12).
+- track: subject, tooling, practice, testing
+- sources: https://dotnet.microsoft.com/en-us/download/dotnet/10.0, https://nodejs.org/dist/index.json, https://registry.npmjs.org/typescript-eslint/latest, https://registry.npmjs.org/tsdown/latest, https://github.blog/changelog/2026-10-20-dependabot-now-supports-npm-12-pnpm-11-and-12-and-bun-1-4/, https://github.blog/changelog/2026-10-20-github-package-firewall-in-public-preview, https://skills.sh/api/search?q=trusted%20publishing
+- magnitude: 0.15
+- applied: C-20261023-1
 
 ### R-20261018-1 · 2026-10-18 · Subject: SlugFest, npm trusted publisher bindings matched by name until the first publish
 - summary: Bloom Security (disclosed 2026-10-13) found a configuration stayed bound to the readable `owner/repo` name until its first successful publish bound it to the numeric repository id; a renamed, transferred or deleted repository let whoever claimed the old name publish. Over 1,500 packages were exposed; no exploitation seen. GitHub's 48-hour expiry (R-20261011-1) is the fix. Actions: `npm trust list` per package, delete a binding before a rename, transfer or delete, recreate and publish through it promptly. Whether a staged publish validates a binding is still undocumented; whether pre-2026-10-02 bindings were rebound retroactively is not stated.
