@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261023-1 · 2026-10-23 · Version facts: SDK 10.0.402, typescript-eslint 8.72.0, tsdown 0.23.2
+- because: R-20261023-1
+- files: references/nuget.md (SDK row), references/npm.md (Language and build row), RESEARCH.md (Open questions, Search plan)
+- Version numbers only; no recommendation changed. Adds the Node-bundled-npm open question and two search-plan sources.
+
 ### C-20261018-1 · 2026-10-18 · npm trusted publisher: survey existing bindings, delete before a rename or transfer (`slugfest-binding-rule`)
 - because: R-20261018-1
 - files: references/npm.md (Phase 5 trusted publisher)
