@@ -15,4 +15,8 @@ Every repository the run touches leaves with its topics set, a package or not: t
 
 Procedure: `scripts/topics.py suggest OWNER/REPO` prints the evidence (description, languages, manifest keywords, README title) and the language and keyword candidates; the plan's decisions table carries the chosen list; in Phase 4 `gh repo edit OWNER/REPO --add-topic a,b,c` (remove a wrong one with `--remove-topic`), then `scripts/topics.py check OWNER/REPO` exits 0 and its output goes to the log. `scripts/topics.py audit OWNER` lists every source repository under the minimum, for a sweep across the maintainer's account.
 
+## Discussions
+
+A public repository leaves the run with the Discussions tab on, so questions and ideas have a home that is not the issue tracker: `gh repo edit OWNER/REPO --enable-discussions` (needs admin), then `gh api graphql -f query='{repository(owner:"OWNER",name:"REPO"){hasDiscussionsEnabled}}'` reads `true`. The maintainer asked for it on 2026-10-24, so it needs no separate OK; a private repository skips it, and so does a repository whose overlay or README sends questions elsewhere. When the token lacks admin, put the command in the handoff. The social preview image is in [readme-images.md](readme-images.md).
+
 Related: builds on [../SKILL.md](../SKILL.md); see also [security.md](security.md).
