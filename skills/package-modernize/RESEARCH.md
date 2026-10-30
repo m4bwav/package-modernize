@@ -68,6 +68,13 @@ Best sources (primary first): docs.npmjs.com and github.blog/changelog; learn.mi
 
 Newest first. One entry per material finding; a quiet refresh gets one entry saying so. `Track` is subject, tooling, practice, or testing.
 
+### R-20261030-1 · 2026-10-30 · Quiet: Node 26 is Active LTS
+- summary: Node v26.13.0 (2026-10-28) is the first LTS release (codename Lithium), bundling npm 11.20.0, so still no Node ships npm 11.21 for OIDC dist-tag. Node 27.0.0 alpha appeared 2026-10-29. typescript 7.0.2, typescript-eslint 8.72.1, tsdown 0.23.4, publint 0.3.25. No new npm or NuGet trusted-publishing changelog entry since 10-23; NuGet's 2026-11-01 old-key expiry still ahead. Tooling, practice, testing: nothing new.
+- track: subject (tooling, practice, testing quiet)
+- sources: https://nodejs.org/dist/index.json, https://github.blog/changelog/2026-10-02-unvalidated-npm-trusted-publishing-configurations-now-expire, https://registry.npmjs.org/typescript-eslint/latest (checked 2026-10-30)
+- magnitude: 0.15
+- applied: C-20261030-1
+
 ### R-20261023-1 · 2026-10-23 · Quiet check: versions, two GitHub previews, nothing core
 - summary: Subject: .NET SDK 10.0.402 (2026-10-13 security patch) current, .NET 11 RC2, .NET 8/9 EOL and .NET 11 GA still 2026-11-10; Node 26.12.1 bundles npm 11.20.0 and 24.22.1 bundles 11.19.1, so no Node ships the npm 11.21+ that runs `npm dist-tag` over OIDC and release.yml's exact npm install stays (re-check after Node 26 Active LTS on 2026-10-28); typescript-eslint 8.72.0 still caps TypeScript below 6.1, xo 5.0.1, `typescript@latest` 7.0.2, tsdown 0.23.2, publint 0.3.25, attw 0.18.5, npm 12.2.1; Dependabot supports npm 12, pnpm 11/12 and Bun 1.4 (2026-10-20; pnpm 12 lockfiles with a pinned pnpm version get no alerts yet). Tooling: GitHub package firewall (npm, Enterprise Cloud only, public preview 2026-10-20) is a consumer-side cooldown and malware proxy, out of reach for personal accounts: note. skills.sh unchanged apart from installs (nuget-trusted-publishing 3,247). Practice: nothing new (no new npm worm since 10-18). Testing: nothing new (zizmor 1.31.1, actionlint 1.7.12).
 - track: subject, tooling, practice, testing

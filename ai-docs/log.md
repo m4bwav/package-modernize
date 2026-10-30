@@ -45,3 +45,5 @@ Append-only. One line per operation: `## [YYYY-MM-DD] op | title` where op is on
 ## [2026-10-06] update | C-20261006-2 security-md-neutral: SECURITY.md templates and all 32 live public SECURITY.md files no longer advise keeping problems out of public view; the private form is listed as an option only (maintainer's ruling)
 ## [2026-10-06] update | awesome-copilot follow-up: package-modernize v1.0.0 (first tag, root plugin.json, PR #31) submitted as github/awesome-copilot#4614; L-157 `shared-docs-synced-into-skills` and L-158 `release-workflow-and-readme-notes` from listing everscout, everlast and evergreen
 ## [2026-10-11] update | C-20261011-4 `next-tag-job`: the npm release.yml template gets a `next-tag` job that moves `next` to a stable release once the maintainer approves it (npm 11.21.0 over OIDC, trusted publisher dist-tag permission ticked by the maintainer once per package); references/npm.md "The `next` rule" and SKILL.md Phase 6 rewritten. Maintainer ruling 2026-10-11, R-20261011-1.
+
+- 2026-10-30: evergreen refresh of package-modernize units (see RESEARCH R-20261030-1); next due recorded in evergreen.json.

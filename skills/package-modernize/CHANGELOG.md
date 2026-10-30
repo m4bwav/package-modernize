@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261030-1 · 2026-10-30 · Node 26 Active LTS confirmed
+- because: R-20261030-1
+- files: references/npm.md (Node floor row)
+- Fact update only; no recommendation changed.
+
 ### C-20261024-1 · 2026-10-24 · Discussions on and a social preview for public repositories
 - because: user request
 - files: references/community.md (Discussions), references/readme-images.md (The social preview), SKILL.md (Phase 4 row)
