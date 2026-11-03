@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261103-1 · 2026-11-03 · Actions allowance stated in dollars
+- because: R-20261103-1
+- files: references/private-repo-ci.md (billing bullet)
+- Wording update; the free-tier and self-hosted rules still hold.
+
 ### C-20261030-1 · 2026-10-30 · Node 26 Active LTS confirmed
 - because: R-20261030-1
 - files: references/npm.md (Node floor row)

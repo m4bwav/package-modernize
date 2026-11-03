@@ -66,6 +66,13 @@ Best sources (primary first): docs.npmjs.com and github.blog/changelog; learn.mi
 
 ## Findings log
 
+### R-20261103-1 · 2026-11-03 · GitHub states included Actions usage in dollars; otherwise quiet
+- Summary: Billing docs now give Free $12/month and Pro $18/month of included usage (about 2,000/3,000 Linux minutes); storage unchanged; self-hosted free, fee still postponed. npm trusted publishing still GitHub-hosted only. NuGet pre-2026-08-17 keys expired 2026-11-01 as planned. Node 26.13.0 LTS still bundles npm 11.20.0 (Node 27 alpha has npm 12.1.0); TS 7.0.2. New lead: GitHub changelog 2026-11-02 "pull_request_target blocked by default December 2" (title only; release.yml is tag-triggered). Tooling, practice, testing: not rechecked (quiet on 10-30).
+- Track: subject
+- Sources: https://docs.github.com/en/billing/concepts/product-billing/github-actions, https://resources.github.com/actions/2026-pricing-changes-for-github-actions/, https://docs.npmjs.com/trusted-publishers, https://nodejs.org/dist/index.json, https://github.blog/changelog/month/11-2026/
+- Magnitude: 0.2
+- applied: C-20261103-1
+
 Newest first. One entry per material finding; a quiet refresh gets one entry saying so. `Track` is subject, tooling, practice, or testing.
 
 ### R-20261030-1 · 2026-10-30 · Quiet: Node 26 is Active LTS

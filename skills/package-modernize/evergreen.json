@@ -14,36 +14,31 @@
   "topic": "modernizing and re-releasing old published libraries: npm, NuGet, PyPI, crates.io, Maven Central and Go registry mechanics (trusted publishing, staged or gated publishing, provenance, deprecation, audit tooling), TypeScript and .NET library packaging defaults, and how AI agents modernize legacy libraries safely",
   "tier": "fast",
   "interval_days": 4.15,
-  "last_checked": "2026-10-30",
-  "next_due": "2026-11-03",
+  "last_checked": "2026-11-03",
+  "next_due": "2026-11-07",
   "verify_at_use": false,
   "volatile_claims": [
     {
       "claim": "GitHub bills private repositories' hosted minutes and storage (Free 2,000 min and 500 MB, Pro 3,000 and 1 GB), self-hosted runner minutes are free, and the $0.002-a-minute self-hosted fee announced for 2026-03-01 is still postponed (references/private-repo-ci.md)",
-      "checked": "2026-09-29",
+      "checked": "2026-11-03",
       "recheck_days": 30.0
     },
     {
       "claim": "npm trusted publishing and provenance accept only GitHub-hosted runners (references/private-repo-ci.md)",
-      "checked": "2026-09-29",
+      "checked": "2026-11-03",
       "recheck_days": 30.0
     }
   ],
   "contradiction": null,
   "events": [
     {
-      "date": "2026-11-01",
-      "label": "nuget-old-api-keys-expire",
-      "settle_days": 2.0
-    },
-    {
       "date": "2026-11-10",
       "label": "dotnet-8-9-eol-dotnet-11-ga",
       "settle_days": 2.0
     },
     {
-      "date": "2026-11-01",
-      "label": "nuget-api-keys-before-2026-08-17-expire",
+      "date": "2026-12-02",
+      "label": "pull-request-target-default-block",
       "settle_days": 2.0
     }
   ],
@@ -89,12 +84,18 @@
       "m": 0.15,
       "interval_after": 4.15,
       "note": "quiet 2026-10-30: Node 26.13.0 LTS (npm 11.20.0), TS 7.0.2, no new TP changelog; cost: searches 1 · fetches 2 · tool calls 4"
+    },
+    {
+      "date": "2026-11-03",
+      "m": 0.2,
+      "interval_after": 4.15,
+      "note": "Actions allowance now $12/$18, self-hosted fee still postponed, npm TP GitHub-hosted only, NuGet old keys expired, Node 26 LTS npm 11.20.0; pull_request_target default 12-02 lead; cost: searches 5 · fetches 4 · tool calls 11"
     }
   ],
   "counts": {
     "learnings": 146,
     "changes": 51,
-    "research": 12,
+    "research": 13,
     "tests": 6
   },
   "consolidate_every": 25,
