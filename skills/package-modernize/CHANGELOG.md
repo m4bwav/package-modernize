@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261105-1 · 2026-11-05 · Test design beyond the golden recording; planted bugs in the review
+- because: user request (book run), Aniche, Effective Software Testing (2022), ch. 2, 3, 5, 6
+- files: references/rewrite-and-review.md (Rewrite, first paragraph), prompts/review-subagent.md (item 5)
+- New tests come from partitions and boundaries, coverage shows gaps and is no target, property tests only where a rule holds, no mocks of types not owned. The review plants bugs by hand: a mutation tool is a cost this step does not need. Not yet run on a package.
+
 ### C-20261103-1 · 2026-11-03 · Actions allowance stated in dollars
 - because: R-20261103-1
 - files: references/private-repo-ci.md (billing bullet)
