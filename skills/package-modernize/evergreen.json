@@ -13,9 +13,9 @@
   "source": null,
   "topic": "modernizing and re-releasing old published libraries: npm, NuGet, PyPI, crates.io, Maven Central and Go registry mechanics (trusted publishing, staged or gated publishing, provenance, deprecation, audit tooling), TypeScript and .NET library packaging defaults, and how AI agents modernize legacy libraries safely",
   "tier": "fast",
-  "interval_days": 4.15,
-  "last_checked": "2026-11-03",
-  "next_due": "2026-11-07",
+  "interval_days": 3,
+  "last_checked": "2026-11-07",
+  "next_due": "2026-11-10",
   "verify_at_use": false,
   "volatile_claims": [
     {
@@ -40,11 +40,16 @@
       "date": "2026-12-02",
       "label": "pull-request-target-default-block",
       "settle_days": 2.0
+    },
+    {
+      "date": "2026-12-02",
+      "label": "pull_request_target-block",
+      "settle_days": 2.0
     }
   ],
   "streak": {
     "quiet": 0,
-    "pinned_min": 0,
+    "pinned_min": 1,
     "pinned_max": 0,
     "vau_quiet": 0
   },
@@ -90,12 +95,18 @@
       "m": 0.2,
       "interval_after": 4.15,
       "note": "Actions allowance now $12/$18, self-hosted fee still postponed, npm TP GitHub-hosted only, NuGet old keys expired, Node 26 LTS npm 11.20.0; pull_request_target default 12-02 lead; cost: searches 5 · fetches 4 · tool calls 11"
+    },
+    {
+      "date": "2026-11-07",
+      "m": 0.35,
+      "interval_after": 3,
+      "note": "pull_request_target block, SDK row; cost: searches 14 · fetches 26 · tool calls 45"
     }
   ],
   "counts": {
     "learnings": 146,
     "changes": 51,
-    "research": 13,
+    "research": 14,
     "tests": 6
   },
   "consolidate_every": 25,

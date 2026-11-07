@@ -4,6 +4,11 @@ Every change to [SKILL.md](SKILL.md) and its companions, newest first, each with
 
 Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (IDs or "user request"), `files:` (file and section), and a sentence on what changed. Cite section headings, not line numbers.
 
+### C-20261107-1 · 2026-11-07 · Survey flags pull_request_target; SDK row current
+- because: R-20261107-1
+- files: references/survey-and-golden.md (first paragraph), references/retrofit.md (gap table), references/nuget.md (SDK row), RESEARCH.md (R-20261103-1 wording)
+- Old workflows using the trigger go in the decisions table before GitHub's December block. The earlier claim that NuGet keys expired was softened to scheduled.
+
 ### C-20261105-1 · 2026-11-05 · Test design beyond the golden recording; planted bugs in the review
 - because: user request (book run), Aniche, Effective Software Testing (2022), ch. 2, 3, 5, 6
 - files: references/rewrite-and-review.md (Rewrite, first paragraph), prompts/review-subagent.md (item 5)
