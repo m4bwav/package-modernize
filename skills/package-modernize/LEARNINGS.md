@@ -142,6 +142,13 @@ The first twelve entries were seeded on 2026-09-25 from the three runs that prec
 - Scope: global (every package the run touches; the maintainer's overlay can opt out)
 - Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-11
 
+### L-171 · 2026-11-08 · Adding JSR to an npm package: explicit types on exported consts, and node_modules for npm deps (`jsr-from-release-yml`)
+- Trigger: the JSR chain added JSR publishing to five modernized npm packages. `npx jsr publish --dry-run` flagged `export const PRNG = Object.freeze({...} as const)` as a slow type (missing explicit type); markdown-plain-link-replacer's dry run failed with "Could not find ... in a node_modules folder" because the jsr CLI runs Deno with `--unstable-byonm`.
+- Rule: `jsr.json` exports `./src/index.ts`, excludes `src/cli.ts`; an exported const object gets an explicit `Readonly<{...}>` type (never `--allow-slow-types`); a package with npm dependencies runs `npm ci --ignore-scripts` before the JSR publish or dry run, and maps them in jsr.json `imports` to `npm:` specifiers. release.yml gets a `jsr` job (`needs: [build, publish]`, `id-token: write`, version copied from package.json, `publish --allow-dirty`), ci.yml a dry-run job in the `ci` gate. OIDC publishing needs the package created on jsr.io and linked to the repository by the maintainer first. A build-time constant (`PACKAGE_VERSION`) is absent in the JSR copy.
+- Evidence: seeded-random-utilities#32, get-title-at-url#39, is-an-image-url#39, replace-string-at-position#14, markdown-plain-link-replacer#25 (2026-11-08); universe-generator-ts did the same before its 1.0.0.
+- Scope: global (npm packages written in TypeScript)
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-11-08
+
 ## Archived entries
 
 Every promoted or merged ID, in order, ten IDs to a line (one line per ID until C-20261011-2, when the list outgrew the 200-line budget): title, then where it went. The full entry (trigger, hypothesis, rule, evidence, where the rule now lives) is in [LEARNINGS-ARCHIVE.md](LEARNINGS-ARCHIVE.md) under the same ID.
