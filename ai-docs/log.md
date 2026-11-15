@@ -47,3 +47,7 @@ Append-only. One line per operation: `## [YYYY-MM-DD] op | title` where op is on
 ## [2026-10-11] update | C-20261011-4 `next-tag-job`: the npm release.yml template gets a `next-tag` job that moves `next` to a stable release once the maintainer approves it (npm 11.21.0 over OIDC, trusted publisher dist-tag permission ticked by the maintainer once per package); references/npm.md "The `next` rule" and SKILL.md Phase 6 rewritten. Maintainer ruling 2026-10-11, R-20261011-1.
 
 - 2026-10-30: evergreen refresh of package-modernize units (see RESEARCH R-20261030-1); next due recorded in evergreen.json.
+
+## 2026-11-15 · package-modernize evergreen refresh
+
+Quiet check (R-20261115-1); no SKILL.md change.

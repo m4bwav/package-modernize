@@ -67,6 +67,13 @@ Best sources (primary first): docs.npmjs.com and github.blog/changelog; learn.mi
 
 ## Findings log
 
+### R-20261115-1 · 2026-11-15 · Quiet check
+- Summary: no npm trusted-publishing changelog entry since 10-02 (expiry of unvalidated configs, issue_comment rejected; already recorded); NuGet's 2026-11-01 cutoff for pre-August API keys has passed, already recorded. Tooling: nothing new. Testing: nothing new.
+- Track: subject, tooling, testing
+- Sources: https://github.blog/changelog/2026-10-02-unvalidated-npm-trusted-publishing-configurations-now-expire, https://devblogs.microsoft.com/dotnet/strengthening-nuget-supply-chain-security-reducing-api-key-lifetime/
+- Magnitude: 0
+- applied: none
+
 ### R-20261107-1 · 2026-11-07 · pull_request_target blocked by default from December 2; versions; lint route to check
 - Summary: from 2026-12-02 Actions blocks `pull_request_target` in public repositories unless an event policy allows it; brownouts 11-09 and 11-16, 16:00 to 18:00 UTC. No template uses it, so the exposure is old workflows in revived repositories. .NET SDK 10.0.403 with runtime 10.0.14. npm 12.2.2, 11.21.2, 10.9.10; tsdown 0.23.7; Node 26.13.0 still bundles npm 11.20.0. typescript-eslint 8.72.1 still caps below TS 6.1 and xo 5.0.1 needs typescript ^6.0.3. Lead, unconfirmed: oxlint's tsgolint tracks TS 7.0.2 (snippets only); leaving xo would be a default change for Mark. zizmor 1.32.0 adds experimental `actions.lock`. dotnet/skills nuget-trusted-publishing 3,959 installs. Unread candidates: svyatov/oss-kit oss-publish, yigitkonur publish-npm-package, so "at most three phases" is untested on them. Lead from a secondary guide: put goldens under CODEOWNERS and deny the agent edit access. NuGet docs, NuGet/login v1.2.0 and #13581 unchanged. No new worm found.
 - Track: subject, tooling, practice, testing

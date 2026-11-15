@@ -13,9 +13,9 @@
   "source": null,
   "topic": "modernizing and re-releasing old published libraries: npm, NuGet, PyPI, crates.io, Maven Central and Go registry mechanics (trusted publishing, staged or gated publishing, provenance, deprecation, audit tooling), TypeScript and .NET library packaging defaults, and how AI agents modernize legacy libraries safely",
   "tier": "fast",
-  "interval_days": 3,
-  "last_checked": "2026-11-07",
-  "next_due": "2026-11-10",
+  "interval_days": 3.75,
+  "last_checked": "2026-11-15",
+  "next_due": "2026-11-19",
   "verify_at_use": false,
   "volatile_claims": [
     {
@@ -32,11 +32,6 @@
   "contradiction": null,
   "events": [
     {
-      "date": "2026-11-10",
-      "label": "dotnet-8-9-eol-dotnet-11-ga",
-      "settle_days": 2.0
-    },
-    {
       "date": "2026-12-02",
       "label": "pull-request-target-default-block",
       "settle_days": 2.0
@@ -48,8 +43,8 @@
     }
   ],
   "streak": {
-    "quiet": 0,
-    "pinned_min": 1,
+    "quiet": 1,
+    "pinned_min": 0,
     "pinned_max": 0,
     "vau_quiet": 0
   },
@@ -101,12 +96,18 @@
       "m": 0.35,
       "interval_after": 3,
       "note": "pull_request_target block, SDK row; cost: searches 14 · fetches 26 · tool calls 45"
+    },
+    {
+      "date": "2026-11-15",
+      "m": 0.0,
+      "interval_after": 3.75,
+      "note": "quiet; cost: searches 2 · fetches 0 · tool calls 2"
     }
   ],
   "counts": {
     "learnings": 146,
     "changes": 51,
-    "research": 14,
+    "research": 15,
     "tests": 6
   },
   "consolidate_every": 25,
