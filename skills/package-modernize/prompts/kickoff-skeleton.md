@@ -42,7 +42,7 @@ Rules:
 
 Remind the maintainer when one of their own tasks blocks you: <revoke tokens, remove OAuth apps, enable secret scanning, add the trusted publisher, approve staged versions>.
 
-After the release is verified, the wiki (Phase 7): a new one with the wikiwright skill when the repository has none, its update mode when it has one. <If ls-remote fails, ask for the first-page click at https://github.com/OWNER/REPO/wiki/_new at the start of Phase 7.>
+After the release is verified, the wiki (Phase 7): a new one with the wikiwright skill when the repository has none, its update mode when it has one. <If ls-remote fails, save the first page yourself at https://github.com/OWNER/REPO/wiki/_new with browser automation (wikiwright L-170 `browser-first-page`); ask for the click only when no browser tool is available.>
 
 At the end: <the deliverables: release verified or stopped cleanly at a stop, the wiki URL and its live check, HANDOFF.md, the inventory row with the wiki, lessons in the skill, the next package>.
 ```
