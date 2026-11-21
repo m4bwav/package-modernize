@@ -14,8 +14,8 @@
   "topic": "modernizing and re-releasing old published libraries: npm, NuGet, PyPI, crates.io, Maven Central and Go registry mechanics (trusted publishing, staged or gated publishing, provenance, deprecation, audit tooling), TypeScript and .NET library packaging defaults, and how AI agents modernize legacy libraries safely",
   "tier": "fast",
   "interval_days": 3.75,
-  "last_checked": "2026-11-15",
-  "next_due": "2026-11-19",
+  "last_checked": "2026-11-20",
+  "next_due": "2026-11-25",
   "verify_at_use": false,
   "volatile_claims": [
     {
@@ -43,7 +43,7 @@
     }
   ],
   "streak": {
-    "quiet": 1,
+    "quiet": 0,
     "pinned_min": 0,
     "pinned_max": 0,
     "vau_quiet": 0
@@ -102,12 +102,18 @@
       "m": 0.0,
       "interval_after": 3.75,
       "note": "quiet; cost: searches 2 · fetches 0 · tool calls 2"
+    },
+    {
+      "date": "2026-11-20",
+      "m": 0.15,
+      "interval_after": 3.75,
+      "note": "Node 27 alpha npm 12.2.2, PolinRider note; cost: searches 1 · fetches 4 · tool calls 8"
     }
   ],
   "counts": {
     "learnings": 146,
     "changes": 51,
-    "research": 15,
+    "research": 16,
     "tests": 6
   },
   "consolidate_every": 25,

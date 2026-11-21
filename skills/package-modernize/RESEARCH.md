@@ -67,6 +67,10 @@ Best sources (primary first): docs.npmjs.com and github.blog/changelog; learn.mi
 
 ## Findings log
 
+### R-20261120-1 · 2026-11-20 · Quiet: Node 27 alpha has npm 12.2.2; PolinRider case
+- Summary: nodejs.org/dist/index.json: v27.0.0-alpha (11-12, 11-16) bundles npm 12.2.2; v26.13.1 LTS (11-10) still bundles npm 11.20.0, so release.yml's exact npm install stays (R-20261023-1 open). Practice: Sonatype's PolinRider (2026-11-03), 12 malicious releases across 10 hijacked, long-dormant npm packages with an Ethereum-fetched second stage: a dated case for retiring old tokens and moving dormant packages to trusted publishing. GitHub changelog 11-17..20: nothing on npm or Packages (pages 2-3 for 11-15..16 not fetched). Testing: publint still 0.3.25. Tooling: not searched.
+- Track: subject, practice, testing · Sources: https://nodejs.org/dist/index.json, https://www.sonatype.com/resources/videos/polinrider-campaign, https://github.blog/changelog/month/11-2026/ · Magnitude: 0.15 · Applied: none (note)
+
 ### R-20261115-1 · 2026-11-15 · Quiet check
 - Summary: no npm trusted-publishing changelog entry since 10-02 (expiry of unvalidated configs, issue_comment rejected; already recorded); NuGet's 2026-11-01 cutoff for pre-August API keys has passed, already recorded. Tooling: nothing new. Testing: nothing new.
 - Track: subject, tooling, testing
